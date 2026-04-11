@@ -61,10 +61,13 @@ public abstract class TransactionDao {
     @Transaction
     public void removeTransaction(TransactionRecord record) {
         int deleted = deleteRecord(record);
-        // Chỉ điều chỉnh số dư nếu bản ghi thực sự đã bị xóa
-        if (deleted == 1) {
-            adjustBalance(record.personId, -calculateDelta(record));
+        // Nếu không xóa được (có thể do ID không tồn tại hoặc dữ liệu bị thay đổi),
+        // ném lỗi ngay để không nảy tiền sai.
+        if (deleted != 1) {
+            throw new IllegalStateException(
+                    "Không thể xóa giao dịch mã " + record.id + ". Dữ liệu có thể đã bị thay đổi.");
         }
+        adjustBalance(record.personId, -calculateDelta(record));
     }
 
     /**
@@ -102,9 +105,6 @@ public abstract class TransactionDao {
         updatePerson(person);
     }
 
-    /**
-     * Giúp máy hiểu: Loại nào là cộng tiền vào nợ, loại nào là trả bớt nợ.
-     */
     private long calculateDelta(TransactionRecord record) {
         switch (record.type) {
             case LEND:
@@ -116,7 +116,10 @@ public abstract class TransactionDao {
             case PAY_BACK:
                 return record.amount; // Mình trả nợ -> Số dư âm tiến về 0 (+)
             default:
-                return 0;
+                // Nếu gặp một loại giao dịch lạ chưa được định nghĩa, báo lỗi ngay để tránh sai
+                // sổ sách.
+                throw new IllegalArgumentException(
+                        "Loại giao dịch lạ (" + record.type + ") cho giao dịch mã " + record.id);
         }
     }
 }
