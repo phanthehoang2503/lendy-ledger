@@ -55,8 +55,9 @@ public abstract class TransactionDao {
      */
     @Transaction
     public void addTransaction(TransactionRecord record) {
+        long delta = calculateDelta(record);
         insertRecord(record);
-        adjustBalance(record.personId, calculateDelta(record));
+        adjustBalance(record.personId, delta);
     }
 
     /**
@@ -136,11 +137,11 @@ public abstract class TransactionDao {
             case LEND:
                 return record.amount; // Cho vay thêm -> Nợ tăng (+)
             case REPAY:
-                return -record.amount; // Họ trả bớt -> Nợ giảm (-)
+                return -record.amount; // Bạn trả bớt -> Nợ giảm (-)
             case BORROW:
-                return -record.amount; // Mình đi vay -> Số dư nợ âm (-)
+                return -record.amount; // Tôi vay -> Số dư nợ âm (-)
             case PAY_BACK:
-                return record.amount; // Mình trả nợ -> Số dư âm tiến về 0 (+)
+                return record.amount; // Tôi trả -> Số dư âm tiến về 0 (+)
             default:
                 throw new IllegalArgumentException(
                         "Loại giao dịch lạ (" + record.type + ") cho giao dịch mã " + record.id);
