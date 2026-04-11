@@ -24,11 +24,11 @@ public abstract class TransactionDao {
 
     // Cập nhật thông tin một giao dịch đã có
     @Update
-    public abstract void updateRecord(TransactionRecord record);
+    public abstract int updateRecord(TransactionRecord record);
 
     // Xóa một giao dịch khỏi máy
     @Delete
-    public abstract void deleteRecord(TransactionRecord record);
+    public abstract int deleteRecord(TransactionRecord record);
 
     // Tìm một người trong danh bạ bằng ID
     @Query("SELECT * FROM people WHERE id = :personId")
@@ -43,12 +43,11 @@ public abstract class TransactionDao {
     public abstract LiveData<List<TransactionRecord>> getTimeline(long personId);
 
     /**
-     * HÀM THÊM GIAO DỊCH:
      * Khi gọi hàm này, máy sẽ vừa lưu lịch sử, vừa tự cộng/trừ tiền vào ví người
      * đó.
      * 
-     * @Transaction đảm bảo nếu một trong hai việc bị lỗi thì máy sẽ không làm gì cả
-     *              (tránh lệch tiền).
+     * @Transaction đảm bảo nếu một trong hai việc bị lỗi thì máy sẽ không làm gì
+     *              cả.
      */
     @Transaction
     public void addTransaction(TransactionRecord record) {
@@ -57,17 +56,18 @@ public abstract class TransactionDao {
     }
 
     /**
-     * HÀM XÓA GIAO DỊCH:
      * Khi xóa một dòng lịch sử, máy sẽ tự động "hoàn nguyên" lại số tiền cũ.
      */
     @Transaction
     public void removeTransaction(TransactionRecord record) {
-        deleteRecord(record);
-        adjustBalance(record.personId, -calculateDelta(record));
+        int deleted = deleteRecord(record);
+        // Chỉ điều chỉnh số dư nếu bản ghi thực sự đã bị xóa
+        if (deleted == 1) {
+            adjustBalance(record.personId, -calculateDelta(record));
+        }
     }
 
     /**
-     * HÀM SỬA GIAO DỊCH:
      * Đây là hàm phức tạp nhất. Nó sẽ:
      * 1. Trừ đi số tiền cũ đã lỡ cộng/trừ trước đó.
      * 2. Cộng lại số tiền mới vừa sửa.
@@ -79,11 +79,15 @@ public abstract class TransactionDao {
         adjustBalance(oldRecord.personId, -calculateDelta(oldRecord));
         // Áp dụng tiền mới
         adjustBalance(newRecord.personId, calculateDelta(newRecord));
-        updateRecord(newRecord);
+
+        int updated = updateRecord(newRecord);
+        if (updated != 1) {
+            throw new IllegalStateException(
+                    "Không thể cập nhật giao dịch. Dữ liệu có thể đã bị thay đổi hoặc không tồn tại.");
+        }
     }
 
     /**
-     * HÀM ĐIỀU CHỈNH SỐ DƯ:
      * Tìm người đó trong máy, lấy số dư cũ cộng thêm phần chênh lệch (delta).
      */
     private void adjustBalance(long personId, long delta) {
@@ -99,7 +103,6 @@ public abstract class TransactionDao {
     }
 
     /**
-     * HÀM TÍNH TOÁN CHÊNH LỆCH:
      * Giúp máy hiểu: Loại nào là cộng tiền vào nợ, loại nào là trả bớt nợ.
      */
     private long calculateDelta(TransactionRecord record) {
