@@ -48,9 +48,11 @@ dependencies {
     implementation(libs.room.runtime)
     annotationProcessor(libs.room.compiler)
 
+    // lombok
+    compileOnly(libs.lombok)
+    annotationProcessor(libs.lombok)
+
     // for managing component such as view model and live data
     implementation(libs.lifecycle.viewmodel)
     implementation(libs.lifecycle.livedata)
-
-
 }
