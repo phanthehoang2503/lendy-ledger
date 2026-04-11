@@ -4,6 +4,7 @@ import androidx.room.Entity;
 import androidx.room.ForeignKey;
 import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
+import androidx.annotation.NonNull;
 import com.lendy.app.data.TransactionType;
 import com.lendy.app.data.converters.TransactionTypeConverter;
 import lombok.Data;
@@ -17,26 +18,20 @@ import lombok.AllArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(tableName = "transactions", foreignKeys = @ForeignKey(entity = Person.class, parentColumns = "id", childColumns = "personId", onDelete = ForeignKey.CASCADE)) // Nếu
-																																																																																			// xóa
-																																																																																			// người
-																																																																																			// nợ,
-																																																																																			// lịch
-																																																																																			// sử
-																																																																																			// giao
-																																																																																			// dịch
-																																																																																			// cũng
-																																																																																			// biến
-																																																																																			// mất
-																																																																																			// theo
-@TypeConverters({ TransactionTypeConverter.class })
-public class TransactionRecord {
+@Entity(tableName = "transactions",
+		foreignKeys = @ForeignKey(entity = Person.class,
+				parentColumns = "id",
+				childColumns = "personId",
+				onDelete = ForeignKey.CASCADE)) // Nếu xóa người nợ, lịch sử giao dịch cũng biến mất theo
+@TypeConverters({TransactionTypeConverter.class})
+public class TransactionRecord { // <-- lo cái này trở xuống kệ đống anote trên đi.
 	@PrimaryKey(autoGenerate = true)
-	public long id; // Mã giao dịch tự động tăng
-	public long personId; // Mã người nợ liên kết (ID của bảng Person)
-	public long amount; // Số tiền giao dịch
-	public TransactionType type; // Loại giao dịch (Vay/Trả...)
-	public String note; // Ghi chú đính kèm
-	public String imageUri; // Ảnh đính kèm (Lưu đường dẫn ảnh)
-	public long timestamp; // Thời gian thực hiện
+	public long id;
+	public long personId;
+	public long amount;
+	@NonNull
+	public TransactionType type;
+	public String note;
+	public String imageUri;
+	public long timestamp;
 }
