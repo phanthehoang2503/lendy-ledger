@@ -106,6 +106,11 @@ public abstract class TransactionDao {
     }
 
     private long calculateDelta(TransactionRecord record) {
+        if (record.amount < 0) {
+            // Không chấp nhận số tiền âm để tránh làm sai lệch logic sổ sách
+            throw new IllegalArgumentException("Số tiền không được âm cho giao dịch mã " + record.id);
+        }
+
         switch (record.type) {
             case LEND:
                 return record.amount; // Cho vay thêm -> Nợ tăng (+)
@@ -116,8 +121,6 @@ public abstract class TransactionDao {
             case PAY_BACK:
                 return record.amount; // Mình trả nợ -> Số dư âm tiến về 0 (+)
             default:
-                // Nếu gặp một loại giao dịch lạ chưa được định nghĩa, báo lỗi ngay để tránh sai
-                // sổ sách.
                 throw new IllegalArgumentException(
                         "Loại giao dịch lạ (" + record.type + ") cho giao dịch mã " + record.id);
         }
