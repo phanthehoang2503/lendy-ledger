@@ -3,10 +3,10 @@ package com.lendy.app.data.dao;
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
-import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
+import androidx.room.Upsert;
 import com.lendy.app.data.entities.Person;
 import com.lendy.app.data.model.SummaryDTO;
 
@@ -18,8 +18,8 @@ import java.util.List;
  *****************************************************************************/
 @Dao
 public interface PersonDao {
-    // Thêm một người mới, nếu trùng ID thì ghi đè lên cái cũ
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    // Thêm hoặc cập nhật một người nợ
+    @Upsert
     long insert(Person person);
 
     // Cập nhật thông tin của một người
@@ -54,8 +54,8 @@ public interface PersonDao {
      * trị tuyệt đối).
      */
     @Query("SELECT " +
-            "SUM(CASE WHEN totalBalance > 0 THEN totalBalance ELSE 0 END) as totalLending, " +
-            "SUM(CASE WHEN totalBalance < 0 THEN ABS(totalBalance) ELSE 0 END) as totalBorrowing " +
+            "COALESCE(SUM(CASE WHEN totalBalance > 0 THEN totalBalance ELSE 0 END), 0) as totalLending, " +
+            "COALESCE(SUM(CASE WHEN totalBalance < 0 THEN ABS(totalBalance) ELSE 0 END), 0) as totalBorrowing " +
             "FROM people")
     LiveData<SummaryDTO> getGlobalSummary();
 }
