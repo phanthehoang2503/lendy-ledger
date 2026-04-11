@@ -30,6 +30,10 @@ public abstract class TransactionDao {
     @Delete
     public abstract int deleteRecord(TransactionRecord record);
 
+    // Lấy thông tin một giao dịch cụ thể
+    @Query("SELECT * FROM transactions WHERE id = :id")
+    public abstract TransactionRecord getRecordByIdSync(long id);
+
     // Tìm một người trong danh bạ bằng ID
     @Query("SELECT * FROM people WHERE id = :personId")
     public abstract Person getPersonSync(long personId);
@@ -60,14 +64,20 @@ public abstract class TransactionDao {
      */
     @Transaction
     public void removeTransaction(TransactionRecord record) {
-        int deleted = deleteRecord(record);
-        // Nếu không xóa được (có thể do ID không tồn tại hoặc dữ liệu bị thay đổi),
-        // ném lỗi ngay để không nảy tiền sai.
+        // Lấy dữ liệu thật từ DB để đảm bảo không bị sai lệch số dư nếu object truyền
+        // vào bị cũ (stale)
+        TransactionRecord persistedRecord = getRecordByIdSync(record.id);
+        if (persistedRecord == null) {
+            throw new IllegalStateException("Không tìm thấy giao dịch mã " + record.id + " để xóa.");
+        }
+
+        int deleted = deleteRecord(persistedRecord);
         if (deleted != 1) {
             throw new IllegalStateException(
                     "Không thể xóa giao dịch mã " + record.id + ". Dữ liệu có thể đã bị thay đổi.");
         }
-        adjustBalance(record.personId, -calculateDelta(record));
+
+        adjustBalance(persistedRecord.personId, -calculateDelta(persistedRecord));
     }
 
     /**
@@ -78,15 +88,26 @@ public abstract class TransactionDao {
      */
     @Transaction
     public void updateTransaction(TransactionRecord oldRecord, TransactionRecord newRecord) {
-        // Hoàn nguyên tiền cũ
-        adjustBalance(oldRecord.personId, -calculateDelta(oldRecord));
-        // Áp dụng tiền mới
+        if (oldRecord.id != newRecord.id) {
+            throw new IllegalArgumentException("Không thể cập nhật: ID giao dịch cũ và mới không khớp.");
+        }
+
+        // Lấy dữ liệu cũ từ DB để tính toán chênh lệch
+        TransactionRecord persistedOldRecord = getRecordByIdSync(oldRecord.id);
+        if (persistedOldRecord == null) {
+            throw new IllegalStateException("Không tìm thấy giao dịch cũ mã " + oldRecord.id);
+        }
+
+        // 1. Hoàn nguyên tiền cũ
+        adjustBalance(persistedOldRecord.personId, -calculateDelta(persistedOldRecord));
+
+        // 2. Áp dụng tiền mới
         adjustBalance(newRecord.personId, calculateDelta(newRecord));
 
+        // 3. Lưu dữ liệu mới
         int updated = updateRecord(newRecord);
         if (updated != 1) {
-            throw new IllegalStateException(
-                    "Không thể cập nhật giao dịch. Dữ liệu có thể đã bị thay đổi hoặc không tồn tại.");
+            throw new IllegalStateException("Không thể cập nhật giao dịch. Bản ghi có thể đã bị xóa.");
         }
     }
 
