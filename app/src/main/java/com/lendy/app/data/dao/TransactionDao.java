@@ -43,7 +43,7 @@ public abstract class TransactionDao {
     public abstract void updatePerson(Person person);
 
     // Lấy toàn bộ lịch sử giao dịch của một người, cái mới nhất hiện lên đầu
-    @Query("SELECT * FROM transactions WHERE personId = :personId ORDER BY timestamp DESC")
+    @Query("SELECT * FROM transactions WHERE personId = :personId ORDER BY timestamp DESC, id DESC")
     public abstract LiveData<List<TransactionRecord>> getTimeline(long personId);
 
     /**
