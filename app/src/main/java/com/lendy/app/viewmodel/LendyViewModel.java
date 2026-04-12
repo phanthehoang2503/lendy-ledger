@@ -10,6 +10,7 @@ import com.lendy.app.data.model.SummaryDTO;
 import com.lendy.app.repository.LendyRepository;
 
 import java.util.List;
+import java.util.Objects;
 
 import lombok.Getter;
 
@@ -18,6 +19,8 @@ public class LendyViewModel extends ViewModel {
     @Getter
     private final LiveData<List<Person>> activeDebts;
     @Getter
+    private final LiveData<List<Person>> completedDebts;
+    @Getter
     private final LiveData<SummaryDTO> globalSummary;
     @Getter
     private final LiveData<Event<String>> errorObserver;
@@ -25,6 +28,7 @@ public class LendyViewModel extends ViewModel {
     public LendyViewModel(LendyRepository repository) {
         this.repository = Objects.requireNonNull(repository, "repository must not be null");
         this.activeDebts = repository.getActiveDebts();
+        this.completedDebts = repository.getCompletedDebts();
         this.globalSummary = repository.getGlobalSummary();
         this.errorObserver = repository.getErrorNotifier();
     }
