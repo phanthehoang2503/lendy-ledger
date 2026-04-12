@@ -68,5 +68,7 @@ public class TransactionDaoTest {
         List<TransactionRecord> timeline = LiveDataTestUtil.getOrAwaitValue(transactionDao.getTimeline(1L));
         assertEquals(1, timeline.size());
         assertEquals(500000L, timeline.get(0).getAmount());
+        assertEquals(TransactionType.LEND, timeline.get(0).getType());
+        assertEquals(1L, timeline.get(0).getPersonId());
     }
 }
