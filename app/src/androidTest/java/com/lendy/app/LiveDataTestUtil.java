@@ -22,8 +22,12 @@ public class LiveDataTestUtil {
         };
         liveData.observeForever(observer);
 
-        if (!latch.await(2, TimeUnit.SECONDS)) {
-            throw new TimeoutException("LiveData value was never set.");
+        try {
+            if (!latch.await(2, TimeUnit.SECONDS)) {
+                throw new TimeoutException("LiveData value was never set.");
+            }
+        } finally {
+            liveData.removeObserver(observer);
         }
 
         @SuppressWarnings("unchecked")

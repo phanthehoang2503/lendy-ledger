@@ -60,9 +60,11 @@ public class TransactionDaoTest {
         );
         transactionDao.addTransaction(record);
 
-        // Check if Person's balance was updated directly from trigger/logic if there is any
-        // Since logic might be in repository, wait, looking at repo, it just calls dao.addTransaction
-        // Let's see timeline
+        // Assert person's balance was updated
+        Person updatedPerson = LiveDataTestUtil.getOrAwaitValue(personDao.getPersonById(1L));
+        assertEquals(500000L, updatedPerson.getTotalBalance());
+
+        // Assert timeline
         List<TransactionRecord> timeline = LiveDataTestUtil.getOrAwaitValue(transactionDao.getTimeline(1L));
         assertEquals(1, timeline.size());
         assertEquals(500000L, timeline.get(0).getAmount());

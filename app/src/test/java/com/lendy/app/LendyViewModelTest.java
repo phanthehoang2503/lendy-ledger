@@ -66,7 +66,8 @@ public class LendyViewModelTest {
         liveData.setValue(Collections.emptyList());
         when(repository.getTimeline(1L)).thenReturn(liveData);
 
-        viewModel.getTimeline(1L);
+        androidx.lifecycle.LiveData<List<TransactionRecord>> result = viewModel.getTimeline(1L);
         verify(repository).getTimeline(1L);
+        org.junit.Assert.assertSame(liveData, result);
     }
 }
