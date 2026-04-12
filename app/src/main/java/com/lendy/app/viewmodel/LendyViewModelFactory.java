@@ -1,7 +1,3 @@
-/******************************************************************************
- * ../viewmodel/LendyViewModelFactory.java - LendyViewModelFactory
- * CHỨC NĂNG: Giúp khởi tạo ViewModel kèm theo tham số Repository.
- *****************************************************************************/
 package com.lendy.app.viewmodel;
 
 import androidx.annotation.NonNull;
@@ -9,6 +5,10 @@ import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 import com.lendy.app.repository.LendyRepository;
 
+/******************************************************************************
+ * ../viewmodel/LendyViewModelFactory.java - LendyViewModelFactory
+ * khởi tạo ViewModel kèm theo tham số Repository.
+ *****************************************************************************/
 public class LendyViewModelFactory implements ViewModelProvider.Factory {
     private final LendyRepository repository;
 

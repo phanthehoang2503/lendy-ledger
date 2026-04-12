@@ -2,6 +2,8 @@
 package com.lendy.app.repository;
 
 import android.app.Application;
+import android.util.Log;
+
 import androidx.lifecycle.LiveData;
 import com.lendy.app.data.LendyDatabase;
 import com.lendy.app.data.dao.TransactionDao;
@@ -21,6 +23,7 @@ import java.util.concurrent.Executors;
  * liệu.
  *****************************************************************************/
 public class LendyRepository {
+    private static final String TAG = "LendyRepository";
     private final TransactionDao transactionDao;
     private final PersonDao personDao;
 
@@ -45,7 +48,7 @@ public class LendyRepository {
             try {
                 transactionDao.addTransaction(record);
             } catch (Exception e) {
-                errorNotifier.postValue(new Event<>("Lỗi lưu giao dịch: " + e.getMessage()));
+                postError("Lỗi lưu giao dịch.", e);
             }
         });
     }
@@ -59,7 +62,7 @@ public class LendyRepository {
             try {
                 transactionDao.updateTransaction(oldRecord, newRecord);
             } catch (Exception e) {
-                errorNotifier.postValue(new Event<>("Lỗi cập nhật giao dịch: " + e.getMessage()));
+                postError("Lỗi cập nhật giao dịch.", e);
             }
         });
     }
@@ -73,7 +76,7 @@ public class LendyRepository {
             try {
                 transactionDao.removeTransaction(record);
             } catch (Exception e) {
-                errorNotifier.postValue(new Event<>("Lỗi xóa giao dịch: " + e.getMessage()));
+                postError("Lỗi xóa giao dịch.", e);
             }
         });
     }
@@ -86,8 +89,7 @@ public class LendyRepository {
             try {
                 personDao.insert(person);
             } catch (Exception e) {
-                errorNotifier.postValue(new Event<>("Lỗi lưu người nợ: " + e.getMessage()));
-            }
+                postError("Lỗi lưu người nợ.", e);            }
         });
     }
 
@@ -97,9 +99,14 @@ public class LendyRepository {
             try {
                 personDao.delete(person);
             } catch (Exception e) {
-                errorNotifier.postValue(new Event<>("Lỗi xóa người nợ: " + e.getMessage()));
-            }
+                postError("Lỗi xóa người nợ.", e);            }
         });
+    }
+
+    // Utils
+    private void postError(String userMessage, Exception e) {
+        Log.e(TAG, userMessage, e);
+        errorNotifier.postValue(new Event<>(userMessage));
     }
 
     // --- CÁC HÀM TRUY VẤN DỮ LIỆU (GETTERS) ---
