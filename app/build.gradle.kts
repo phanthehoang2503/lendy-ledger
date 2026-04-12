@@ -55,4 +55,10 @@ dependencies {
     // for managing component such as view model and live data
     implementation(libs.lifecycle.viewmodel)
     implementation(libs.lifecycle.livedata)
+
+    // for testing
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.core.testing)
+    androidTestImplementation(libs.core.testing)
+    androidTestImplementation(libs.room.testing)
 }
