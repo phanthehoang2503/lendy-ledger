@@ -17,9 +17,9 @@ import lombok.AllArgsConstructor;
 @Entity(tableName = "people")
 public class Person {
     @PrimaryKey(autoGenerate = true)
-    public long id; // Mã số định danh tự động tăng
-    public String name; // Tên người nợ
-    public String phoneNumber; // Số điện thoại
-    public long totalBalance; // Số dư nợ (Dương: họ nợ mình, Âm: mình nợ họ)
-    public long updatedAt; // Thời điểm cập nhật cuối cùng
+    public long id;
+    public String name;
+    public String phoneNumber;
+    public long totalBalance;
+    public long updatedAt;
 }

@@ -2,10 +2,13 @@
 package com.lendy.app.repository;
 
 import android.app.Application;
+import android.util.Log;
+
 import androidx.lifecycle.LiveData;
 import com.lendy.app.data.LendyDatabase;
 import com.lendy.app.data.dao.TransactionDao;
 import com.lendy.app.data.dao.PersonDao;
+import com.lendy.app.utils.Event;
 import com.lendy.app.data.entities.Person;
 import com.lendy.app.data.entities.TransactionRecord;
 import com.lendy.app.data.model.SummaryDTO;
@@ -20,10 +23,11 @@ import java.util.concurrent.Executors;
  * liệu.
  *****************************************************************************/
 public class LendyRepository {
+    private static final String TAG = "LendyRepository";
     private final TransactionDao transactionDao;
     private final PersonDao personDao;
 
-    private final MutableLiveData<String> errorNotifier = new MutableLiveData<>();
+    private final MutableLiveData<Event<String>> errorNotifier = new MutableLiveData<>();
 
     // Bộ máy chạy ngầm: Giúp thực hiện lưu/xóa dữ liệu mà không làm đứng màn hình
     // điện thoại
@@ -44,7 +48,7 @@ public class LendyRepository {
             try {
                 transactionDao.addTransaction(record);
             } catch (Exception e) {
-                errorNotifier.postValue("Lỗi thêm giao dịch: " + e.getMessage());
+                postError("Lỗi lưu giao dịch.", e);
             }
         });
     }
@@ -58,7 +62,7 @@ public class LendyRepository {
             try {
                 transactionDao.updateTransaction(oldRecord, newRecord);
             } catch (Exception e) {
-                errorNotifier.postValue("Lỗi cập nhật: " + e.getMessage());
+                postError("Lỗi cập nhật giao dịch.", e);
             }
         });
     }
@@ -72,12 +76,12 @@ public class LendyRepository {
             try {
                 transactionDao.removeTransaction(record);
             } catch (Exception e) {
-                errorNotifier.postValue("Lỗi xóa giao dịch: " + e.getMessage());
+                postError("Lỗi xóa giao dịch.", e);
             }
         });
     }
 
-    // --- CÁC THAO TÁC VỚI NGƯỜI NỢ (PERSON) ---
+    // --- CÁC THAO TÁC VỚI NGƯỜI NỢ ---
 
     // Thêm hoặc cập nhật một người nợ
     public void upsertPerson(Person person) {
@@ -85,20 +89,24 @@ public class LendyRepository {
             try {
                 personDao.insert(person);
             } catch (Exception e) {
-                errorNotifier.postValue("Lỗi lưu thông tin người nợ: " + e.getMessage());
-            }
+                postError("Lỗi lưu người nợ.", e);            }
         });
     }
 
-    // Xóa một người khỏi danh sách (Xóa luôn cả lịch sử liên quan)
+    // Xóa một người khỏi danh sách
     public void deletePerson(Person person) {
         executor.execute(() -> {
             try {
                 personDao.delete(person);
             } catch (Exception e) {
-                errorNotifier.postValue("Lỗi xóa người nợ: " + e.getMessage());
-            }
+                postError("Lỗi xóa người nợ.", e);            }
         });
+    }
+
+    // Utils
+    private void postError(String userMessage, Exception e) {
+        Log.e(TAG, userMessage, e);
+        errorNotifier.postValue(new Event<>(userMessage));
     }
 
     // --- CÁC HÀM TRUY VẤN DỮ LIỆU (GETTERS) ---
@@ -136,7 +144,7 @@ public class LendyRepository {
         return personDao.getGlobalSummary();
     }
 
-    public LiveData<String> getErrorNotifier() {
+    public LiveData<Event<String>> getErrorNotifier() {
         return errorNotifier;
     }
 }
