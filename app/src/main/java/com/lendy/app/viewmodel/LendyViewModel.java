@@ -10,7 +10,6 @@ import com.lendy.app.data.model.SummaryDTO;
 import com.lendy.app.repository.LendyRepository;
 
 import java.util.List;
-import java.util.Objects;
 
 import lombok.Getter;
 
