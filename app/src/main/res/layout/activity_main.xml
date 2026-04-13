@@ -12,7 +12,7 @@
         android:id="@+id/app_bar_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/primary"
+        android:background="@drawable/bg_header_gradient"
         app:elevation="0dp">
 
         <com.google.android.material.appbar.MaterialToolbar
@@ -26,34 +26,46 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:minHeight="80dp"
-            android:paddingBottom="16dp">
+            android:minHeight="100dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="50dp">
+
+            <TextView
+                android:id="@+id/welcome_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="16dp"
+                android:text="Xin chào,"
+                android:textColor="@color/text_white_secondary"
+                android:textSize="14sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/welcome_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"
-                android:layout_marginTop="12dp"
-                android:text="Xin chào"
+                android:layout_marginTop="2dp"
+                android:text="Lendy User"
                 android:textColor="@color/white"
-                android:textSize="24sp"
+                android:textSize="28sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toBottomOf="@id/welcome_label" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <!-- FIX LỖI ANCHOR: Gắn Card vào AppBarLayout -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/summary_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="20dp"
-        app:cardCornerRadius="20dp"
-        app:cardElevation="8dp"
+        app:cardCornerRadius="24dp"
+        app:cardElevation="12dp"
         app:layout_anchor="@id/app_bar_layout"
         app:layout_anchorGravity="bottom"
         app:strokeWidth="0dp">
@@ -63,7 +75,8 @@
             android:layout_height="wrap_content"
             android:background="@color/white"
             android:orientation="horizontal"
-            android:padding="16dp">
+            android:paddingVertical="20dp"
+            android:paddingHorizontal="16dp">
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -77,26 +90,27 @@
                     android:layout_height="wrap_content"
                     android:text="Họ nợ mình"
                     android:textColor="@color/outline"
-                    android:textSize="11sp"
+                    android:textSize="12sp"
                     android:textAllCaps="true"
-                    android:letterSpacing="0.05" />
+                    android:letterSpacing="0.05"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/textTotalLending"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="0 ₫"
+                    android:layout_marginTop="6dp"
+                    android:text="+đ 0"
                     android:textColor="@color/receivable"
-                    android:textSize="17sp"
+                    android:textSize="20sp"
                     android:textStyle="bold" />
             </LinearLayout>
 
             <View
                 android:layout_width="1dp"
-                android:layout_height="30dp"
+                android:layout_height="40dp"
                 android:layout_gravity="center"
-                android:background="#F0F0F0" />
+                android:background="#EEEEEE" />
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -110,18 +124,19 @@
                     android:layout_height="wrap_content"
                     android:text="Mình nợ họ"
                     android:textColor="@color/outline"
-                    android:textSize="11sp"
+                    android:textSize="12sp"
                     android:textAllCaps="true"
-                    android:letterSpacing="0.05" />
+                    android:letterSpacing="0.05"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/textTotalBorrowing"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="0 ₫"
+                    android:layout_marginTop="6dp"
+                    android:text="-đ 0"
                     android:textColor="@color/payable"
-                    android:textSize="17sp"
+                    android:textSize="20sp"
                     android:textStyle="bold" />
             </LinearLayout>
 
@@ -150,29 +165,30 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <ImageView
-            android:layout_width="120dp"
-            android:layout_height="120dp"
-            android:alpha="0.2"
-            android:src="@android:drawable/ic_menu_edit"
-            app:tint="@color/primary" />
+            android:layout_width="140dp"
+            android:layout_height="140dp"
+            android:alpha="0.15"
+            android:src="@android:drawable/ic_menu_agenda"
+            app:tint="@color/primary_dark" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="Chưa có ai nợ bạn cả"
-            android:textColor="@color/outline"
-            android:textSize="18sp"
+            android:layout_marginTop="24dp"
+            android:text="Sổ nợ đang trống"
+            android:textColor="@color/black"
+            android:textSize="20sp"
             android:textStyle="bold" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="12dp"
             android:gravity="center"
-            android:text="Nhấn nút \'+\' bên dưới để thêm người nợ đầu tiên nhé!"
+            android:text="Hãy nhấn nút '+' để bắt đầu ghi lại \nnhững khoản nợ đầu tiên nhé!"
             android:textColor="@color/outline"
-            android:textSize="14sp" />
+            android:textSize="15sp"
+            android:lineSpacingExtra="4dp" />
 
     </LinearLayout>
 

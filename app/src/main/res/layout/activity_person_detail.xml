@@ -10,7 +10,7 @@
         android:id="@+id/detail_app_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/primary"
+        android:background="@drawable/bg_header_gradient"
         app:elevation="0dp">
 
         <com.google.android.material.appbar.MaterialToolbar
@@ -26,7 +26,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:minHeight="100dp"
-            android:paddingBottom="24dp">
+            android:paddingTop="16dp"
+            android:paddingBottom="42dp">
 
             <TextView
                 android:id="@+id/textDetailName"
@@ -58,8 +59,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="20dp"
-        app:cardCornerRadius="20dp"
-        app:cardElevation="8dp"
+        app:cardCornerRadius="24dp"
+        app:cardElevation="12dp"
         app:layout_anchor="@id/detail_app_bar"
         app:layout_anchorGravity="bottom"
         app:strokeWidth="0dp">
@@ -107,7 +108,7 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
         android:src="@android:drawable/ic_input_add"
-        app:backgroundTint="@color/primary"
+        app:backgroundTint="@color/primary_gradient_end"
         app:tint="@color/white" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
