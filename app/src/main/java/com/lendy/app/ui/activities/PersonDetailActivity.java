@@ -293,6 +293,7 @@ public class PersonDetailActivity extends AppCompatActivity {
                 newRecord.amount = newAmount;
                 newRecord.type = oldRecord.type;
                 newRecord.note = newNote;
+                newRecord.imageUri = oldRecord.imageUri;
                 newRecord.timestamp = oldRecord.timestamp;
 
                 viewModel.updateTransaction(oldRecord, newRecord);
