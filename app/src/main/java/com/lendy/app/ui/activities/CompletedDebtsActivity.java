@@ -1,4 +1,4 @@
-package com.lendy.app;
+package com.lendy.app.ui.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,9 +11,15 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.lendy.app.R;
+import com.lendy.app.data.entities.Person;
 import com.lendy.app.repository.LendyRepository;
+import com.lendy.app.ui.adapters.PersonAdapter;
 import com.lendy.app.viewmodel.LendyViewModel;
 import com.lendy.app.viewmodel.LendyViewModelFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class CompletedDebtsActivity extends AppCompatActivity {
 
@@ -44,7 +50,7 @@ public class CompletedDebtsActivity extends AppCompatActivity {
             intent.putExtra(PersonDetailActivity.EXTRA_PERSON_PHONE, person.phoneNumber);
             startActivity(intent);
         }, person -> {
-            // Có thể thêm chức năng xóa ở đây nếu muốn
+            // Không làm gì cả (cái này để sau rồi làm...)
         });
         recyclerView.setAdapter(adapter);
     }
@@ -52,15 +58,15 @@ public class CompletedDebtsActivity extends AppCompatActivity {
     private void setupViewModel() {
         LendyRepository repository = new LendyRepository(getApplication());
         viewModel = new ViewModelProvider(this, new LendyViewModelFactory(repository)).get(LendyViewModel.class);
-        
+
         viewModel.getCompletedDebts().observe(this, people -> {
-            if (people == null || people.isEmpty()) {
+            List<Person> safeList = (people != null) ? people : new ArrayList<>();
+            if (safeList.isEmpty()) {
                 textNoData.setVisibility(View.VISIBLE);
-                adapter.setPeople(people);
             } else {
                 textNoData.setVisibility(View.GONE);
-                adapter.setPeople(people);
             }
+            adapter.setPeople(safeList);
         });
     }
 }

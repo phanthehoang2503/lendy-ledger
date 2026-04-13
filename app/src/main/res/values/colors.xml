@@ -4,10 +4,14 @@
     <color name="white">#FFFFFFFF</color>
 
     <!-- Deep Navy Theme - Light Version -->
+    <!-- Gradient Colors - Deep Ocean -->
     <color name="primary">#0D47A1</color>
-    <color name="primary_dark">#002171</color>
+    <color name="primary_gradient_start">#0D47A1</color>
+    <color name="primary_gradient_end">#1A237E</color>
+    <color name="primary_dark">#001064</color>
     <color name="primary_light">#5472D3</color>
     <color name="primary_container">#E3F2FD</color>
+    <color name="text_white_secondary">#B3FFFFFF</color>
 
     <!-- Status Colors -->
     <color name="receivable">#2E7D32</color> <!-- Xanh lá chuẩn -->

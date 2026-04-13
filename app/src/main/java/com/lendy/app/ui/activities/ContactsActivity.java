@@ -1,4 +1,4 @@
-package com.lendy.app;
+package com.lendy.app.ui.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,11 +10,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.appcompat.app.AlertDialog;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
+import com.lendy.app.R;
 import com.lendy.app.data.entities.Person;
 import com.lendy.app.repository.LendyRepository;
+import com.lendy.app.ui.adapters.PersonAdapter;
 import com.lendy.app.viewmodel.LendyViewModel;
 import com.lendy.app.viewmodel.LendyViewModelFactory;
 
@@ -59,6 +62,8 @@ public class ContactsActivity extends AppCompatActivity {
         View v = LayoutInflater.from(this).inflate(R.layout.dialog_add_person, null);
         v.findViewById(R.id.layoutAmount).setVisibility(View.GONE);
         v.findViewById(R.id.toggleGroup).setVisibility(View.GONE);
+        v.findViewById(R.id.layoutNote).setVisibility(View.GONE);
+        v.findViewById(R.id.scrollChips).setVisibility(View.GONE);
 
         TextInputEditText editName = v.findViewById(R.id.editName);
         TextInputEditText editPhone = v.findViewById(R.id.editPhone);
@@ -66,16 +71,33 @@ public class ContactsActivity extends AppCompatActivity {
         editName.setText(person.name);
         editPhone.setText(person.phoneNumber);
 
-        new MaterialAlertDialogBuilder(this)
+        AlertDialog dialog = new MaterialAlertDialogBuilder(this)
                 .setTitle(R.string.edit_person)
                 .setView(v)
-                .setPositiveButton("Lưu", (d, w) -> {
-                    String name = editName.getText().toString().trim();
-                    if (name.isEmpty()) return;
-                    person.name = name;
-                    person.phoneNumber = editPhone.getText().toString().trim();
-                    viewModel.addPerson(person); // upsert
-                })
-                .setNegativeButton("Hủy", null).show();
+                .setPositiveButton("Lưu", null) // Để null để tự xử lý click sau show()
+                .setNegativeButton("Hủy", null)
+                .create();
+
+        dialog.setOnShowListener(dialogInterface -> {
+            android.widget.Button button = dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE);
+            button.setOnClickListener(view -> {
+                String name = editName.getText().toString().trim();
+                String phone = editPhone.getText().toString().trim();
+
+                if (name.isEmpty()) {
+                    editName.setError("Vui lòng nhập tên người nợ");
+                    return;
+                }
+
+                person.name = name;
+                person.phoneNumber = phone;
+                person.updatedAt = System.currentTimeMillis();
+
+                viewModel.addPerson(person);
+                dialog.dismiss();
+            });
+        });
+
+        dialog.show();
     }
 }

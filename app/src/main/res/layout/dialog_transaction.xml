@@ -6,44 +6,40 @@
     android:orientation="vertical"
     android:padding="24dp">
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/layoutName"
-        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+    <!-- Toggle Group: Vay / Trả -->
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/toggleGroup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Tên người nợ"
-        android:layout_marginBottom="12dp">
+        android:layout_marginBottom="16dp"
+        app:checkedButton="@id/btnLending"
+        app:singleSelection="true"
+        app:selectionRequired="true">
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/editName"
-            android:layout_width="match_parent"
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnLending"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:inputType="textPersonName" />
-    </com.google.android.material.textfield.TextInputLayout>
+            android:layout_weight="1"
+            android:text="Cho Vay Thêm" />
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/layoutPhone"
-        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Số điện thoại (không bắt buộc)"
-        android:layout_marginBottom="12dp">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/editPhone"
-            android:layout_width="match_parent"
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnBorrowing"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:inputType="phone" />
-    </com.google.android.material.textfield.TextInputLayout>
+            android:layout_weight="1"
+            android:text="Trả Nợ/Thu" />
+    </com.google.android.material.button.MaterialButtonToggleGroup>
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/layoutAmount"
         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Số tiền"
-        android:layout_marginBottom="8dp"
-        app:suffixText="đ">
+        android:hint="@string/amount"
+        app:endIconMode="clear_text">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/editAmount"
@@ -52,14 +48,13 @@
             android:inputType="number" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <!-- Quick Chips Area -->
     <HorizontalScrollView
-        android:id="@+id/scrollChips"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
+        android:layout_marginTop="16dp"
         android:scrollbars="none">
 
+        <!-- Các nút gợi ý số tiền nhanh -->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -111,8 +106,8 @@
         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:hint="Lý do / Ghi chú (tùy chọn)"
-        android:layout_marginBottom="16dp"
         app:startIconDrawable="@android:drawable/ic_menu_edit">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -121,31 +116,5 @@
             android:layout_height="wrap_content"
             android:inputType="textCapSentences" />
     </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.button.MaterialButtonToggleGroup
-        android:id="@+id/toggleGroup"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginBottom="8dp"
-        app:checkedButton="@+id/btnLending"
-        app:singleSelection="true">
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnLending"
-            style="@style/Widget.Material3.Button.OutlinedButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Họ nợ tôi" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnBorrowing"
-            style="@style/Widget.Material3.Button.OutlinedButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Tôi nợ họ" />
-    </com.google.android.material.button.MaterialButtonToggleGroup>
 
 </LinearLayout>

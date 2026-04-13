@@ -1,4 +1,3 @@
-
 package com.lendy.app.repository;
 
 import android.app.Application;
@@ -17,42 +16,59 @@ import androidx.lifecycle.MutableLiveData;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import androidx.annotation.VisibleForTesting;
 
+/******************************************************************************
+ * ../repository/LendyRepository.java - LendyRepository
+ * Điều phối dữ liệu giữa Giao diện (UI) và Cơ sở dữ liệu.
+ * Đóng gói các thao tác nền, đảm bảo tính nguyên tử qua bộ máy chạy ngầm.
+ *****************************************************************************/
 public class LendyRepository {
     private static final String TAG = "LendyRepository";
+    private final LendyDatabase db;
     private final TransactionDao transactionDao;
     private final PersonDao personDao;
     private final MutableLiveData<Event<String>> errorNotifier = new MutableLiveData<>();
-    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private final ExecutorService executor;
 
+    // Default Constructor for App usage
     public LendyRepository(Application application) {
-        LendyDatabase db = LendyDatabase.getInstance(application);
-        transactionDao = db.transactionDao();
-        personDao = db.personDao();
+        this(LendyDatabase.getInstance(application), Executors.newSingleThreadExecutor());
     }
 
-    public void addPersonWithBalance(Person person, long amount, TransactionType type) {
+    // Constructor for Testing (DI - DI là gì thì lên mạng search ngen)
+    @VisibleForTesting // hàm này cho test thôi khỏi cần trình bày
+    LendyRepository(LendyDatabase db, ExecutorService executor) {
+        this.db = db;
+        this.transactionDao = db.transactionDao();
+        this.personDao = db.personDao();
+        this.executor = executor;
+    }
+
+    // Add person with debt
+    public void addPersonWithBalance(Person person, long amount, TransactionType type, String note) {
         executor.execute(() -> {
             try {
-                person.totalBalance = 0;
-                long personId = personDao.insert(person);
-                
-                if (amount != 0) {
-                    TransactionRecord firstRecord = new TransactionRecord();
-                    firstRecord.personId = personId;
-                    firstRecord.amount = Math.abs(amount);
-                    firstRecord.type = type;
-                    firstRecord.timestamp = System.currentTimeMillis();
-                    firstRecord.note = "Khởi tạo số nợ";
-                    transactionDao.addTransaction(firstRecord);
-                }
+                db.runInTransaction(() -> {
+                    person.totalBalance = 0;
+                    long personId = personDao.insert(person);
+
+                    if (amount != 0) {
+                        TransactionRecord firstRecord = new TransactionRecord();
+                        firstRecord.personId = personId;
+                        firstRecord.amount = Math.abs(amount);
+                        firstRecord.type = type;
+                        firstRecord.timestamp = System.currentTimeMillis();
+                        firstRecord.note = (note != null && !note.trim().isEmpty()) ? note : "Khởi tạo số nợ";
+                        transactionDao.addTransaction(firstRecord);
+                    }
+                });
             } catch (Exception e) {
                 postError("Lỗi khởi tạo người nợ.", e);
             }
         });
     }
 
-    // HÀM XÓA TẤT CẢ DỮ LIỆU
     public void clearAllData() {
         executor.execute(() -> {
             try {
@@ -98,7 +114,8 @@ public class LendyRepository {
             try {
                 personDao.insert(person);
             } catch (Exception e) {
-                postError("Lỗi lưu người nợ.", e);            }
+                postError("Lỗi lưu người nợ.", e);
+            }
         });
     }
 
@@ -107,7 +124,8 @@ public class LendyRepository {
             try {
                 personDao.delete(person);
             } catch (Exception e) {
-                postError("Lỗi xóa người nợ.", e);            }
+                postError("Lỗi xóa người nợ.", e);
+            }
         });
     }
 

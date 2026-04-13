@@ -1,4 +1,4 @@
-package com.lendy.app;
+package com.lendy.app.ui.adapters;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,6 +7,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
+import com.lendy.app.R;
 import com.lendy.app.data.entities.TransactionRecord;
 import com.lendy.app.data.TransactionType;
 import com.lendy.app.utils.FormatUtils;
@@ -29,6 +30,13 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
     public void setTransactions(List<TransactionRecord> transactions) {
         this.transactions = transactions;
         notifyDataSetChanged();
+    }
+
+    public TransactionRecord getTransactionAt(int position) {
+        if (position >= 0 && position < transactions.size()) {
+            return transactions.get(position);
+        }
+        return null;
     }
 
     @NonNull
