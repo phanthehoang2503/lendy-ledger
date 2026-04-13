@@ -158,14 +158,13 @@ public class PersonDetailActivity extends AppCompatActivity {
     }
 
     private void updateBalanceUI(long balance) {
-        NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
-        String formatted = formatter.format(Math.abs(balance));
+        String formatted = FormatUtils.formatCurrencyAbs(balance);
 
         if (balance > 0) {
-            textBalance.setText("+" + formatted);
+            textBalance.setText("+ " + formatted);
             textBalance.setTextColor(ContextCompat.getColor(this, R.color.receivable));
         } else if (balance < 0) {
-            textBalance.setText("-" + formatted);
+            textBalance.setText("- " + formatted);
             textBalance.setTextColor(ContextCompat.getColor(this, R.color.payable));
         } else {
             textBalance.setText(formatted);

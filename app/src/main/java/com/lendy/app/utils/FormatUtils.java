@@ -10,11 +10,11 @@ public class FormatUtils {
     private static final NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(VIETNAM);
 
     public static String formatCurrency(long amount) {
-        return currencyFormatter.format(amount);
+        return formatThousand(amount) + " ₫";
     }
 
     public static String formatCurrencyAbs(long amount) {
-        return currencyFormatter.format(Math.abs(amount));
+        return formatThousand(Math.abs(amount)) + " ₫";
     }
 
     public static String formatDateTime(long timestamp) {
