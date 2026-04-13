@@ -127,12 +127,24 @@ public class PersonDetailActivity extends AppCompatActivity {
         viewModel = new ViewModelProvider(this, factory).get(LendyViewModel.class);
 
         viewModel.getActiveDebts().observe(this, people -> {
+            if (people == null)
+                return;
+
+            // tìm kiếm có reset state
+            boolean found = false;
             for (Person p : people) {
                 if (p.id == personId) {
                     currentBalance = p.totalBalance;
                     updateBalanceUI(p.totalBalance);
+                    found = true;
                     break;
                 }
+            }
+
+            // Nếu không tìm thấy (đã trả hết nợ), reset UI về 0
+            if (!found) {
+                currentBalance = 0;
+                updateBalanceUI(0);
             }
         });
 

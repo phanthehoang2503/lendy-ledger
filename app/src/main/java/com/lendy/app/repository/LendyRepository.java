@@ -16,6 +16,7 @@ import androidx.lifecycle.MutableLiveData;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import androidx.annotation.VisibleForTesting;
 
 /******************************************************************************
  * ../repository/LendyRepository.java - LendyRepository
@@ -28,13 +29,20 @@ public class LendyRepository {
     private final TransactionDao transactionDao;
     private final PersonDao personDao;
     private final MutableLiveData<Event<String>> errorNotifier = new MutableLiveData<>();
-    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private final ExecutorService executor;
 
-    // Constructor
+    // Default Constructor for App usage
     public LendyRepository(Application application) {
-        db = LendyDatabase.getInstance(application);
-        transactionDao = db.transactionDao();
-        personDao = db.personDao();
+        this(LendyDatabase.getInstance(application), Executors.newSingleThreadExecutor());
+    }
+
+    // Constructor for Testing (DI - DI là gì thì lên mạng search ngen)
+    @VisibleForTesting // hàm này cho test thôi khỏi cần trình bày
+    LendyRepository(LendyDatabase db, ExecutorService executor) {
+        this.db = db;
+        this.transactionDao = db.transactionDao();
+        this.personDao = db.personDao();
+        this.executor = executor;
     }
 
     // Add person with debt

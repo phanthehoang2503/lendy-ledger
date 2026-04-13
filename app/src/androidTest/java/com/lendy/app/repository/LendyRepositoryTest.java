@@ -1,15 +1,15 @@
-package com.lendy.app;
+package com.lendy.app.repository;
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.room.Room;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
+import com.lendy.app.LiveDataTestUtil;
 import com.lendy.app.data.LendyDatabase;
 import com.lendy.app.data.TransactionType;
 import com.lendy.app.data.entities.Person;
 import com.lendy.app.data.entities.TransactionRecord;
-import com.lendy.app.repository.LendyRepository;
 
 import org.junit.After;
 import org.junit.Before;
@@ -41,7 +41,6 @@ public class LendyRepositoryTest {
                 .allowMainThreadQueries()
                 .build();
 
-        // Khởi tạo Repo bằng constructor VisibleForTesting để Inject DB ảo
         repository = new LendyRepository(db, Executors.newSingleThreadExecutor());
     }
 
@@ -56,14 +55,13 @@ public class LendyRepositoryTest {
         newPerson.name = "John Doe";
         repository.addPersonWithBalance(newPerson, 500000, TransactionType.LEND, "");
 
-        // Kiểm tra xem Person đã được lưu chưa (getOrAwaitValue sẽ tự động chờ DB xử lý
-        // xong)
+        // Kiểm tra xem Person đã được lưu chưa
         List<Person> activeDebts = LiveDataTestUtil.getOrAwaitValue(repository.getActiveDebts());
         assertEquals(1, activeDebts.size());
         assertEquals("John Doe", activeDebts.get(0).name);
         assertEquals(500000, activeDebts.get(0).totalBalance);
 
-        // Kiểm tra xem Transaction (Lịch sử) đã được tạo đồng thời chưa
+        // Kiểm tra xem Transactionđã được tạo đồng thời chưa
         long savedPersonId = activeDebts.get(0).id;
         List<TransactionRecord> timeline = LiveDataTestUtil.getOrAwaitValue(repository.getTimeline(savedPersonId));
         assertEquals(1, timeline.size());

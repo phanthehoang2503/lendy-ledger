@@ -38,10 +38,11 @@ public class FormatUtils {
     public static long parseFormattedNumber(String input) {
         if (input == null || input.isEmpty())
             return 0;
-        try {
-            String cleanString = input.replaceAll("[^\\d]", "");
-            return cleanString.isEmpty() ? 0 : Long.parseLong(cleanString);
-        } catch (Exception e) {
+        String cleanString = input.replaceAll("[^\\d]", "");
+        if (cleanString.isEmpty()) return 0;
+        try{
+            return Long.parseLong(cleanString);
+        } catch (NumberFormatException e) {
             return 0;
         }
     }
