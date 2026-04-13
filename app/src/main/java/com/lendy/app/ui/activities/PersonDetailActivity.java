@@ -27,6 +27,7 @@ import com.lendy.app.data.entities.Person;
 import com.lendy.app.data.entities.TransactionRecord;
 import com.lendy.app.repository.LendyRepository;
 import com.lendy.app.ui.adapters.TransactionAdapter;
+import com.lendy.app.utils.FormatUtils;
 import com.lendy.app.viewmodel.LendyViewModel;
 import com.lendy.app.viewmodel.LendyViewModelFactory;
 
@@ -88,8 +89,7 @@ public class PersonDetailActivity extends AppCompatActivity {
 
         new ItemTouchHelper(
                 new ItemTouchHelper.SimpleCallback(0,
-                        androidx.recyclerview.widget.ItemTouchHelper.LEFT
-                                | androidx.recyclerview.widget.ItemTouchHelper.RIGHT) {
+                        ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
                     @Override
                     public boolean onMove(@NonNull RecyclerView recyclerView,
                             @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
@@ -99,9 +99,11 @@ public class PersonDetailActivity extends AppCompatActivity {
                     @Override
                     public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                         int position = viewHolder.getAdapterPosition();
+                        if (position == RecyclerView.NO_POSITION)
+                            return;
                         TransactionRecord record = adapter.getTransactionAt(position);
 
-                        if (direction == androidx.recyclerview.widget.ItemTouchHelper.LEFT) {
+                        if (direction == ItemTouchHelper.LEFT) {
                             // Vuốt trái -> Xóa
                             new MaterialAlertDialogBuilder(PersonDetailActivity.this)
                                     .setTitle("Xóa giao dịch này?")
@@ -201,7 +203,7 @@ public class PersonDetailActivity extends AppCompatActivity {
         TextInputEditText editAmount = dialogView.findViewById(R.id.editAmount);
         TextInputEditText editNote = dialogView.findViewById(R.id.editNote);
 
-        editAmount.setText(com.lendy.app.utils.FormatUtils.formatThousand(oldRecord.amount));
+        editAmount.setText(FormatUtils.formatThousand(oldRecord.amount));
         editNote.setText(oldRecord.note);
 
         // TEXT WATCHER (FIX CURSOR)
@@ -223,8 +225,7 @@ public class PersonDetailActivity extends AppCompatActivity {
                     String cleanString = s.toString().replaceAll("[^\\d]", "");
                     if (!cleanString.isEmpty()) {
                         try {
-                            String formatted = com.lendy.app.utils.FormatUtils
-                                    .formatThousand(Long.parseLong(cleanString));
+                            String formatted = FormatUtils.formatThousand(Long.parseLong(cleanString));
                             current = formatted;
                             editAmount.setText(formatted);
                             editAmount.setSelection(formatted.length());
@@ -243,7 +244,7 @@ public class PersonDetailActivity extends AppCompatActivity {
 
         // Chips logic
         View.OnClickListener chipListener = v -> {
-            long currentVal = com.lendy.app.utils.FormatUtils.parseFormattedNumber(editAmount.getText().toString());
+            long currentVal = FormatUtils.parseFormattedNumber(editAmount.getText().toString());
             long addVal = 0;
             int id = v.getId();
             if (id == R.id.chip20k)
@@ -257,7 +258,7 @@ public class PersonDetailActivity extends AppCompatActivity {
             else if (id == R.id.chip500k)
                 addVal = 500000;
 
-            String newVal = com.lendy.app.utils.FormatUtils.formatThousand(currentVal + addVal);
+            String newVal = FormatUtils.formatThousand(currentVal + addVal);
             editAmount.setText(newVal);
             editAmount.setSelection(newVal.length());
         };
@@ -278,8 +279,8 @@ public class PersonDetailActivity extends AppCompatActivity {
         dialog.setOnShowListener(dialogInterface -> {
             android.widget.Button button = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
             button.setOnClickListener(v -> {
-                long newAmount = com.lendy.app.utils.FormatUtils
-                        .parseFormattedNumber(editAmount.getText().toString());
+                long newAmount = FormatUtils.parseFormattedNumber(
+                        editAmount.getText().toString());
                 String newNote = editNote.getText().toString().trim();
 
                 if (newAmount <= 0) {
@@ -348,8 +349,9 @@ public class PersonDetailActivity extends AppCompatActivity {
                     String cleanString = s.toString().replaceAll("[^\\d]", "");
                     if (!cleanString.isEmpty()) {
                         try {
-                            String formatted = com.lendy.app.utils.FormatUtils
-                                    .formatThousand(Long.parseLong(cleanString));
+                            String formatted = FormatUtils.formatThousand(
+                                    Long.parseLong(cleanString)
+                            );
                             current = formatted;
                             editAmount.setText(formatted);
                             editAmount.setSelection(formatted.length());
@@ -368,7 +370,7 @@ public class PersonDetailActivity extends AppCompatActivity {
 
         // Chips logic
         View.OnClickListener chipListener = v -> {
-            long currentVal = com.lendy.app.utils.FormatUtils.parseFormattedNumber(editAmount.getText().toString());
+            long currentVal = FormatUtils.parseFormattedNumber(editAmount.getText().toString());
             long addVal = 0;
             int id = v.getId();
             if (id == R.id.chip20k)
@@ -382,7 +384,7 @@ public class PersonDetailActivity extends AppCompatActivity {
             else if (id == R.id.chip500k)
                 addVal = 500000;
 
-            String newVal = com.lendy.app.utils.FormatUtils.formatThousand(currentVal + addVal);
+            String newVal = FormatUtils.formatThousand(currentVal + addVal);
             editAmount.setText(newVal);
             editAmount.setSelection(newVal.length());
         };
@@ -403,7 +405,7 @@ public class PersonDetailActivity extends AppCompatActivity {
         dialog.setOnShowListener(dialogInterface -> {
             android.widget.Button button = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
             button.setOnClickListener(view -> {
-                long amount = com.lendy.app.utils.FormatUtils.parseFormattedNumber(editAmount.getText().toString());
+                long amount = FormatUtils.parseFormattedNumber(editAmount.getText().toString());
                 String note = editNote.getText().toString().trim();
 
                 if (amount <= 0) {
