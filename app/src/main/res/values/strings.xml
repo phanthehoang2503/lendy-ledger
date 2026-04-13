@@ -13,4 +13,8 @@
     <string name="confirm_reset_message">Hành động này sẽ xóa sạch tất cả người nợ và lịch sử giao dịch. Bạn không thể hoàn tác!</string>
     <string name="confirm_delete_person_title">Xóa người này?</string>
     <string name="confirm_delete_person_message">Tất cả lịch sử giao dịch liên quan đến người này cũng sẽ bị xóa vĩnh viễn.</string>
+    <string name="amount">Số tiền</string>
+    <string name="transaction_note">Ghi chú (tùy chọn)</string>
+    <string name="save">Lưu</string>
+    <string name="cancel">Hủy</string>
 </resources>
