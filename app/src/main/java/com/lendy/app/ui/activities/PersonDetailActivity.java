@@ -53,7 +53,8 @@ public class PersonDetailActivity extends AppCompatActivity {
 
         personId = getIntent().getLongExtra(EXTRA_PERSON_ID, -1);
         if (personId == -1) {
-            android.widget.Toast.makeText(this, "Không tìm thấy thông tin người nợ", android.widget.Toast.LENGTH_SHORT).show();
+            android.widget.Toast.makeText(this, "Không tìm thấy thông tin người nợ", android.widget.Toast.LENGTH_SHORT)
+                    .show();
             setResult(RESULT_CANCELED);
             finish();
             return;
@@ -255,26 +256,39 @@ public class PersonDetailActivity extends AppCompatActivity {
         dialogView.findViewById(R.id.chip200k).setOnClickListener(chipListener);
         dialogView.findViewById(R.id.chip500k).setOnClickListener(chipListener);
 
-        new MaterialAlertDialogBuilder(this)
+        AlertDialog dialog = new MaterialAlertDialogBuilder(this)
                 .setTitle("Sửa số tiền giao dịch")
                 .setView(dialogView)
-                .setPositiveButton("Cập nhật", (dialog, which) -> {
-                    long newAmount = com.lendy.app.utils.FormatUtils
-                            .parseFormattedNumber(editAmount.getText().toString());
-                    String newNote = editNote.getText().toString().trim();
-
-                    TransactionRecord newRecord = new TransactionRecord();
-                    newRecord.id = oldRecord.id;
-                    newRecord.personId = oldRecord.personId;
-                    newRecord.amount = newAmount;
-                    newRecord.type = oldRecord.type;
-                    newRecord.note = newNote;
-                    newRecord.timestamp = oldRecord.timestamp;
-
-                    viewModel.updateTransaction(oldRecord, newRecord);
-                })
+                .setPositiveButton("Cập nhật", null)
                 .setNegativeButton("Hủy", null)
-                .show();
+                .create();
+
+        dialog.setOnShowListener(dialogInterface -> {
+            android.widget.Button button = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+            button.setOnClickListener(v -> {
+                long newAmount = com.lendy.app.utils.FormatUtils
+                        .parseFormattedNumber(editAmount.getText().toString());
+                String newNote = editNote.getText().toString().trim();
+
+                if (newAmount <= 0) {
+                    editAmount.setError("Số tiền phải lớn hơn 0");
+                    return;
+                }
+
+                TransactionRecord newRecord = new TransactionRecord();
+                newRecord.id = oldRecord.id;
+                newRecord.personId = oldRecord.personId;
+                newRecord.amount = newAmount;
+                newRecord.type = oldRecord.type;
+                newRecord.note = newNote;
+                newRecord.timestamp = oldRecord.timestamp;
+
+                viewModel.updateTransaction(oldRecord, newRecord);
+                dialog.dismiss();
+            });
+        });
+
+        dialog.show();
     }
 
     private void setupFab() {
@@ -370,7 +384,7 @@ public class PersonDetailActivity extends AppCompatActivity {
                 .create();
 
         dialog.setOnShowListener(dialogInterface -> {
-            android.widget.Button button = dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE);
+            android.widget.Button button = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
             button.setOnClickListener(view -> {
                 long amount = com.lendy.app.utils.FormatUtils.parseFormattedNumber(editAmount.getText().toString());
                 String note = editNote.getText().toString().trim();

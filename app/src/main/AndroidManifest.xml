@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Lendy">
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.activities.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -21,15 +21,15 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".PersonDetailActivity"
+            android:name=".ui.activities.PersonDetailActivity"
             android:exported="false"
             android:label="Chi tiết giao dịch" />
         <activity
-            android:name=".CompletedDebtsActivity"
+            android:name=".ui.activities.CompletedDebtsActivity"
             android:exported="false"
             android:label="@string/title_completed_debts" />
         <activity
-            android:name=".ContactsActivity"
+            android:name=".ui.activities.ContactsActivity"
             android:exported="false"
             android:label="@string/title_contacts" />
     </application>
