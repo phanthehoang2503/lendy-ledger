@@ -147,6 +147,8 @@ public class MainActivity extends AppCompatActivity {
         View v = LayoutInflater.from(this).inflate(R.layout.dialog_add_person, null);
         v.findViewById(R.id.layoutAmount).setVisibility(View.GONE);
         v.findViewById(R.id.toggleGroup).setVisibility(View.GONE);
+        v.findViewById(R.id.layoutNote).setVisibility(View.GONE);
+        v.findViewById(R.id.scrollChips).setVisibility(View.GONE);
 
         TextInputEditText editName = v.findViewById(R.id.editName);
         TextInputEditText editPhone = v.findViewById(R.id.editPhone);
@@ -154,18 +156,34 @@ public class MainActivity extends AppCompatActivity {
         editName.setText(person.name);
         editPhone.setText(person.phoneNumber);
 
-        new MaterialAlertDialogBuilder(this)
+        AlertDialog dialog = new MaterialAlertDialogBuilder(this)
                 .setTitle("Cập nhật thông tin")
                 .setView(v)
-                .setPositiveButton("Lưu", (d, w) -> {
-                    String name = editName.getText().toString().trim();
-                    if (name.isEmpty())
-                        return;
-                    person.name = name;
-                    person.phoneNumber = editPhone.getText().toString().trim();
-                    viewModel.addPerson(person);
-                })
-                .setNegativeButton("Hủy", null).show();
+                .setPositiveButton("Lưu", null) // Để null để tự xử lý click sau show()
+                .setNegativeButton("Hủy", null)
+                .create();
+
+        dialog.setOnShowListener(dialogInterface -> {
+            android.widget.Button button = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+            button.setOnClickListener(view -> {
+                String name = editName.getText().toString().trim();
+                String phone = editPhone.getText().toString().trim();
+
+                if (name.isEmpty()) {
+                    editName.setError("Vui lòng nhập tên người nợ");
+                    return;
+                }
+
+                person.name = name;
+                person.phoneNumber = phone;
+                person.updatedAt = System.currentTimeMillis();
+
+                viewModel.addPerson(person);
+                dialog.dismiss();
+            });
+        });
+
+        dialog.show();
     }
 
     private void setupViewModel() {
@@ -289,7 +307,7 @@ public class MainActivity extends AppCompatActivity {
                 .create();
 
         dialog.setOnShowListener(dialogInterface -> {
-            android.widget.Button button = dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE);
+            android.widget.Button button = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
             button.setOnClickListener(view -> {
                 String name = editName.getText().toString().trim();
                 String phone = editPhone.getText().toString().trim();

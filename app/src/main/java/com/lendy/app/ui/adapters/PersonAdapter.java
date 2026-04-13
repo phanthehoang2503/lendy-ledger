@@ -129,10 +129,17 @@ public class PersonAdapter extends RecyclerView.Adapter<PersonAdapter.PersonView
                 textBalance.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.outline));
             }
 
-            itemView.setOnClickListener(v -> listener.onPersonClick(person));
+            itemView.setOnClickListener(v -> {
+                if (listener != null) {
+                    listener.onPersonClick(person);
+                }
+            });
             itemView.setOnLongClickListener(v -> {
-                longListener.onPersonLongClick(person);
-                return true;
+                if (longListener != null) {
+                    longListener.onPersonLongClick(person);
+                    return true;
+                }
+                return false;
             });
         }
     }

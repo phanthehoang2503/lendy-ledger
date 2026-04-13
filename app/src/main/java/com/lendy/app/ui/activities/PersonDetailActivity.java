@@ -52,6 +52,12 @@ public class PersonDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_person_detail);
 
         personId = getIntent().getLongExtra(EXTRA_PERSON_ID, -1);
+        if (personId == -1) {
+            android.widget.Toast.makeText(this, "Không tìm thấy thông tin người nợ", android.widget.Toast.LENGTH_SHORT).show();
+            setResult(RESULT_CANCELED);
+            finish();
+            return;
+        }
         String name = getIntent().getStringExtra(EXTRA_PERSON_NAME);
         String phone = getIntent().getStringExtra(EXTRA_PERSON_PHONE);
 
