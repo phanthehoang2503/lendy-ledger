@@ -317,12 +317,16 @@ public class PersonDetailActivity extends AppCompatActivity {
         MaterialButton btnLeft = dialogView.findViewById(R.id.btnLending);
         MaterialButton btnRight = dialogView.findViewById(R.id.btnBorrowing);
 
-        if (currentBalance >= 0) {
+        if (currentBalance > 0) {
             btnLeft.setText("Cho vay thêm");
             btnRight.setText("Họ trả nợ");
-        } else {
+        } else if (currentBalance < 0) {
             btnLeft.setText("Đi vay thêm");
             btnRight.setText("Trả nợ họ");
+        } else {
+            // currentBalance == 0
+            btnLeft.setText("Cho vay");
+            btnRight.setText("Đi vay");
         }
 
         // Về cơ bản là cái hàm này nhìn cái input
@@ -408,14 +412,19 @@ public class PersonDetailActivity extends AppCompatActivity {
                 }
 
                 TransactionType type;
-                if (currentBalance >= 0) {
+                if (currentBalance > 0) {
                     type = (toggleGroup.getCheckedButtonId() == R.id.btnLending)
                             ? TransactionType.LEND
                             : TransactionType.REPAY;
-                } else {
+                } else if (currentBalance < 0) {
                     type = (toggleGroup.getCheckedButtonId() == R.id.btnLending)
                             ? TransactionType.BORROW
                             : TransactionType.PAY_BACK;
+                } else {
+                    // currentBalance == 0
+                    type = (toggleGroup.getCheckedButtonId() == R.id.btnLending)
+                            ? TransactionType.LEND
+                            : TransactionType.BORROW;
                 }
 
                 TransactionRecord record = new TransactionRecord();
