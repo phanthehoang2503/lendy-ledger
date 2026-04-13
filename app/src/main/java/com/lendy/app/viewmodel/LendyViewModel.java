@@ -3,6 +3,7 @@ package com.lendy.app.viewmodel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.lendy.app.data.TransactionType;
 import com.lendy.app.utils.Event;
 import com.lendy.app.data.entities.Person;
 import com.lendy.app.data.entities.TransactionRecord;
@@ -33,6 +34,10 @@ public class LendyViewModel extends ViewModel {
         this.errorObserver = repository.getErrorNotifier();
     }
 
+    public LiveData<List<Person>> getAllPeople() {
+        return repository.getAllPeople();
+    }
+
     public LiveData<List<TransactionRecord>> getTimeline(long personId) {
         return repository.getTimeline(personId);
     }
@@ -49,11 +54,19 @@ public class LendyViewModel extends ViewModel {
         repository.deleteTransaction(record);
     }
 
+    public void addPersonWithInitialBalance(Person person, long amount, TransactionType type) {
+        repository.addPersonWithBalance(person, amount, type);
+    }
+
     public void addPerson(Person person) {
         repository.upsertPerson(person);
     }
 
     public void removePerson(Person person) {
         repository.deletePerson(person);
+    }
+
+    public void clearAllData() {
+        repository.clearAllData();
     }
 }

@@ -45,8 +45,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="+500.000 đ"
-            tools:textColor="@color/income" />
+            tools:text="+500.000 đ" />
 
         <TextView
             android:id="@+id/textTransNote"
@@ -57,7 +56,7 @@
             android:maxLines="1"
             android:textColor="@color/outline"
             android:textSize="13sp"
-            android:fontStyle="italic"
+            android:textStyle="italic"
             app:layout_constraintEnd_toStartOf="@id/textTransAmount"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/textTransDate"
