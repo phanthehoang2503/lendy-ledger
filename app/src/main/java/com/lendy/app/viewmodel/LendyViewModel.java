@@ -15,6 +15,11 @@ import java.util.Objects;
 
 import lombok.Getter;
 
+/******************************************************************************
+ * ../viewmodel/LendyViewModel.java - LendyViewModel
+ * Bộ phận điều khiển, kết nối Giao diện và Dữ liệu.
+ * Đảm bảo các luồng thông báo lỗi, dữ liệu được cập nhật theo chu kỳ sống UI.
+ *****************************************************************************/
 public class LendyViewModel extends ViewModel {
     private final LendyRepository repository;
     @Getter
@@ -54,8 +59,8 @@ public class LendyViewModel extends ViewModel {
         repository.deleteTransaction(record);
     }
 
-    public void addPersonWithInitialBalance(Person person, long amount, TransactionType type) {
-        repository.addPersonWithBalance(person, amount, type);
+    public void addPersonWithInitialBalance(Person person, long amount, TransactionType type, String note) {
+        repository.addPersonWithBalance(person, amount, type, note);
     }
 
     public void addPerson(Person person) {
