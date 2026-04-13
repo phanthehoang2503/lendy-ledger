@@ -9,7 +9,7 @@ import java.util.Locale;
  *****************************************************************************/
 public class CurrencyUtils {
     public static String formatVND(long amount) {
-        Locale vietnam = new Locale("vi", "VN");
+        Locale vietnam = Locale.forLanguageTag("vi-VN");
         NumberFormat format = NumberFormat.getCurrencyInstance(vietnam);
         return format.format(amount);
     }
