@@ -1,5 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
+    <color name="black">#FF1A1C1E</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Deep Navy Theme - Light Version -->
+    <color name="primary">#0D47A1</color>
+    <color name="primary_dark">#002171</color>
+    <color name="primary_light">#5472D3</color>
+    <color name="primary_container">#E3F2FD</color>
+
+    <!-- Status Colors -->
+    <color name="receivable">#2E7D32</color> <!-- Xanh lá chuẩn -->
+    <color name="payable">#D32F2F</color>    <!-- Đỏ chuẩn -->
+
+    <!-- Backgrounds -->
+    <color name="background">#F0F2F5</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="outline">#72777E</color>
 </resources>

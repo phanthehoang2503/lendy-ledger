@@ -20,6 +20,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".PersonDetailActivity"
+            android:exported="false"
+            android:label="Chi tiết giao dịch" />
+        <activity
+            android:name=".CompletedDebtsActivity"
+            android:exported="false"
+            android:label="@string/title_completed_debts" />
+        <activity
+            android:name=".ContactsActivity"
+            android:exported="false"
+            android:label="@string/title_contacts" />
     </application>
 
 </manifest>

@@ -1,3 +1,16 @@
 <resources>
     <string name="app_name">Lendy</string>
+    <string name="action_history">Lịch sử nợ</string>
+    <string name="action_contacts">Danh bạ</string>
+    <string name="action_reset">Xóa sạch dữ liệu</string>
+    <string name="title_completed_debts">Nợ đã hoàn thành</string>
+    <string name="title_contacts">Danh sách liên lạc</string>
+    <string name="no_completed_debts">Chưa có khoản nợ nào hoàn thành</string>
+    <string name="no_contacts">Chưa có liên lạc nào</string>
+    <string name="edit_person">Sửa thông tin</string>
+
+    <string name="confirm_reset_title">Xóa toàn bộ dữ liệu?</string>
+    <string name="confirm_reset_message">Hành động này sẽ xóa sạch tất cả người nợ và lịch sử giao dịch. Bạn không thể hoàn tác!</string>
+    <string name="confirm_delete_person_title">Xóa người này?</string>
+    <string name="confirm_delete_person_message">Tất cả lịch sử giao dịch liên quan đến người này cũng sẽ bị xóa vĩnh viễn.</string>
 </resources>
