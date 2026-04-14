@@ -2,10 +2,12 @@ package com.lendy.app.ui.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.transition.TransitionManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -40,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
     private ViewPager2 viewPager;
     private BottomNavigationView bottomNav;
     private TextView textTotalLending, textTotalBorrowing;
+    private View welcomeContainer, summaryCard;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +54,8 @@ public class MainActivity extends AppCompatActivity {
         bottomNav = findViewById(R.id.bottomNav);
         textTotalLending = findViewById(R.id.textTotalLending);
         textTotalBorrowing = findViewById(R.id.textTotalBorrowing);
+        welcomeContainer = findViewById(R.id.header_welcome_container);
+        summaryCard = findViewById(R.id.summary_card);
 
         // 2. Toolbar
         setSupportActionBar(findViewById(R.id.toolbar));
@@ -69,9 +74,10 @@ public class MainActivity extends AppCompatActivity {
         });
 
         ViewCompat.setOnApplyWindowInsetsListener(viewPager, (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            // Đảm bảo nội dung Fragment không bị BottomNav đè lên
-            v.setPadding(0, 0, 0, bottomNav.getHeight());
+            // Sử dụng post() để chắc chắn bottomNav đã được đo (measured)
+            bottomNav.post(() -> {
+                v.setPadding(0, 0, 0, bottomNav.getHeight());
+            });
             return insets;
         });
     }
@@ -86,13 +92,23 @@ public class MainActivity extends AppCompatActivity {
             public void onPageSelected(int position) {
                 int menuId;
                 switch (position) {
-                    case 0: menuId = R.id.nav_home; break;
-                    case 1: menuId = R.id.nav_stats; break;
-                    case 2: menuId = R.id.nav_history; break;
-                    case 3: menuId = R.id.nav_contacts; break;
-                    default: menuId = R.id.nav_home;
+                    case 0:
+                        menuId = R.id.nav_home;
+                        break;
+                    case 1:
+                        menuId = R.id.nav_stats;
+                        break;
+                    case 2:
+                        menuId = R.id.nav_history;
+                        break;
+                    case 3:
+                        menuId = R.id.nav_contacts;
+                        break;
+                    default:
+                        menuId = R.id.nav_home;
                 }
                 bottomNav.setSelectedItemId(menuId);
+                updateHeaderVisibility(position);
             }
         });
 
@@ -135,16 +151,17 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        return false;
+    private void updateHeaderVisibility(int position) {
+        // Animation khi ẩn/hiện
+        TransitionManager.beginDelayedTransition((ViewGroup) findViewById(R.id.main));
+        if (position == 0) {
+            welcomeContainer.setVisibility(View.VISIBLE);
+            summaryCard.setVisibility(View.VISIBLE);
+        } else {
+            welcomeContainer.setVisibility(View.GONE);
+            summaryCard.setVisibility(View.GONE);
+        }
     }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        return super.onOptionsItemSelected(item);
-    }
-
 
     public void showAddPersonDialog() {
         View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_add_person, null);
@@ -225,8 +242,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupQuickAddChips(View dialogView, TextInputEditText editAmount) {
-        int[] chipIds = {R.id.chip20k, R.id.chip50k, R.id.chip100k, R.id.chip200k, R.id.chip500k};
-        long[] amounts = {20000, 50000, 100000, 200000, 500000};
+        int[] chipIds = { R.id.chip20k, R.id.chip50k, R.id.chip100k, R.id.chip200k, R.id.chip500k };
+        long[] amounts = { 20000, 50000, 100000, 200000, 500000 };
 
         for (int i = 0; i < chipIds.length; i++) {
             final long amount = amounts[i];
@@ -236,7 +253,7 @@ public class MainActivity extends AppCompatActivity {
                     String currentStr = editAmount.getText().toString().replaceAll("[^\\d]", "");
                     long currentAmount = currentStr.isEmpty() ? 0 : Long.parseLong(currentStr);
                     long finalAmount = currentAmount + amount;
-                    
+
                     editAmount.setText(com.lendy.app.utils.FormatUtils.formatThousand(finalAmount));
                     editAmount.setSelection(editAmount.getText().length());
                 });
