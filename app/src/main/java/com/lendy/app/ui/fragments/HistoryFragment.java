@@ -35,14 +35,19 @@ public class HistoryFragment extends Fragment {
 
         emptyView = view.findViewById(R.id.layoutEmptyHistory);
         setupRecyclerView(view);
-        setupViewModel();
-
+        
         return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        setupViewModel();
     }
 
     private void setupRecyclerView(View view) {
         RecyclerView recyclerView = view.findViewById(R.id.recyclerViewHistory);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         
         adapter = new PersonAdapter(person -> {
             Intent intent = new Intent(getActivity(), PersonDetailActivity.class);

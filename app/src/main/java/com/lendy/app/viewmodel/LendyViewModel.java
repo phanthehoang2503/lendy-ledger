@@ -67,6 +67,10 @@ public class LendyViewModel extends ViewModel {
         repository.upsertPerson(person);
     }
 
+    public void updatePerson(Person person) {
+        repository.upsertPerson(person);
+    }
+
     public void removePerson(Person person) {
         repository.deletePerson(person);
     }

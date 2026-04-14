@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -55,7 +55,7 @@ public class HomeFragment extends Fragment {
 
     private void setupRecyclerView(View view) {
         RecyclerView recyclerView = view.findViewById(R.id.recyclerViewHome);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
 
         adapter = new PersonAdapter(person -> {
             // Click: Mở chi tiết
@@ -65,7 +65,7 @@ public class HomeFragment extends Fragment {
             intent.putExtra(PersonDetailActivity.EXTRA_PERSON_PHONE, person.phoneNumber);
             startActivity(intent);
         }, person -> {
-            // Long click: Placeholder cho các tính năng khác (như chỉnh sửa)
+            // TODO: implement long-click actions such as edit/delete
         });
 
         recyclerView.setAdapter(adapter);

@@ -39,13 +39,14 @@ public class StatsFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+            @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_stats, container, false);
 
         pieChart = view.findViewById(R.id.pieChart);
         textTopDebtorsTitle = view.findViewById(R.id.textTopDebtorsTitle);
         cardTopDebtors = view.findViewById(R.id.cardTopDebtors);
-        
+
         setupRecyclerView(view);
         setupViewModel();
 
@@ -56,15 +57,19 @@ public class StatsFragment extends Fragment {
         RecyclerView recyclerView = view.findViewById(R.id.recyclerViewTopDebtors);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         // Adapter mini cho danh sách Top 3 (Không cần click hay long click phức tạp)
-        topDebtorsAdapter = new PersonAdapter(person -> {}, person -> {});
+        topDebtorsAdapter = new PersonAdapter(person -> {
+        }, person -> {
+        });
         recyclerView.setAdapter(topDebtorsAdapter);
     }
 
     private void setupViewModel() {
-        if (getActivity() == null) return;
+        if (getActivity() == null)
+            return;
 
         LendyRepository repository = new LendyRepository(getActivity().getApplication());
-        viewModel = new ViewModelProvider(requireActivity(), new LendyViewModelFactory(repository)).get(LendyViewModel.class);
+        viewModel = new ViewModelProvider(requireActivity(), new LendyViewModelFactory(repository))
+                .get(LendyViewModel.class);
 
         // 1. Cập nhật biểu đồ tròn
         viewModel.getGlobalSummary().observe(getViewLifecycleOwner(), summary -> {
@@ -79,11 +84,12 @@ public class StatsFragment extends Fragment {
             if (hasDebts) {
                 textTopDebtorsTitle.setVisibility(View.VISIBLE);
                 cardTopDebtors.setVisibility(View.VISIBLE);
-                
+
                 List<Person> sortedList = new ArrayList<>(people);
                 // Sắp xếp giảm dần theo nợ (Person.totalBalance)
-                Collections.sort(sortedList, (p1, p2) -> Double.compare(Math.abs(p2.totalBalance), Math.abs(p1.totalBalance)));
-                
+                Collections.sort(sortedList,
+                        (p1, p2) -> Double.compare(Math.abs(p2.totalBalance), Math.abs(p1.totalBalance)));
+
                 // Lấy tối đa 3 người
                 int limit = Math.min(sortedList.size(), 3);
                 topDebtorsAdapter.setPeople(sortedList.subList(0, limit));
@@ -101,7 +107,7 @@ public class StatsFragment extends Fragment {
         entries.add(new PieEntry(summary.totalBorrowing, "Mình nợ họ"));
 
         PieDataSet dataSet = new PieDataSet(entries, "");
-        dataSet.setColors(new int[]{
+        dataSet.setColors(new int[] {
                 ContextCompat.getColor(requireContext(), R.color.receivable),
                 ContextCompat.getColor(requireContext(), R.color.payable)
         });
@@ -112,7 +118,7 @@ public class StatsFragment extends Fragment {
         pieChart.setData(data);
         pieChart.getDescription().setEnabled(false);
         pieChart.setCenterText("Tổng nợ");
-        pieChart.setDrawEntryLabels(false); // Ẩn label đè lên biểu đồ cho sạch
+        pieChart.setDrawEntryLabels(false);
         pieChart.animateY(1000);
         pieChart.invalidate();
     }

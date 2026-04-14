@@ -12,6 +12,8 @@ import com.lendy.app.ui.fragments.StatsFragment;
 
 public class MainPagerAdapter extends FragmentStateAdapter {
 
+    private static final int PAGE_COUNT = 4;
+
     public MainPagerAdapter(@NonNull FragmentActivity fragmentActivity) {
         super(fragmentActivity);
     }
@@ -24,12 +26,12 @@ public class MainPagerAdapter extends FragmentStateAdapter {
             case 1: return new StatsFragment();
             case 2: return new HistoryFragment();
             case 3: return new ContactsFragment();
-            default: return new HomeFragment();
+            default: throw new IllegalArgumentException("Invalid position: " + position);
         }
     }
 
     @Override
     public int getItemCount() {
-        return 4;
+        return PAGE_COUNT;
     }
 }

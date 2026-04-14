@@ -46,7 +46,7 @@ public class ContactsFragment extends Fragment {
 
     private void setupRecyclerView(View view) {
         RecyclerView recyclerView = view.findViewById(R.id.recyclerViewContacts);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         
         adapter = new PersonAdapter(person -> {
             // Click: Mở chi tiết
@@ -111,7 +111,7 @@ public class ContactsFragment extends Fragment {
                 person.phoneNumber = phone;
                 person.updatedAt = System.currentTimeMillis();
 
-                viewModel.addPerson(person);
+                viewModel.updatePerson(person);
                 dialog.dismiss();
             });
         });
