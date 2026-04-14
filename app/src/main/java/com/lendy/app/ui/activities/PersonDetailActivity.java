@@ -153,13 +153,20 @@ public class PersonDetailActivity extends AppCompatActivity {
         String formatted = FormatUtils.formatCurrencyAbs(balance);
 
         if (balance > 0) {
-            textBalance.setText(formatted);
+            // Nợ thu (Họ nợ mình)
+            String text = "+ " + formatted;
+            textBalance.setText(text);
+            textBalance.setContentDescription(getString(R.string.balance_receivable_talkback, formatted));
             textBalance.setTextColor(ContextCompat.getColor(this, R.color.receivable));
         } else if (balance < 0) {
-            textBalance.setText(formatted);
+            // Nợ trả (Mình nợ họ)
+            String text = "- " + formatted;
+            textBalance.setText(text);
+            textBalance.setContentDescription(getString(R.string.balance_payable_talkback, formatted));
             textBalance.setTextColor(ContextCompat.getColor(this, R.color.payable));
         } else {
             textBalance.setText("0 đ");
+            textBalance.setContentDescription("0 đ");
             textBalance.setTextColor(ContextCompat.getColor(this, R.color.outline));
         }
     }

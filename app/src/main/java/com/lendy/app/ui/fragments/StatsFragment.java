@@ -139,9 +139,12 @@ public class StatsFragment extends Fragment {
     }
 
     private void updateChart(SummaryDTO summary) {
+        float lending = summary.totalLending != null ? summary.totalLending.floatValue() : 0f;
+        float borrowing = summary.totalBorrowing != null ? summary.totalBorrowing.floatValue() : 0f;
+
         List<PieEntry> entries = new ArrayList<>();
-        entries.add(new PieEntry(summary.totalLending, "Họ nợ mình"));
-        entries.add(new PieEntry(summary.totalBorrowing, "Mình nợ họ"));
+        entries.add(new PieEntry(lending, getString(R.string.label_lend)));
+        entries.add(new PieEntry(borrowing, getString(R.string.label_borrow)));
 
         PieDataSet dataSet = new PieDataSet(entries, "");
         dataSet.setColors(new int[] {
@@ -154,7 +157,7 @@ public class StatsFragment extends Fragment {
         PieData data = new PieData(dataSet);
         pieChart.setData(data);
         pieChart.getDescription().setEnabled(false);
-        pieChart.setCenterText("Tổng nợ");
+        pieChart.setCenterText(getString(R.string.total_debt_center));
         pieChart.setDrawEntryLabels(false);
         pieChart.animateY(1000);
         pieChart.invalidate();

@@ -168,7 +168,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateHeaderVisibility(int position) {
         if (position == 0) {
-            textAppTitle.setText("L E N D Y");
+            textAppTitle.setText(getString(R.string.tab_home));
             welcomeContainer.setVisibility(View.VISIBLE);
             summaryCard.setVisibility(View.VISIBLE);
         } else {
@@ -178,13 +178,13 @@ public class MainActivity extends AppCompatActivity {
             // Cập nhật tiêu đề động theo từng Tab
             switch (position) {
                 case 1:
-                    textAppTitle.setText("THỐNG KÊ");
+                    textAppTitle.setText(getString(R.string.tab_stats));
                     break;
                 case 2:
-                    textAppTitle.setText("LỊCH SỬ");
+                    textAppTitle.setText(getString(R.string.tab_history));
                     break;
                 case 3:
-                    textAppTitle.setText("DANH BẠ");
+                    textAppTitle.setText(getString(R.string.tab_contacts));
                     break;
             }
         }
@@ -218,12 +218,15 @@ public class MainActivity extends AppCompatActivity {
                 if (!s.toString().equals(current)) {
                     editAmount.removeTextChangedListener(this);
                     String cleanString = s.toString().replaceAll("[^\\d]", "");
-                    if (!cleanString.isEmpty()) {
-                        long parsed = Long.parseLong(cleanString);
+                    Long parsed = parseAmountSafely(cleanString);
+                    if (parsed != null) {
                         String formatted = com.lendy.app.utils.FormatUtils.formatThousand(parsed);
                         current = formatted;
                         editAmount.setText(formatted);
                         editAmount.setSelection(formatted.length());
+                    } else if (cleanString.isEmpty()) {
+                        current = "";
+                        editAmount.setText("");
                     }
                     editAmount.addTextChangedListener(this);
                 }
@@ -278,13 +281,29 @@ public class MainActivity extends AppCompatActivity {
             if (chip != null) {
                 chip.setOnClickListener(v -> {
                     String currentStr = editAmount.getText().toString().replaceAll("[^\\d]", "");
-                    long currentAmount = currentStr.isEmpty() ? 0 : Long.parseLong(currentStr);
+                    Long currentAmount = parseAmountSafely(currentStr);
+                    if (currentAmount == null) currentAmount = 0L;
                     long finalAmount = currentAmount + amount;
 
                     editAmount.setText(com.lendy.app.utils.FormatUtils.formatThousand(finalAmount));
                     editAmount.setSelection(editAmount.getText().length());
                 });
             }
+        }
+    }
+
+    private Long parseAmountSafely(String digits) {
+        if (digits == null || digits.isEmpty()) return null;
+        try {
+            // Check if it's too large for Long
+            if (digits.length() > 18) {
+                // Approximate check for Long.MAX_VALUE (19 digits)
+                // 18 digits is safe. For 19 we use a real try-catch.
+                return Long.MAX_VALUE;
+            }
+            return Long.parseLong(digits);
+        } catch (NumberFormatException e) {
+            return Long.MAX_VALUE;
         }
     }
 }

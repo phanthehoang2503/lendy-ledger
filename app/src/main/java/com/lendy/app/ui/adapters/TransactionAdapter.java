@@ -92,42 +92,48 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
 
         public void bind(TransactionRecord record, boolean useClassicColors) {
             // Hiển thị tên (snapshot)
-            textPersonName.setText(record.personNameSnapshot != null ? record.personNameSnapshot : "Người nợ ẩn danh");
+            textPersonName.setText(record.personNameSnapshot != null ? record.personNameSnapshot : itemView.getContext().getString(R.string.anonymous_person));
 
             // Hiển thị số tiền
             textAmount.setText(FormatUtils.formatCurrency(record.amount));
 
             // Hiển thị số nợ sau giao dịch
-            textBalanceSnapshot.setText("Số nợ còn lại: " + FormatUtils.formatCurrencyAbs(record.balanceSnapshot));
+            String formattedBalance = FormatUtils.formatCurrencyAbs(record.balanceSnapshot != null ? record.balanceSnapshot : 0);
+            textBalanceSnapshot.setText(itemView.getContext().getString(R.string.remaining_debt_format, formattedBalance));
 
             // Hiển thị ghi chú và ngày tháng
-            textNote.setText(record.note != null && !record.note.isEmpty() ? record.note : "Không có ghi chú");
+            textNote.setText(record.note != null && !record.note.isEmpty() ? record.note : itemView.getContext().getString(R.string.no_note));
             textDate.setText(FormatUtils.formatDateTime(record.timestamp));
 
             // Định dạng màu sắc và tag dựa trên loại giao dịch
             int color;
             String typeText;
 
-            switch (record.type) {
-                case LEND:
-                    color = ContextCompat.getColor(itemView.getContext(), useClassicColors ? R.color.classic_receivable : R.color.receivable);
-                    typeText = "CHO VAY THÊM";
-                    break;
-                case REPAY:
-                    color = ContextCompat.getColor(itemView.getContext(), useClassicColors ? R.color.classic_payable : R.color.payable);
-                    typeText = "HỌ TRẢ NỢ";
-                    break;
-                case BORROW:
-                    color = ContextCompat.getColor(itemView.getContext(), useClassicColors ? R.color.classic_payable : R.color.payable);
-                    typeText = "MÌNH VAY THÊM";
-                    break;
-                case PAY_BACK:
-                    color = ContextCompat.getColor(itemView.getContext(), useClassicColors ? R.color.classic_receivable : R.color.receivable);
-                    typeText = "MÌNH TRẢ NỢ";
-                    break;
-                default:
-                    color = ContextCompat.getColor(itemView.getContext(), R.color.outline);
-                    typeText = "GIAO DỊCH";
+            if (record.type == null) {
+                color = ContextCompat.getColor(itemView.getContext(), R.color.outline);
+                typeText = itemView.getContext().getString(R.string.transaction_type_default);
+            } else {
+                switch (record.type) {
+                    case LEND:
+                        color = ContextCompat.getColor(itemView.getContext(), useClassicColors ? R.color.classic_receivable : R.color.receivable);
+                        typeText = itemView.getContext().getString(R.string.transaction_type_lend);
+                        break;
+                    case REPAY:
+                        color = ContextCompat.getColor(itemView.getContext(), useClassicColors ? R.color.classic_payable : R.color.payable);
+                        typeText = itemView.getContext().getString(R.string.transaction_type_repay);
+                        break;
+                    case BORROW:
+                        color = ContextCompat.getColor(itemView.getContext(), useClassicColors ? R.color.classic_payable : R.color.payable);
+                        typeText = itemView.getContext().getString(R.string.transaction_type_borrow);
+                        break;
+                    case PAY_BACK:
+                        color = ContextCompat.getColor(itemView.getContext(), useClassicColors ? R.color.classic_receivable : R.color.receivable);
+                        typeText = itemView.getContext().getString(R.string.transaction_type_pay_back);
+                        break;
+                    default:
+                        color = ContextCompat.getColor(itemView.getContext(), R.color.outline);
+                        typeText = itemView.getContext().getString(R.string.transaction_type_default);
+                }
             }
 
             indicator.setBackgroundColor(color);
