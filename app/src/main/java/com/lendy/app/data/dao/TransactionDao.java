@@ -26,6 +26,9 @@ public abstract class TransactionDao {
     @Update
     public abstract int updateRecord(TransactionRecord record);
 
+    @Update
+    public abstract void updateRecords(List<TransactionRecord> records);
+
     // Xóa một giao dịch khỏi máy
     @Delete
     public abstract int deleteRecord(TransactionRecord record);
@@ -82,9 +85,6 @@ public abstract class TransactionDao {
 
         insertRecord(record);
         updatePerson(person);
-        
-        // Đảm bảo các snapshot trước đó/sau đó (nếu có) cũng được đồng bộ
-        recomputeSnapshotsForPerson(record.personId);
     }
 
     /**
@@ -106,6 +106,9 @@ public abstract class TransactionDao {
         }
 
         adjustBalance(persistedRecord.personId, -calculateDelta(persistedRecord));
+        
+        // Cập nhật lại snapshot sau khi xóa
+        recomputeSnapshotsForPerson(persistedRecord.personId);
     }
 
     /**
@@ -160,8 +163,6 @@ public abstract class TransactionDao {
         person.totalBalance += delta;
         person.updatedAt = System.currentTimeMillis(); // Ghi nhận thời gian vừa cập nhật
         updatePerson(person);
-        
-        recomputeSnapshotsForPerson(personId);
     }
 
     /**
@@ -173,13 +174,25 @@ public abstract class TransactionDao {
         if (person == null) return;
 
         List<TransactionRecord> timeline = getTimelineSync(personId);
+        java.util.List<TransactionRecord> recordsToUpdate = new java.util.ArrayList<>();
         long currentBalance = 0;
 
         for (TransactionRecord record : timeline) {
             currentBalance += calculateDelta(record);
-            record.balanceSnapshot = currentBalance;
-            record.personNameSnapshot = person.name;
-            updateRecord(record);
+            
+            // Chỉ cập nhật nếu snapshot bị sai khác để tối ưu hóa việc ghi đĩa
+            if (record.balanceSnapshot == null || record.balanceSnapshot != currentBalance || 
+                !person.name.equals(record.personNameSnapshot)) {
+                
+                record.balanceSnapshot = currentBalance;
+                record.personNameSnapshot = person.name;
+                recordsToUpdate.add(record);
+            }
+        }
+
+        // Cập nhật hàng loạt (Batch update) để tăng tốc độ
+        if (!recordsToUpdate.isEmpty()) {
+            updateRecords(recordsToUpdate);
         }
 
         // Cập nhật lại số dư cuối cùng vào bảng people phòng trường hợp lệch
