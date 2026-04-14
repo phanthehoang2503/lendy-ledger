@@ -35,6 +35,7 @@ public class StatsFragment extends Fragment {
     private LendyViewModel viewModel;
     private PieChart pieChart;
     private PersonAdapter topDebtorsAdapter;
+    private View textTopDebtorsTitle, cardTopDebtors;
 
     @Nullable
     @Override
@@ -42,6 +43,9 @@ public class StatsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_stats, container, false);
 
         pieChart = view.findViewById(R.id.pieChart);
+        textTopDebtorsTitle = view.findViewById(R.id.textTopDebtorsTitle);
+        cardTopDebtors = view.findViewById(R.id.cardTopDebtors);
+        
         setupRecyclerView(view);
         setupViewModel();
 
@@ -71,15 +75,21 @@ public class StatsFragment extends Fragment {
 
         // 2. Cập nhật danh sách Top 3 (Lấy từ Active Debts và sắp xếp)
         viewModel.getActiveDebts().observe(getViewLifecycleOwner(), people -> {
-            if (people != null && !people.isEmpty()) {
+            boolean hasDebts = people != null && !people.isEmpty();
+            if (hasDebts) {
+                textTopDebtorsTitle.setVisibility(View.VISIBLE);
+                cardTopDebtors.setVisibility(View.VISIBLE);
+                
                 List<Person> sortedList = new ArrayList<>(people);
-                // Sắp xếp giảm dần theo nợ (Person.balance)
+                // Sắp xếp giảm dần theo nợ (Person.totalBalance)
                 Collections.sort(sortedList, (p1, p2) -> Double.compare(Math.abs(p2.totalBalance), Math.abs(p1.totalBalance)));
                 
                 // Lấy tối đa 3 người
                 int limit = Math.min(sortedList.size(), 3);
                 topDebtorsAdapter.setPeople(sortedList.subList(0, limit));
             } else {
+                textTopDebtorsTitle.setVisibility(View.GONE);
+                cardTopDebtors.setVisibility(View.GONE);
                 topDebtorsAdapter.setPeople(new ArrayList<>());
             }
         });
