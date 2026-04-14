@@ -20,6 +20,7 @@ public class PersonAdapter extends RecyclerView.Adapter<PersonAdapter.PersonView
 
     private List<Person> people = new ArrayList<>();
     private List<Person> peopleFull = new ArrayList<>();
+    private boolean useUnifiedColor = false;
     private final OnPersonClickListener listener;
     private final OnPersonLongClickListener longListener;
 
@@ -50,6 +51,11 @@ public class PersonAdapter extends RecyclerView.Adapter<PersonAdapter.PersonView
         notifyDataSetChanged();
     }
 
+    public void setUseUnifiedColor(boolean useUnifiedColor) {
+        this.useUnifiedColor = useUnifiedColor;
+        notifyDataSetChanged();
+    }
+
     public void filter(String k) {
         people.clear();
         if (k.isEmpty()) {
@@ -57,8 +63,8 @@ public class PersonAdapter extends RecyclerView.Adapter<PersonAdapter.PersonView
         } else {
             String filterPattern = k.toLowerCase().trim();
             for (Person item : peopleFull) {
-                if (item.name.toLowerCase().contains(filterPattern) || 
-                    (item.phoneNumber != null && item.phoneNumber.contains(filterPattern))) {
+                if (item.name.toLowerCase().contains(filterPattern) ||
+                        (item.phoneNumber != null && item.phoneNumber.contains(filterPattern))) {
                     people.add(item);
                 }
             }
@@ -83,7 +89,7 @@ public class PersonAdapter extends RecyclerView.Adapter<PersonAdapter.PersonView
     @Override
     public void onBindViewHolder(@NonNull PersonViewHolder holder, int position) {
         Person person = people.get(position);
-        holder.bind(person, listener, longListener, avatarColors);
+        holder.bind(person, listener, longListener, avatarColors, useUnifiedColor);
     }
 
     @Override
@@ -104,29 +110,43 @@ public class PersonAdapter extends RecyclerView.Adapter<PersonAdapter.PersonView
             textBalance = itemView.findViewById(R.id.textBalance);
         }
 
-        public void bind(final Person person, final OnPersonClickListener listener, 
-                         final OnPersonLongClickListener longListener, int[] colors) {
+        public void bind(final Person person, final OnPersonClickListener listener,
+                final OnPersonLongClickListener longListener, int[] colors, boolean useUnifiedColor) {
             textName.setText(person.name);
-            textPhone.setText(person.phoneNumber != null && !person.phoneNumber.isEmpty() ? person.phoneNumber : "Chưa có SĐT");
-            
+            textPhone.setText(
+                    person.phoneNumber != null && !person.phoneNumber.isEmpty() ? person.phoneNumber : "Chưa có SĐT");
+
             if (person.name != null && !person.name.isEmpty()) {
                 textInitial.setText(person.name.substring(0, 1).toUpperCase());
                 int colorIndex = (person.name.hashCode() & 0x7FFFFFFF) % colors.length;
                 avatarContainer.setCardBackgroundColor(colors[colorIndex]);
             }
 
-            // CLEAN CODE: Dùng FormatUtils
             String formattedBalance = FormatUtils.formatCurrencyAbs(person.totalBalance);
 
-            if (person.totalBalance > 0) {
-                textBalance.setText("+" + formattedBalance);
-                textBalance.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.receivable));
-            } else if (person.totalBalance < 0) {
-                textBalance.setText("-" + formattedBalance);
-                textBalance.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.payable));
+            if (useUnifiedColor) {
+                textBalance.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.black));
+                if (person.totalBalance > 0) {
+                    textBalance.setText("+" + formattedBalance);
+                } else if (person.totalBalance < 0) {
+                    textBalance.setText("-" + formattedBalance);
+                } else {
+                    textBalance.setText(formattedBalance);
+                }
+                // Toggle amount itself to Navy as suggested indicator color
+                textBalance.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.unified_indicator));
             } else {
-                textBalance.setText(formattedBalance);
-                textBalance.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.outline));
+                // Chế độ truyền thống (Xanh/Đỏ)
+                if (person.totalBalance > 0) {
+                    textBalance.setText("+" + formattedBalance);
+                    textBalance.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.receivable));
+                } else if (person.totalBalance < 0) {
+                    textBalance.setText("-" + formattedBalance);
+                    textBalance.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.payable));
+                } else {
+                    textBalance.setText(formattedBalance);
+                    textBalance.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.outline));
+                }
             }
 
             itemView.setOnClickListener(v -> {
