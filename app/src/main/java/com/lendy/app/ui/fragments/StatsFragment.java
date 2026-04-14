@@ -66,6 +66,7 @@ public class StatsFragment extends Fragment {
         // Adapter mini cho danh sách Top 3
         topDebtorsAdapter = new PersonAdapter(person -> {}, person -> {});
         topDebtorsAdapter.setUseUnifiedColor(true);
+        topDebtorsAdapter.setUseClassicColors(true);
         recyclerViewTopDebtors.setAdapter(topDebtorsAdapter);
 
         toggleGroup.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
@@ -144,8 +145,8 @@ public class StatsFragment extends Fragment {
 
         PieDataSet dataSet = new PieDataSet(entries, "");
         dataSet.setColors(new int[] {
-                ContextCompat.getColor(requireContext(), R.color.receivable),
-                ContextCompat.getColor(requireContext(), R.color.payable)
+                ContextCompat.getColor(requireContext(), R.color.classic_receivable),
+                ContextCompat.getColor(requireContext(), R.color.classic_payable)
         });
         dataSet.setValueTextColor(Color.WHITE);
         dataSet.setValueTextSize(14f);

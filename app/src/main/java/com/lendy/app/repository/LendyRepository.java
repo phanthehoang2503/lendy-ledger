@@ -122,7 +122,7 @@ public class LendyRepository {
     public void deletePerson(Person person) {
         executor.execute(() -> {
             try {
-                personDao.delete(person);
+                personDao.softDelete(person.id);
             } catch (Exception e) {
                 postError("Lỗi xóa người nợ.", e);
             }
@@ -132,6 +132,10 @@ public class LendyRepository {
     private void postError(String userMessage, Exception e) {
         Log.e(TAG, userMessage, e);
         errorNotifier.postValue(new Event<>(userMessage));
+    }
+
+    public LiveData<List<TransactionRecord>> getAllTransactions() {
+        return transactionDao.getAllTransactions();
     }
 
     public LiveData<List<Person>> getActiveDebts() {

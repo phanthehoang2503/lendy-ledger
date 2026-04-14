@@ -128,25 +128,17 @@ public class PersonDetailActivity extends AppCompatActivity {
         LendyViewModelFactory factory = new LendyViewModelFactory(repository);
         viewModel = new ViewModelProvider(this, factory).get(LendyViewModel.class);
 
-        viewModel.getActiveDebts().observe(this, people -> {
-            if (people == null)
-                return;
+        viewModel.getPersonById(personId).observe(this, person -> {
+            if (person != null) {
+                currentBalance = person.totalBalance;
+                updateBalanceUI(person.totalBalance);
 
-            // tìm kiếm có reset state
-            boolean found = false;
-            for (Person p : people) {
-                if (p.id == personId) {
-                    currentBalance = p.totalBalance;
-                    updateBalanceUI(p.totalBalance);
-                    found = true;
-                    break;
-                }
-            }
-
-            // Nếu không tìm thấy (đã trả hết nợ), reset UI về 0
-            if (!found) {
-                currentBalance = 0;
-                updateBalanceUI(0);
+                // Cập nhật lại tên và SĐT nếu có thay đổi
+                String displayName = person.isDeleted ? person.name + " (Đã xóa)" : person.name;
+                textName.setText(displayName);
+                textPhone.setText(person.phoneNumber != null && !person.phoneNumber.isEmpty()
+                        ? person.phoneNumber
+                        : "Không có SĐT");
             }
         });
 
@@ -161,13 +153,13 @@ public class PersonDetailActivity extends AppCompatActivity {
         String formatted = FormatUtils.formatCurrencyAbs(balance);
 
         if (balance > 0) {
-            textBalance.setText("+ " + formatted);
+            textBalance.setText(formatted);
             textBalance.setTextColor(ContextCompat.getColor(this, R.color.receivable));
         } else if (balance < 0) {
-            textBalance.setText("- " + formatted);
+            textBalance.setText(formatted);
             textBalance.setTextColor(ContextCompat.getColor(this, R.color.payable));
         } else {
-            textBalance.setText(formatted);
+            textBalance.setText("0 đ");
             textBalance.setTextColor(ContextCompat.getColor(this, R.color.outline));
         }
     }
@@ -349,8 +341,7 @@ public class PersonDetailActivity extends AppCompatActivity {
                     if (!cleanString.isEmpty()) {
                         try {
                             String formatted = FormatUtils.formatThousand(
-                                    Long.parseLong(cleanString)
-                            );
+                                    Long.parseLong(cleanString));
                             current = formatted;
                             editAmount.setText(formatted);
                             editAmount.setSelection(formatted.length());

@@ -47,6 +47,14 @@ public class LendyViewModel extends ViewModel {
         return repository.getTimeline(personId);
     }
 
+    public LiveData<List<TransactionRecord>> getAllTransactions() {
+        return repository.getAllTransactions();
+    }
+
+    public LiveData<Person> getPersonById(long id) {
+        return repository.getPersonById(id);
+    }
+
     public void addTransaction(TransactionRecord record) {
         repository.createTransaction(record);
     }

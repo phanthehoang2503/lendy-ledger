@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.lendy.app.R;
 import com.lendy.app.repository.LendyRepository;
 import com.lendy.app.ui.activities.PersonDetailActivity;
-import com.lendy.app.ui.adapters.PersonAdapter;
+import com.lendy.app.ui.adapters.TransactionAdapter;
 import com.lendy.app.viewmodel.LendyViewModel;
 import com.lendy.app.viewmodel.LendyViewModelFactory;
 
@@ -25,7 +25,7 @@ import java.util.ArrayList;
 public class HistoryFragment extends Fragment {
 
     private LendyViewModel viewModel;
-    private PersonAdapter adapter;
+    private TransactionAdapter adapter;
     private View emptyView;
 
     @Nullable
@@ -49,16 +49,8 @@ public class HistoryFragment extends Fragment {
         RecyclerView recyclerView = view.findViewById(R.id.recyclerViewHistory);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         
-        adapter = new PersonAdapter(person -> {
-            Intent intent = new Intent(getActivity(), PersonDetailActivity.class);
-            intent.putExtra(PersonDetailActivity.EXTRA_PERSON_ID, person.id);
-            intent.putExtra(PersonDetailActivity.EXTRA_PERSON_NAME, person.name);
-            intent.putExtra(PersonDetailActivity.EXTRA_PERSON_PHONE, person.phoneNumber);
-            startActivity(intent);
-        }, person -> {
-            // Long click: Placeholder
-        });
-        
+        adapter = new TransactionAdapter();
+        adapter.setUseClassicColors(true);
         recyclerView.setAdapter(adapter);
     }
 
@@ -68,13 +60,13 @@ public class HistoryFragment extends Fragment {
         LendyRepository repository = new LendyRepository(getActivity().getApplication());
         viewModel = new ViewModelProvider(requireActivity(), new LendyViewModelFactory(repository)).get(LendyViewModel.class);
 
-        viewModel.getCompletedDebts().observe(getViewLifecycleOwner(), people -> {
-            if (people == null || people.isEmpty()) {
+        viewModel.getAllTransactions().observe(getViewLifecycleOwner(), transactions -> {
+            if (transactions == null || transactions.isEmpty()) {
                 emptyView.setVisibility(View.VISIBLE);
             } else {
                 emptyView.setVisibility(View.GONE);
             }
-            adapter.setPeople(people != null ? people : new ArrayList<>());
+            adapter.setTransactions(transactions != null ? transactions : new ArrayList<>());
         });
     }
 }

@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
     private LendyViewModel viewModel;
     private ViewPager2 viewPager;
     private BottomNavigationView bottomNav;
-    private TextView textTotalLending, textTotalBorrowing;
+    private TextView textTotalLending, textTotalBorrowing, textAppTitle;
     private View welcomeContainer, summaryCard;
 
     @Override
@@ -56,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
         textTotalBorrowing = findViewById(R.id.textTotalBorrowing);
         welcomeContainer = findViewById(R.id.header_welcome_container);
         summaryCard = findViewById(R.id.summary_card);
+        textAppTitle = findViewById(R.id.textAppTitle);
 
         // 2. Toolbar
         setSupportActionBar(findViewById(R.id.toolbar));
@@ -74,10 +75,19 @@ public class MainActivity extends AppCompatActivity {
         });
 
         ViewCompat.setOnApplyWindowInsetsListener(viewPager, (v, insets) -> {
-            // Sử dụng post() để chắc chắn bottomNav đã được đo (measured)
-            bottomNav.post(() -> {
-                v.setPadding(0, 0, 0, bottomNav.getHeight());
-            });
+            int navHeight = bottomNav.getHeight();
+            if (navHeight > 0) {
+                v.setPadding(0, 0, 0, navHeight);
+            } else {
+                bottomNav.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+                    @Override
+                    public void onLayoutChange(View view, int left, int top, int right, int bottom, int oldLeft,
+                            int oldTop, int oldRight, int oldBottom) {
+                        bottomNav.removeOnLayoutChangeListener(this);
+                        v.setPadding(0, 0, 0, bottomNav.getHeight());
+                    }
+                });
+            }
             return insets;
         });
     }
@@ -133,14 +143,19 @@ public class MainActivity extends AppCompatActivity {
         LendyRepository repository = new LendyRepository(getApplication());
         viewModel = new ViewModelProvider(this, new LendyViewModelFactory(repository)).get(LendyViewModel.class);
 
-        // Summary vẫn nằm ở MainActivity vì nó cố định ở Top
         viewModel.getGlobalSummary().observe(this, summary -> {
             if (summary == null)
                 return;
-            NumberFormat nf = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
-            textTotalLending.setText("+" + nf.format(summary.totalLending != null ? summary.totalLending : 0));
-            textTotalBorrowing
-                    .setText("-" + nf.format(Math.abs(summary.totalBorrowing != null ? summary.totalBorrowing : 0)));
+
+            long lendingVal = summary.totalLending != null ? summary.totalLending : 0;
+            long borrowingVal = Math.abs(summary.totalBorrowing != null ? summary.totalBorrowing : 0);
+
+            // Format số
+            textTotalLending.setText(com.lendy.app.utils.FormatUtils.formatCurrency(lendingVal));
+            textTotalBorrowing.setText(com.lendy.app.utils.FormatUtils.formatCurrency(borrowingVal));
+
+            textTotalLending.setTextColor(androidx.core.content.ContextCompat.getColor(this, R.color.receivable));
+            textTotalBorrowing.setTextColor(androidx.core.content.ContextCompat.getColor(this, R.color.payable));
         });
 
         viewModel.getErrorObserver().observe(this, event -> {
@@ -152,14 +167,26 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateHeaderVisibility(int position) {
-        // Animation khi ẩn/hiện
-        TransitionManager.beginDelayedTransition((ViewGroup) findViewById(R.id.main));
         if (position == 0) {
+            textAppTitle.setText("L E N D Y");
             welcomeContainer.setVisibility(View.VISIBLE);
             summaryCard.setVisibility(View.VISIBLE);
         } else {
             welcomeContainer.setVisibility(View.GONE);
             summaryCard.setVisibility(View.GONE);
+
+            // Cập nhật tiêu đề động theo từng Tab
+            switch (position) {
+                case 1:
+                    textAppTitle.setText("THỐNG KÊ");
+                    break;
+                case 2:
+                    textAppTitle.setText("LỊCH SỬ");
+                    break;
+                case 3:
+                    textAppTitle.setText("DANH BẠ");
+                    break;
+            }
         }
     }
 

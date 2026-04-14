@@ -38,9 +38,12 @@ public abstract class TransactionDao {
     @Query("SELECT * FROM people WHERE id = :personId")
     public abstract Person getPersonSync(long personId);
 
-    // Cập nhật số dư mới cho một người
     @Update
     public abstract void updatePerson(Person person);
+
+    // Lấy toàn bộ lịch sử giao dịch (Toàn app), cái mới nhất hiện lên đầu
+    @Query("SELECT * FROM transactions ORDER BY timestamp DESC, id DESC")
+    public abstract LiveData<List<TransactionRecord>> getAllTransactions();
 
     // Lấy toàn bộ lịch sử giao dịch của một người, cái mới nhất hiện lên đầu
     @Query("SELECT * FROM transactions WHERE personId = :personId ORDER BY timestamp DESC, id DESC")
@@ -55,9 +58,23 @@ public abstract class TransactionDao {
      */
     @Transaction
     public void addTransaction(TransactionRecord record) {
+        Person person = getPersonSync(record.personId);
+        if (person == null) {
+            throw new IllegalStateException("Không tìm thấy người có mã ID " + record.personId);
+        }
+
         long delta = calculateDelta(record);
+        
+        // Cập nhật số dư trong Object person trước
+        person.totalBalance += delta;
+        person.updatedAt = System.currentTimeMillis();
+        
+        // Lưu Snapshot vào giao dịch để sau này tra cứu "Số dư lúc đó"
+        record.balanceSnapshot = person.totalBalance;
+        record.personNameSnapshot = person.name;
+
         insertRecord(record);
-        adjustBalance(record.personId, delta);
+        updatePerson(person);
     }
 
     /**
