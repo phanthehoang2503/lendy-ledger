@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,7 +22,6 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.lendy.app.R;
 import com.lendy.app.data.TransactionType;
@@ -69,6 +67,13 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(0, 0, 0, systemBars.bottom);
             return insets;
         });
+
+        ViewCompat.setOnApplyWindowInsetsListener(viewPager, (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            // Đảm bảo nội dung Fragment không bị BottomNav đè lên
+            v.setPadding(0, 0, 0, bottomNav.getHeight());
+            return insets;
+        });
     }
 
     private void setupNavigation() {
@@ -79,7 +84,15 @@ public class MainActivity extends AppCompatActivity {
         viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageSelected(int position) {
-                bottomNav.getMenu().getItem(position).setChecked(true);
+                int menuId;
+                switch (position) {
+                    case 0: menuId = R.id.nav_home; break;
+                    case 1: menuId = R.id.nav_stats; break;
+                    case 2: menuId = R.id.nav_history; break;
+                    case 3: menuId = R.id.nav_contacts; break;
+                    default: menuId = R.id.nav_home;
+                }
+                bottomNav.setSelectedItemId(menuId);
             }
         });
 
@@ -132,57 +145,6 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-//    private void showResetConfirmation() {
-//        new MaterialAlertDialogBuilder(this)
-//                .setTitle(R.string.confirm_reset_title)
-//                .setMessage(R.string.confirm_reset_message)
-//                .setPositiveButton("Xóa hết", (d, w) -> viewModel.clearAllData())
-//                .setNegativeButton("Hủy", null)
-//                .show();
-//    }
-//
-//    private void showEditPersonDialog(Person person) {
-//        View v = LayoutInflater.from(this).inflate(R.layout.dialog_add_person, null);
-//        v.findViewById(R.id.layoutAmount).setVisibility(View.GONE);
-//        v.findViewById(R.id.toggleGroup).setVisibility(View.GONE);
-//        v.findViewById(R.id.layoutNote).setVisibility(View.GONE);
-//        v.findViewById(R.id.scrollChips).setVisibility(View.GONE);
-//
-//        TextInputEditText editName = v.findViewById(R.id.editName);
-//        TextInputEditText editPhone = v.findViewById(R.id.editPhone);
-//
-//        editName.setText(person.name);
-//        editPhone.setText(person.phoneNumber);
-//
-//        AlertDialog dialog = new MaterialAlertDialogBuilder(this)
-//                .setTitle("Cập nhật thông tin")
-//                .setView(v)
-//                .setPositiveButton("Lưu", null)
-//                .setNegativeButton("Hủy", null)
-//                .create();
-//
-//        dialog.setOnShowListener(dialogInterface -> {
-//            android.widget.Button button = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-//            button.setOnClickListener(view -> {
-//                String name = editName.getText().toString().trim();
-//                String phone = editPhone.getText().toString().trim();
-//
-//                if (name.isEmpty()) {
-//                    editName.setError("Vui lòng nhập tên người nợ");
-//                    return;
-//                }
-//
-//                person.name = name;
-//                person.phoneNumber = phone;
-//                person.updatedAt = System.currentTimeMillis();
-//
-//                viewModel.addPerson(person);
-//                dialog.dismiss();
-//            });
-//        });
-//
-//        dialog.show();
-//    }
 
     public void showAddPersonDialog() {
         View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_add_person, null);
