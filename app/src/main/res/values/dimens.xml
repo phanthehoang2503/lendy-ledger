@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="header_padding_top">70dp</dimen>
+    <dimen name="header_padding_top">16dp</dimen>
     <dimen name="main_bottom_nav_height">56dp</dimen>
     <dimen name="card_margin_horizontal">20dp</dimen>
     <dimen name="card_corner_radius">24dp</dimen>
