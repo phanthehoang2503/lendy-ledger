@@ -40,5 +40,29 @@ thông tin nợ sẽ hiện ở đây.</string>
     <string name="contacts_empty_subtitle">Những người bạn đã từng giao dịch 
 sẽ xuất hiện tại đây.</string>
     
-    <string name="placeholder_home_title">Home Fragment</string>
+    <!-- Tab Titles -->
+    <string name="tab_home">L E N D Y</string>
+    <string name="tab_stats">THỐNG KÊ</string>
+    <string name="tab_history">LỊCH SỬ</string>
+    <string name="tab_contacts">DANH BẠ</string>
+
+    <!-- Stats & Charts -->
+    <string name="label_lend">Họ nợ mình</string>
+    <string name="label_borrow">Mình nợ họ</string>
+    <string name="total_debt_center">Tổng nợ</string>
+
+    <!-- Transactions -->
+    <string name="anonymous_person">Người nợ ẩn danh</string>
+    <string name="remaining_debt_format">Số nợ còn lại: %s</string>
+    <string name="no_note">Không có ghi chú</string>
+    <string name="transaction_type_lend">CHO VAY THÊM</string>
+    <string name="transaction_type_repay">HỌ TRẢ NỢ</string>
+    <string name="transaction_type_borrow">MÌNH VAY THÊM</string>
+    <string name="transaction_type_pay_back">MÌNH TRẢ NỢ</string>
+    <string name="transaction_type_default">GIAO DỊCH</string>
+
+    <!-- Accessibility -->
+    <string name="add_item">Thêm khoản nợ mới</string>
+    <string name="balance_receivable_talkback">Khoản thu: %s</string>
+    <string name="balance_payable_talkback">Khoản trả: %s</string>
 </resources>

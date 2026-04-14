@@ -27,4 +27,8 @@
     <color name="outline">#72777E</color>
     <color name="gray_unchecked">#757575</color>
     <color name="unified_indicator">#1A237E</color>
+
+    <!-- Decoration Colors -->
+    <color name="divider">#EEEEEE</color>
+    <color name="border_light">#EEEEEE</color>
 </resources>
