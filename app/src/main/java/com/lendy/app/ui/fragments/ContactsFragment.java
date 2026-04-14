@@ -55,7 +55,7 @@ public class ContactsFragment extends Fragment {
             intent.putExtra(PersonDetailActivity.EXTRA_PERSON_NAME, person.name);
             intent.putExtra(PersonDetailActivity.EXTRA_PERSON_PHONE, person.phoneNumber);
             startActivity(intent);
-        }, this::showEditPersonDialog);
+        }, this::showPersonOptionsDialog);
         
         recyclerView.setAdapter(adapter);
     }
@@ -76,8 +76,33 @@ public class ContactsFragment extends Fragment {
         });
     }
 
+    private void showPersonOptionsDialog(Person person) {
+        String[] options = {"Chỉnh sửa thông tin", "Xóa người này"};
+        new MaterialAlertDialogBuilder(requireContext())
+                .setTitle(person.name)
+                .setItems(options, (dialog, which) -> {
+                    if (which == 0) {
+                        showEditPersonDialog(person);
+                    } else {
+                        showDeleteConfirmation(person);
+                    }
+                })
+                .show();
+    }
+
+    private void showDeleteConfirmation(Person person) {
+        new MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Xác nhận xóa")
+                .setMessage("Bạn có chắc chắn muốn xóa '" + person.name + "'? Toàn bộ lịch sử giao dịch sẽ bị mất.")
+                .setPositiveButton("Xóa", (dialog, which) -> {
+                    viewModel.removePerson(person);
+                })
+                .setNegativeButton("Hủy", null)
+                .show();
+    }
+
     private void showEditPersonDialog(Person person) {
-        View v = LayoutInflater.from(getContext()).inflate(R.layout.dialog_add_person, null);
+        View v = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_add_person, null);
         v.findViewById(R.id.layoutAmount).setVisibility(View.GONE);
         v.findViewById(R.id.toggleGroup).setVisibility(View.GONE);
         v.findViewById(R.id.layoutNote).setVisibility(View.GONE);
