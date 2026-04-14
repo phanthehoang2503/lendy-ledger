@@ -49,6 +49,10 @@ public abstract class TransactionDao {
     @Query("SELECT * FROM transactions WHERE personId = :personId ORDER BY timestamp DESC, id DESC")
     public abstract LiveData<List<TransactionRecord>> getTimeline(long personId);
 
+    // Lấy toàn bộ lịch sử giao dịch của một người theo thứ tự thời gian (phục vụ tính toán lại)
+    @Query("SELECT * FROM transactions WHERE personId = :personId ORDER BY timestamp ASC, id ASC")
+    public abstract List<TransactionRecord> getTimelineSync(long personId);
+
     /**
      * Khi gọi hàm này, máy sẽ vừa lưu lịch sử, vừa tự cộng/trừ tiền vào ví người
      * đó.
@@ -61,6 +65,9 @@ public abstract class TransactionDao {
         Person person = getPersonSync(record.personId);
         if (person == null) {
             throw new IllegalStateException("Không tìm thấy người có mã ID " + record.personId);
+        }
+        if (person.isDeleted) {
+            throw new IllegalStateException("Không thể thêm giao dịch cho người đã bị xóa.");
         }
 
         long delta = calculateDelta(record);
@@ -75,6 +82,9 @@ public abstract class TransactionDao {
 
         insertRecord(record);
         updatePerson(person);
+        
+        // Đảm bảo các snapshot trước đó/sau đó (nếu có) cũng được đồng bộ
+        recomputeSnapshotsForPerson(record.personId);
     }
 
     /**
@@ -127,6 +137,11 @@ public abstract class TransactionDao {
         if (updated != 1) {
             throw new IllegalStateException("Không thể cập nhật giao dịch. Bản ghi có thể đã bị xóa.");
         }
+        
+        recomputeSnapshotsForPerson(newRecord.personId);
+        if (oldRecord.personId != newRecord.personId) {
+            recomputeSnapshotsForPerson(oldRecord.personId);
+        }
     }
 
     /**
@@ -139,9 +154,39 @@ public abstract class TransactionDao {
             throw new IllegalStateException(
                     "Không tìm thấy người có mã ID " + personId + ". Dữ liệu có thể đã bị lỗi!");
         }
+        if (person.isDeleted) {
+            throw new IllegalStateException("Không thể thay đổi số dư của người đã bị xóa.");
+        }
         person.totalBalance += delta;
         person.updatedAt = System.currentTimeMillis(); // Ghi nhận thời gian vừa cập nhật
         updatePerson(person);
+        
+        recomputeSnapshotsForPerson(personId);
+    }
+
+    /**
+     * Tính toán lại toàn bộ snapshot cho một người để đảm bảo tính nhất quán khi có sửa/xóa.
+     */
+    @Transaction
+    public void recomputeSnapshotsForPerson(long personId) {
+        Person person = getPersonSync(personId);
+        if (person == null) return;
+
+        List<TransactionRecord> timeline = getTimelineSync(personId);
+        long currentBalance = 0;
+
+        for (TransactionRecord record : timeline) {
+            currentBalance += calculateDelta(record);
+            record.balanceSnapshot = currentBalance;
+            record.personNameSnapshot = person.name;
+            updateRecord(record);
+        }
+
+        // Cập nhật lại số dư cuối cùng vào bảng people phòng trường hợp lệch
+        if (person.totalBalance != currentBalance) {
+            person.totalBalance = currentBalance;
+            updatePerson(person);
+        }
     }
 
     private long calculateDelta(TransactionRecord record) {

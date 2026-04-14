@@ -43,6 +43,9 @@ public interface PersonDao {
     @Query("SELECT * FROM people WHERE id = :id AND isDeleted = 0")
     LiveData<Person> getPersonById(long id);
 
+    @Query("SELECT * FROM people WHERE id = :id")
+    LiveData<Person> getPersonByIdIncludingDeleted(long id);
+
     @Query("SELECT " +
             "COALESCE(SUM(CASE WHEN totalBalance > 0 THEN totalBalance ELSE 0 END), 0) as totalLending, " +
             "COALESCE(SUM(CASE WHEN totalBalance < 0 THEN ABS(totalBalance) ELSE 0 END), 0) as totalBorrowing " +

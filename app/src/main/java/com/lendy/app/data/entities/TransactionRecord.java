@@ -30,6 +30,6 @@ public class TransactionRecord { // <-- lo cái này trở xuống kệ đống 
 	public String note;
 	public String imageUri;
 	public long timestamp;
-	public long balanceSnapshot;
+	public Long balanceSnapshot;
 	public String personNameSnapshot;
 }
