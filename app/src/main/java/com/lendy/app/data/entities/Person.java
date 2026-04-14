@@ -22,4 +22,5 @@ public class Person {
     public String phoneNumber;
     public long totalBalance;
     public long updatedAt;
+    public boolean isDeleted;
 }

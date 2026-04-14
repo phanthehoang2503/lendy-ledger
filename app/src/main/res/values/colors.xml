@@ -13,12 +13,22 @@
     <color name="primary_container">#E3F2FD</color>
     <color name="text_white_secondary">#B3FFFFFF</color>
 
-    <!-- Status Colors -->
-    <color name="receivable">#2E7D32</color> <!-- Xanh lá chuẩn -->
-    <color name="payable">#D32F2F</color>    <!-- Đỏ chuẩn -->
+    <!-- Neutral Status Colors -->
+    <color name="receivable">#34495E</color> <!-- Deep Slate Blue (Họ nợ mình - Tin cậy) -->
+    <color name="payable">#5D6D7E</color>    <!-- Warm Charcoal (Mình nợ họ - Nhẹ nhàng) -->
+
+    <!-- Classic Status Colors for Stats/History (Muted variants) -->
+    <color name="classic_receivable">#2E7D32</color> <!-- Muted Dark Green -->
+    <color name="classic_payable">#C62828</color>    <!-- Muted Dark Red -->
 
     <!-- Backgrounds -->
     <color name="background">#F0F2F5</color>
     <color name="surface">#FFFFFF</color>
     <color name="outline">#72777E</color>
+    <color name="gray_unchecked">#757575</color>
+    <color name="unified_indicator">#1A237E</color>
+
+    <!-- Decoration Colors -->
+    <color name="divider">#EEEEEE</color>
+    <color name="border_light">#EEEEEE</color>
 </resources>

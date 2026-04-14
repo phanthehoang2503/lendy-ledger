@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Lendy</string>
+    <string name="app_name">L E N D Y</string>
     <string name="action_history">Lịch sử nợ</string>
     <string name="action_contacts">Danh bạ</string>
     <string name="action_reset">Xóa sạch dữ liệu</string>
@@ -8,6 +8,7 @@
     <string name="no_completed_debts">Chưa có khoản nợ nào hoàn thành</string>
     <string name="no_contacts">Chưa có liên lạc nào</string>
     <string name="edit_person">Sửa thông tin</string>
+    <string name="statistics">Thống kê</string>
 
     <string name="confirm_reset_title">Xóa toàn bộ dữ liệu?</string>
     <string name="confirm_reset_message">Hành động này sẽ xóa sạch tất cả người nợ và lịch sử giao dịch. Bạn không thể hoàn tác!</string>
@@ -17,4 +18,51 @@
     <string name="transaction_note">Ghi chú (tùy chọn)</string>
     <string name="save">Lưu</string>
     <string name="cancel">Hủy</string>
+
+    <!-- Navigation -->
+    <string name="home">Trang chủ</string>
+    <string name="stats">Thống kê</string>
+    <string name="history">Lịch sử</string>
+    <string name="contacts">Danh bạ</string>
+    <string name="action_search">Tìm kiếm…</string>
+
+    <!-- Empty States -->
+    <string name="home_quick_add_hint">Ghi khoản nợ mới…</string>
+    <string name="home_empty_title">Sổ nợ đang trống</string>
+    <string name="home_empty_subtitle">Hãy nhấn thanh nhập phía trên để 
+bắt đầu ghi lại các khoản nợ nhé!</string>
+    
+    <string name="history_empty_title">Chưa có nợ hoàn thành</string>
+    <string name="history_empty_subtitle">Khi bạn trả xong hoặc người khác trả nợ, 
+thông tin nợ sẽ hiện ở đây.</string>
+    
+    <string name="contacts_empty_title">Danh bạ trống</string>
+    <string name="contacts_empty_subtitle">Những người bạn đã từng giao dịch 
+sẽ xuất hiện tại đây.</string>
+    
+    <!-- Tab Titles -->
+    <string name="tab_home">L E N D Y</string>
+    <string name="tab_stats">THỐNG KÊ</string>
+    <string name="tab_history">LỊCH SỬ</string>
+    <string name="tab_contacts">DANH BẠ</string>
+
+    <!-- Stats & Charts -->
+    <string name="label_lend">Họ nợ mình</string>
+    <string name="label_borrow">Mình nợ họ</string>
+    <string name="total_debt_center">Tổng nợ</string>
+
+    <!-- Transactions -->
+    <string name="anonymous_person">Người nợ ẩn danh</string>
+    <string name="remaining_debt_format">Số nợ còn lại: %s</string>
+    <string name="no_note">Không có ghi chú</string>
+    <string name="transaction_type_lend">CHO VAY THÊM</string>
+    <string name="transaction_type_repay">HỌ TRẢ NỢ</string>
+    <string name="transaction_type_borrow">MÌNH VAY THÊM</string>
+    <string name="transaction_type_pay_back">MÌNH TRẢ NỢ</string>
+    <string name="transaction_type_default">GIAO DỊCH</string>
+
+    <!-- Accessibility -->
+    <string name="add_item">Thêm khoản nợ mới</string>
+    <string name="balance_receivable_talkback">Khoản thu: %s</string>
+    <string name="balance_payable_talkback">Khoản trả: %s</string>
 </resources>

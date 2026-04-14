@@ -4,27 +4,35 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.lendy.app.R;
 import com.lendy.app.data.entities.TransactionRecord;
-import com.lendy.app.data.TransactionType;
 import com.lendy.app.utils.FormatUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.TransactionViewHolder> {
 
-    private List<TransactionRecord> transactions = new ArrayList<>();
-    private OnTransactionLongClickListener longClickListener;
-
     public interface OnTransactionLongClickListener {
         void onTransactionLongClick(TransactionRecord record);
     }
 
+    private List<TransactionRecord> transactions = new ArrayList<>();
+    private OnTransactionLongClickListener longClickListener;
+    private boolean useClassicColors = false;
+
     public void setOnTransactionLongClickListener(OnTransactionLongClickListener listener) {
         this.longClickListener = listener;
+    }
+
+    public TransactionRecord getTransactionAt(int position) {
+        if (position < 0 || position >= transactions.size()) return null;
+        return transactions.get(position);
     }
 
     public void setTransactions(List<TransactionRecord> transactions) {
@@ -32,11 +40,11 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         notifyDataSetChanged();
     }
 
-    public TransactionRecord getTransactionAt(int position) {
-        if (position >= 0 && position < transactions.size()) {
-            return transactions.get(position);
+    public void setUseClassicColors(boolean useClassicColors) {
+        if (this.useClassicColors != useClassicColors) {
+            this.useClassicColors = useClassicColors;
+            notifyItemRangeChanged(0, getItemCount());
         }
-        return null;
     }
 
     @NonNull
@@ -49,7 +57,15 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
     @Override
     public void onBindViewHolder(@NonNull TransactionViewHolder holder, int position) {
         TransactionRecord record = transactions.get(position);
-        holder.bind(record, longClickListener);
+        holder.bind(record, useClassicColors);
+
+        holder.itemView.setOnLongClickListener(v -> {
+            if (longClickListener != null) {
+                longClickListener.onTransactionLongClick(record);
+                return true;
+            }
+            return false;
+        });
     }
 
     @Override
@@ -58,58 +74,74 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
     }
 
     static class TransactionViewHolder extends RecyclerView.ViewHolder {
-        private final TextView textTransType, textTransDate, textTransAmount, textTransNote;
+        private final View indicator;
+        private final TextView textPersonName;
+        private final TextView textType;
+        private final TextView textAmount;
+        private final TextView textBalanceSnapshot;
+        private final TextView textNote;
+        private final TextView textDate;
 
         public TransactionViewHolder(@NonNull View itemView) {
             super(itemView);
-            textTransType = itemView.findViewById(R.id.textTransType);
-            textTransDate = itemView.findViewById(R.id.textTransDate);
-            textTransAmount = itemView.findViewById(R.id.textTransAmount);
-            textTransNote = itemView.findViewById(R.id.textTransNote);
+            indicator = itemView.findViewById(R.id.indicator);
+            textPersonName = itemView.findViewById(R.id.textPersonName);
+            textType = itemView.findViewById(R.id.textType);
+            textAmount = itemView.findViewById(R.id.textAmount);
+            textBalanceSnapshot = itemView.findViewById(R.id.textBalanceSnapshot);
+            textNote = itemView.findViewById(R.id.textNote);
+            textDate = itemView.findViewById(R.id.textDate);
         }
 
-        public void bind(TransactionRecord record, OnTransactionLongClickListener longClickListener) {
-            String typeStr = "";
+        public void bind(TransactionRecord record, boolean useClassicColors) {
+            // Hiển thị tên (snapshot)
+            textPersonName.setText(record.personNameSnapshot != null ? record.personNameSnapshot : itemView.getContext().getString(R.string.anonymous_person));
+
+            // Hiển thị số tiền
+            textAmount.setText(FormatUtils.formatCurrency(record.amount));
+
+            // Hiển thị số nợ sau giao dịch
+            String formattedBalance = FormatUtils.formatCurrencyAbs(record.balanceSnapshot != null ? record.balanceSnapshot : 0);
+            textBalanceSnapshot.setText(itemView.getContext().getString(R.string.remaining_debt_format, formattedBalance));
+
+            // Hiển thị ghi chú và ngày tháng
+            textNote.setText(record.note != null && !record.note.isEmpty() ? record.note : itemView.getContext().getString(R.string.no_note));
+            textDate.setText(FormatUtils.formatDateTime(record.timestamp));
+
+            // Định dạng màu sắc và tag dựa trên loại giao dịch
             int color;
+            String typeText;
 
-            if (record.type == TransactionType.LEND) {
-                typeStr = "Cho vay thêm";
-                color = ContextCompat.getColor(itemView.getContext(), R.color.receivable);
-            } else if (record.type == TransactionType.REPAY) {
-                typeStr = "Được trả nợ";
-                color = ContextCompat.getColor(itemView.getContext(), R.color.receivable);
-            } else if (record.type == TransactionType.BORROW) {
-                typeStr = "Đi vay thêm";
-                color = ContextCompat.getColor(itemView.getContext(), R.color.payable);
-            } else if (record.type == TransactionType.PAY_BACK) {
-                typeStr = "Trả nợ họ";
-                color = ContextCompat.getColor(itemView.getContext(), R.color.payable);
-            } else {
+            if (record.type == null) {
                 color = ContextCompat.getColor(itemView.getContext(), R.color.outline);
-            }
-
-            textTransType.setText(typeStr);
-            textTransType.setTextColor(color);
-
-            // CLEAN CODE: Dùng FormatUtils
-            textTransDate.setText(FormatUtils.formatDateTime(record.timestamp));
-            textTransAmount.setText(FormatUtils.formatCurrency(record.amount));
-            textTransAmount.setTextColor(color);
-
-            if (record.note != null && !record.note.isEmpty()) {
-                textTransNote.setVisibility(View.VISIBLE);
-                textTransNote.setText(record.note);
+                typeText = itemView.getContext().getString(R.string.transaction_type_default);
             } else {
-                textTransNote.setVisibility(View.GONE);
+                switch (record.type) {
+                    case LEND:
+                        color = ContextCompat.getColor(itemView.getContext(), useClassicColors ? R.color.classic_receivable : R.color.receivable);
+                        typeText = itemView.getContext().getString(R.string.transaction_type_lend);
+                        break;
+                    case REPAY:
+                        color = ContextCompat.getColor(itemView.getContext(), useClassicColors ? R.color.classic_payable : R.color.payable);
+                        typeText = itemView.getContext().getString(R.string.transaction_type_repay);
+                        break;
+                    case BORROW:
+                        color = ContextCompat.getColor(itemView.getContext(), useClassicColors ? R.color.classic_payable : R.color.payable);
+                        typeText = itemView.getContext().getString(R.string.transaction_type_borrow);
+                        break;
+                    case PAY_BACK:
+                        color = ContextCompat.getColor(itemView.getContext(), useClassicColors ? R.color.classic_receivable : R.color.receivable);
+                        typeText = itemView.getContext().getString(R.string.transaction_type_pay_back);
+                        break;
+                    default:
+                        color = ContextCompat.getColor(itemView.getContext(), R.color.outline);
+                        typeText = itemView.getContext().getString(R.string.transaction_type_default);
+                }
             }
 
-            itemView.setOnLongClickListener(v -> {
-                if (longClickListener != null) {
-                    longClickListener.onTransactionLongClick(record);
-                    return true;
-                }
-                return false;
-            });
+            indicator.setBackgroundColor(color);
+            textType.setText(typeText);
+            textAmount.setTextColor(color);
         }
     }
 }

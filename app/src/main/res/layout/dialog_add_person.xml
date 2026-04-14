@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="24dp">
+    android:padding="24dp"
+    android:background="?attr/colorSurface">
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/layoutName"
@@ -12,7 +13,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Tên người nợ"
-        android:layout_marginBottom="12dp">
+        android:layout_marginBottom="12dp"
+        app:boxBackgroundColor="?attr/colorSurface">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/editName"
@@ -27,7 +29,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Số điện thoại (không bắt buộc)"
-        android:layout_marginBottom="12dp">
+        android:layout_marginBottom="12dp"
+        app:boxBackgroundColor="?attr/colorSurface">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/editPhone"
@@ -43,7 +46,8 @@
         android:layout_height="wrap_content"
         android:hint="Số tiền"
         android:layout_marginBottom="8dp"
-        app:suffixText="đ">
+        app:suffixText="đ"
+        app:boxBackgroundColor="?attr/colorSurface">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/editAmount"
@@ -71,6 +75,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
+                android:checkable="false"
                 android:text="+20K" />
 
             <com.google.android.material.chip.Chip
@@ -79,6 +84,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
+                android:checkable="false"
                 android:text="+50K" />
 
             <com.google.android.material.chip.Chip
@@ -87,6 +93,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
+                android:checkable="false"
                 android:text="+100K" />
 
             <com.google.android.material.chip.Chip
@@ -95,6 +102,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
+                android:checkable="false"
                 android:text="+200K" />
 
             <com.google.android.material.chip.Chip
@@ -102,6 +110,7 @@
                 style="@style/Widget.Material3.Chip.Suggestion"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:checkable="false"
                 android:text="+500K" />
         </LinearLayout>
     </HorizontalScrollView>
@@ -113,7 +122,8 @@
         android:layout_height="wrap_content"
         android:hint="Lý do / Ghi chú (tùy chọn)"
         android:layout_marginBottom="16dp"
-        app:startIconDrawable="@android:drawable/ic_menu_edit">
+        app:startIconDrawable="@android:drawable/ic_menu_edit"
+        app:boxBackgroundColor="?attr/colorSurface">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/editNote"

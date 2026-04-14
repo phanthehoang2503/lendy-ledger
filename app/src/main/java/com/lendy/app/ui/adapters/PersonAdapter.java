@@ -20,6 +20,8 @@ public class PersonAdapter extends RecyclerView.Adapter<PersonAdapter.PersonView
 
     private List<Person> people = new ArrayList<>();
     private List<Person> peopleFull = new ArrayList<>();
+    private boolean useUnifiedColor = false;
+    private boolean useClassicColors = false;
     private final OnPersonClickListener listener;
     private final OnPersonLongClickListener longListener;
 
@@ -50,6 +52,16 @@ public class PersonAdapter extends RecyclerView.Adapter<PersonAdapter.PersonView
         notifyDataSetChanged();
     }
 
+    public void setUseUnifiedColor(boolean useUnifiedColor) {
+        this.useUnifiedColor = useUnifiedColor;
+        notifyDataSetChanged();
+    }
+
+    public void setUseClassicColors(boolean useClassicColors) {
+        this.useClassicColors = useClassicColors;
+        notifyDataSetChanged();
+    }
+
     public void filter(String k) {
         people.clear();
         if (k.isEmpty()) {
@@ -57,8 +69,8 @@ public class PersonAdapter extends RecyclerView.Adapter<PersonAdapter.PersonView
         } else {
             String filterPattern = k.toLowerCase().trim();
             for (Person item : peopleFull) {
-                if (item.name.toLowerCase().contains(filterPattern) || 
-                    (item.phoneNumber != null && item.phoneNumber.contains(filterPattern))) {
+                if (item.name.toLowerCase().contains(filterPattern) ||
+                        (item.phoneNumber != null && item.phoneNumber.contains(filterPattern))) {
                     people.add(item);
                 }
             }
@@ -83,7 +95,7 @@ public class PersonAdapter extends RecyclerView.Adapter<PersonAdapter.PersonView
     @Override
     public void onBindViewHolder(@NonNull PersonViewHolder holder, int position) {
         Person person = people.get(position);
-        holder.bind(person, listener, longListener, avatarColors);
+        holder.bind(person, listener, longListener, avatarColors, useUnifiedColor, useClassicColors);
     }
 
     @Override
@@ -104,28 +116,38 @@ public class PersonAdapter extends RecyclerView.Adapter<PersonAdapter.PersonView
             textBalance = itemView.findViewById(R.id.textBalance);
         }
 
-        public void bind(final Person person, final OnPersonClickListener listener, 
-                         final OnPersonLongClickListener longListener, int[] colors) {
+        public void bind(final Person person, final OnPersonClickListener listener,
+                final OnPersonLongClickListener longListener, int[] colors, boolean useUnifiedColor, boolean useClassicColors) {
             textName.setText(person.name);
-            textPhone.setText(person.phoneNumber != null && !person.phoneNumber.isEmpty() ? person.phoneNumber : "Chưa có SĐT");
-            
+            if (person.phoneNumber != null && !person.phoneNumber.isEmpty()) {
+                textPhone.setVisibility(View.VISIBLE);
+                textPhone.setText(person.phoneNumber);
+            } else {
+                textPhone.setVisibility(View.VISIBLE);
+                textPhone.setText("Chưa có SĐT");
+            }
+
             if (person.name != null && !person.name.isEmpty()) {
                 textInitial.setText(person.name.substring(0, 1).toUpperCase());
                 int colorIndex = (person.name.hashCode() & 0x7FFFFFFF) % colors.length;
                 avatarContainer.setCardBackgroundColor(colors[colorIndex]);
             }
 
-            // CLEAN CODE: Dùng FormatUtils
             String formattedBalance = FormatUtils.formatCurrencyAbs(person.totalBalance);
 
             if (person.totalBalance > 0) {
-                textBalance.setText("+" + formattedBalance);
-                textBalance.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.receivable));
+                // Họ nợ mình
+                textBalance.setText("Nợ bạn: " + formattedBalance);
+                int colorRes = useClassicColors ? R.color.classic_receivable : R.color.receivable;
+                textBalance.setTextColor(ContextCompat.getColor(itemView.getContext(), colorRes));
             } else if (person.totalBalance < 0) {
-                textBalance.setText("-" + formattedBalance);
-                textBalance.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.payable));
+                // Mình nợ họ
+                textBalance.setText("Bạn nợ: " + formattedBalance);
+                int colorRes = useClassicColors ? R.color.classic_payable : R.color.payable;
+                textBalance.setTextColor(ContextCompat.getColor(itemView.getContext(), colorRes));
             } else {
-                textBalance.setText(formattedBalance);
+                // Bằng 0
+                textBalance.setText("Đã hết nợ");
                 textBalance.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.outline));
             }
 

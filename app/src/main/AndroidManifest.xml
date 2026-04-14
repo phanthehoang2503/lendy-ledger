@@ -24,14 +24,6 @@
             android:name=".ui.activities.PersonDetailActivity"
             android:exported="false"
             android:label="Chi tiết giao dịch" />
-        <activity
-            android:name=".ui.activities.CompletedDebtsActivity"
-            android:exported="false"
-            android:label="@string/title_completed_debts" />
-        <activity
-            android:name=".ui.activities.ContactsActivity"
-            android:exported="false"
-            android:label="@string/title_contacts" />
     </application>
 
 </manifest>

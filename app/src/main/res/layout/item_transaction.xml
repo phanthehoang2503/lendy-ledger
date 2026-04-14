@@ -1,66 +1,111 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="16dp"
-    android:layout_marginVertical="4dp"
-    app:cardCornerRadius="8dp"
-    app:cardElevation="0dp"
-    app:strokeColor="#F0F0F0"
-    app:strokeWidth="1dp">
+    android:layout_marginVertical="6dp"
+    app:cardBackgroundColor="@color/white"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="1dp"
+    app:strokeWidth="1dp"
+    app:strokeColor="#F0F0F0">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="12dp">
+        android:padding="16dp">
 
+        <!-- Status Indicator Strip -->
+        <View
+            android:id="@+id/indicator"
+            android:layout_width="4dp"
+            android:layout_height="0dp"
+            android:background="@color/primary"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Person Name & Type -->
         <TextView
-            android:id="@+id/textTransType"
-            android:layout_width="wrap_content"
+            android:id="@+id/textPersonName"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/black"
             android:textSize="14sp"
             android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/textType"
+            app:layout_constraintStart_toEndOf="@id/indicator"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="Cho vay" />
+            tools:text="Nguyễn Văn A" />
 
         <TextView
-            android:id="@+id/textTransDate"
+            android:id="@+id/textType"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/outline"
             android:textSize="12sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/textTransType"
-            tools:text="12/10/2023 14:30" />
-
-        <TextView
-            android:id="@+id/textTransAmount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="+500.000 đ" />
+            tools:text="Họ trả nợ" />
+
+        <!-- Amount & Snapshot -->
+        <TextView
+            android:id="@+id/textAmount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="8dp"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toEndOf="@id/indicator"
+            app:layout_constraintTop_toBottomOf="@id/textPersonName"
+            tools:text="+200.000 đ" />
 
         <TextView
-            android:id="@+id/textTransNote"
+            android:id="@+id/textBalanceSnapshot"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:alpha="0.7"
+            android:textColor="@color/outline"
+            android:textSize="12sp"
+            app:layout_constraintStart_toStartOf="@id/textAmount"
+            app:layout_constraintTop_toBottomOf="@id/textAmount"
+            tools:text="Số dư nợ còn lại: 500.000đ" />
+
+        <!-- Note & Date -->
+        <TextView
+            android:id="@+id/textNote"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="8dp"
             android:ellipsize="end"
-            android:maxLines="1"
-            android:textColor="@color/outline"
+            android:maxLines="2"
+            android:textColor="@color/black"
             android:textSize="13sp"
-            android:textStyle="italic"
-            app:layout_constraintEnd_toStartOf="@id/textTransAmount"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/textTransDate"
-            tools:text="Vay đi ăn cưới" />
+            android:alpha="0.8"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@id/textAmount"
+            app:layout_constraintTop_toBottomOf="@id/textBalanceSnapshot"
+            tools:text="Tiền ăn trưa hôm qua" />
+
+        <TextView
+            android:id="@+id/textDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textColor="@color/outline"
+            android:textSize="11sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textNote"
+            tools:text="14:50 - 14/04/2026" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 </com.google.android.material.card.MaterialCardView>
