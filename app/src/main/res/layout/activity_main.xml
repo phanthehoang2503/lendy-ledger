@@ -24,6 +24,7 @@
             app:contentInsetEnd="0dp">
 
             <TextView
+                android:id="@+id/textAppTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -44,33 +45,9 @@
             android:id="@+id/header_welcome_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:minHeight="100dp"
-            android:paddingTop="8dp"
-            android:paddingBottom="50dp">
-
-            <TextView
-                android:id="@+id/welcome_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="24dp"
-                android:layout_marginTop="16dp"
-                android:text="Xin chào,"
-                android:textColor="@color/text_white_secondary"
-                android:textSize="16sp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:id="@+id/welcome_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:text="Lendy User"
-                android:textColor="@color/white"
-                android:textSize="22sp"
-                android:textStyle="bold"
-                app:layout_constraintBaseline_toBaselineOf="@id/welcome_label"
-                app:layout_constraintStart_toEndOf="@id/welcome_label" />
+            android:minHeight="40dp"
+            android:paddingTop="0dp"
+            android:paddingBottom="40dp">
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
