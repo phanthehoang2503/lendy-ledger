@@ -18,4 +18,27 @@
     <string name="transaction_note">Ghi chú (tùy chọn)</string>
     <string name="save">Lưu</string>
     <string name="cancel">Hủy</string>
+
+    <!-- Navigation -->
+    <string name="home">Trang chủ</string>
+    <string name="stats">Thống kê</string>
+    <string name="history">Lịch sử</string>
+    <string name="contacts">Danh bạ</string>
+    <string name="action_search">Tìm kiếm…</string>
+
+    <!-- Empty States -->
+    <string name="home_quick_add_hint">Ghi khoản nợ mới…</string>
+    <string name="home_empty_title">Sổ nợ đang trống</string>
+    <string name="home_empty_subtitle">Hãy nhấn thanh nhập phía trên để 
+bắt đầu ghi lại các khoản nợ nhé!</string>
+    
+    <string name="history_empty_title">Chưa có nợ hoàn thành</string>
+    <string name="history_empty_subtitle">Khi bạn trả xong hoặc người khác trả nợ, 
+thông tin nợ sẽ hiện ở đây.</string>
+    
+    <string name="contacts_empty_title">Danh bạ trống</string>
+    <string name="contacts_empty_subtitle">Những người bạn đã từng giao dịch 
+sẽ xuất hiện tại đây.</string>
+    
+    <string name="placeholder_home_title">Home Fragment</string>
 </resources>

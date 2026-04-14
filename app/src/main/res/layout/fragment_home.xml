@@ -36,7 +36,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
-                android:text="Ghi khoản nợ mới..."
+                android:text="@string/home_quick_add_hint"
                 android:textColor="@color/outline"
                 android:textSize="14sp" />
 
@@ -67,6 +67,7 @@
             android:layout_width="120dp"
             android:layout_height="120dp"
             android:alpha="0.15"
+            android:contentDescription="@null"
             android:src="@android:drawable/ic_menu_agenda"
             app:tint="@color/primary_dark" />
 
@@ -74,7 +75,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:text="Sổ nợ đang trống"
+            android:text="@string/home_empty_title"
             android:textColor="@color/black"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -84,7 +85,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:gravity="center"
-            android:text="Hãy nhấn nút '+' phía dưới để \nbắt đầu ghi lại các khoản nợ nhé!"
+            android:text="@string/home_empty_subtitle"
             android:textColor="@color/outline"
             android:textSize="14sp" />
 

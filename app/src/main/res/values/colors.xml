@@ -21,4 +21,5 @@
     <color name="background">#F0F2F5</color>
     <color name="surface">#FFFFFF</color>
     <color name="outline">#72777E</color>
+    <color name="gray_unchecked">#757575</color>
 </resources>
