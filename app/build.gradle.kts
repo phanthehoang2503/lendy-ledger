@@ -25,7 +25,7 @@ android {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro" 
             )
         }
     }
@@ -61,4 +61,8 @@ dependencies {
     testImplementation(libs.core.testing)
     androidTestImplementation(libs.core.testing)
     androidTestImplementation(libs.room.testing)
+
+    // chart
+    implementation(libs.mpandroidchart)
+    implementation(libs.viewpager2)
 }
