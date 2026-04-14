@@ -32,6 +32,10 @@
             android:name=".ui.activities.ContactsActivity"
             android:exported="false"
             android:label="@string/title_contacts" />
+        <activity
+            android:name=".ui.activities.StatisticsActivity"
+            android:exported="false"
+            android:label="@string/statistics" />
     </application>
 
 </manifest>

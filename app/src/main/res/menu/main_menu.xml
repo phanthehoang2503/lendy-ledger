@@ -21,4 +21,9 @@
         android:id="@+id/action_reset"
         android:title="@string/action_reset"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_statistics"
+        android:icon="@android:drawable/ic_menu_sort_by_size"
+        android:title="Thống kê"
+        app:showAsAction="ifRoom" />
 </menu>
