@@ -41,7 +41,6 @@ public class MainActivity extends AppCompatActivity {
     private LendyViewModel viewModel;
     private ViewPager2 viewPager;
     private BottomNavigationView bottomNav;
-    private ExtendedFloatingActionButton fabAdd;
     private TextView textTotalLending, textTotalBorrowing;
 
     @Override
@@ -49,11 +48,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
-
         // 1. Ánh xạ View
         viewPager = findViewById(R.id.viewPager);
         bottomNav = findViewById(R.id.bottomNav);
-        fabAdd = findViewById(R.id.fabAdd);
         textTotalLending = findViewById(R.id.textTotalLending);
         textTotalBorrowing = findViewById(R.id.textTotalBorrowing);
 
@@ -72,18 +69,6 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(0, 0, 0, systemBars.bottom);
             return insets;
         });
-
-        // Xử lý tràn viền cho FAB (Để không bị phím điều hướng Android che mất/đẩy lệch)
-        ViewCompat.setOnApplyWindowInsetsListener(fabAdd, (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            ViewGroup.MarginLayoutParams marginParams = (ViewGroup.MarginLayoutParams) v.getLayoutParams();
-            // 72dp cơ bản + khoảng cách phím hệ thống
-            marginParams.bottomMargin = (int) (getResources().getDisplayMetrics().density * 80) + systemBars.bottom;
-            v.setLayoutParams(marginParams);
-            return insets;
-        });
-
-        fabAdd.setOnClickListener(v -> showAddPersonDialog());
     }
 
     private void setupNavigation() {
@@ -95,11 +80,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPageSelected(int position) {
                 bottomNav.getMenu().getItem(position).setChecked(true);
-                // Ẩn FAB ở tab Danh bạ (3)
-                if (position == 3)
-                    fabAdd.hide();
-                else
-                    fabAdd.show();
             }
         });
 
@@ -144,7 +124,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Xóa sạch menu cũ vì đã có Bottom Navigation
         return false;
     }
 
@@ -153,65 +132,68 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void showResetConfirmation() {
-        new MaterialAlertDialogBuilder(this)
-                .setTitle(R.string.confirm_reset_title)
-                .setMessage(R.string.confirm_reset_message)
-                .setPositiveButton("Xóa hết", (d, w) -> viewModel.clearAllData())
-                .setNegativeButton("Hủy", null)
-                .show();
-    }
+//    private void showResetConfirmation() {
+//        new MaterialAlertDialogBuilder(this)
+//                .setTitle(R.string.confirm_reset_title)
+//                .setMessage(R.string.confirm_reset_message)
+//                .setPositiveButton("Xóa hết", (d, w) -> viewModel.clearAllData())
+//                .setNegativeButton("Hủy", null)
+//                .show();
+//    }
+//
+//    private void showEditPersonDialog(Person person) {
+//        View v = LayoutInflater.from(this).inflate(R.layout.dialog_add_person, null);
+//        v.findViewById(R.id.layoutAmount).setVisibility(View.GONE);
+//        v.findViewById(R.id.toggleGroup).setVisibility(View.GONE);
+//        v.findViewById(R.id.layoutNote).setVisibility(View.GONE);
+//        v.findViewById(R.id.scrollChips).setVisibility(View.GONE);
+//
+//        TextInputEditText editName = v.findViewById(R.id.editName);
+//        TextInputEditText editPhone = v.findViewById(R.id.editPhone);
+//
+//        editName.setText(person.name);
+//        editPhone.setText(person.phoneNumber);
+//
+//        AlertDialog dialog = new MaterialAlertDialogBuilder(this)
+//                .setTitle("Cập nhật thông tin")
+//                .setView(v)
+//                .setPositiveButton("Lưu", null)
+//                .setNegativeButton("Hủy", null)
+//                .create();
+//
+//        dialog.setOnShowListener(dialogInterface -> {
+//            android.widget.Button button = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+//            button.setOnClickListener(view -> {
+//                String name = editName.getText().toString().trim();
+//                String phone = editPhone.getText().toString().trim();
+//
+//                if (name.isEmpty()) {
+//                    editName.setError("Vui lòng nhập tên người nợ");
+//                    return;
+//                }
+//
+//                person.name = name;
+//                person.phoneNumber = phone;
+//                person.updatedAt = System.currentTimeMillis();
+//
+//                viewModel.addPerson(person);
+//                dialog.dismiss();
+//            });
+//        });
+//
+//        dialog.show();
+//    }
 
-    private void showEditPersonDialog(Person person) {
-        View v = LayoutInflater.from(this).inflate(R.layout.dialog_add_person, null);
-        v.findViewById(R.id.layoutAmount).setVisibility(View.GONE);
-        v.findViewById(R.id.toggleGroup).setVisibility(View.GONE);
-        v.findViewById(R.id.layoutNote).setVisibility(View.GONE);
-        v.findViewById(R.id.scrollChips).setVisibility(View.GONE);
-
-        TextInputEditText editName = v.findViewById(R.id.editName);
-        TextInputEditText editPhone = v.findViewById(R.id.editPhone);
-
-        editName.setText(person.name);
-        editPhone.setText(person.phoneNumber);
-
-        AlertDialog dialog = new MaterialAlertDialogBuilder(this)
-                .setTitle("Cập nhật thông tin")
-                .setView(v)
-                .setPositiveButton("Lưu", null)
-                .setNegativeButton("Hủy", null)
-                .create();
-
-        dialog.setOnShowListener(dialogInterface -> {
-            android.widget.Button button = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-            button.setOnClickListener(view -> {
-                String name = editName.getText().toString().trim();
-                String phone = editPhone.getText().toString().trim();
-
-                if (name.isEmpty()) {
-                    editName.setError("Vui lòng nhập tên người nợ");
-                    return;
-                }
-
-                person.name = name;
-                person.phoneNumber = phone;
-                person.updatedAt = System.currentTimeMillis();
-
-                viewModel.addPerson(person);
-                dialog.dismiss();
-            });
-        });
-
-        dialog.show();
-    }
-
-    private void showAddPersonDialog() {
+    public void showAddPersonDialog() {
         View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_add_person, null);
         TextInputEditText editName = dialogView.findViewById(R.id.editName);
         TextInputEditText editPhone = dialogView.findViewById(R.id.editPhone);
         TextInputEditText editAmount = dialogView.findViewById(R.id.editAmount);
         TextInputEditText editNote = dialogView.findViewById(R.id.editNote);
         MaterialButtonToggleGroup toggleGroup = dialogView.findViewById(R.id.toggleGroup);
+
+        // Setup Quick Add Chips
+        setupQuickAddChips(dialogView, editAmount);
 
         // Format tiền
         editAmount.addTextChangedListener(new android.text.TextWatcher() {
@@ -278,5 +260,25 @@ public class MainActivity extends AppCompatActivity {
         });
 
         dialog.show();
+    }
+
+    private void setupQuickAddChips(View dialogView, TextInputEditText editAmount) {
+        int[] chipIds = {R.id.chip20k, R.id.chip50k, R.id.chip100k, R.id.chip200k, R.id.chip500k};
+        long[] amounts = {20000, 50000, 100000, 200000, 500000};
+
+        for (int i = 0; i < chipIds.length; i++) {
+            final long amount = amounts[i];
+            View chip = dialogView.findViewById(chipIds[i]);
+            if (chip != null) {
+                chip.setOnClickListener(v -> {
+                    String currentStr = editAmount.getText().toString().replaceAll("[^\\d]", "");
+                    long currentAmount = currentStr.isEmpty() ? 0 : Long.parseLong(currentStr);
+                    long finalAmount = currentAmount + amount;
+                    
+                    editAmount.setText(com.lendy.app.utils.FormatUtils.formatThousand(finalAmount));
+                    editAmount.setSelection(editAmount.getText().length());
+                });
+            }
+        }
     }
 }
