@@ -29,9 +29,14 @@ import java.util.ArrayList;
 
 public class HomeFragment extends Fragment {
 
+    public interface AddPersonDialogHost {
+        void showAddPersonDialog();
+    }
+
     private LendyViewModel viewModel;
     private PersonAdapter adapter;
     private View emptyView;
+    private AddPersonDialogHost dialogHost;
 
     @Nullable
     @Override
@@ -45,8 +50,8 @@ public class HomeFragment extends Fragment {
         View btnQuickAdd = view.findViewById(R.id.cardQuickAdd);
         if (btnQuickAdd != null) {
             btnQuickAdd.setOnClickListener(v -> {
-                if (getActivity() instanceof com.lendy.app.ui.activities.MainActivity) {
-                    ((com.lendy.app.ui.activities.MainActivity) getActivity()).showAddPersonDialog();
+                if (dialogHost != null) {
+                    dialogHost.showAddPersonDialog();
                 }
             });
         }
@@ -156,5 +161,19 @@ public class HomeFragment extends Fragment {
         });
 
         dialog.show();
+    }
+
+    @Override
+    public void onAttach(@NonNull android.content.Context context) {
+        super.onAttach(context);
+        if (context instanceof AddPersonDialogHost) {
+            dialogHost = (AddPersonDialogHost) context;
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        dialogHost = null;
     }
 }

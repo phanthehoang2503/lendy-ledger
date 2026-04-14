@@ -36,7 +36,7 @@ import com.lendy.app.repository.LendyRepository;
 import java.text.NumberFormat;
 import java.util.Locale;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements com.lendy.app.ui.fragments.HomeFragment.AddPersonDialogHost {
 
     private LendyViewModel viewModel;
     private ViewPager2 viewPager;
@@ -190,6 +190,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
     public void showAddPersonDialog() {
         View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_add_person, null);
         TextInputEditText editName = dialogView.findViewById(R.id.editName);
@@ -295,15 +296,9 @@ public class MainActivity extends AppCompatActivity {
     private Long parseAmountSafely(String digits) {
         if (digits == null || digits.isEmpty()) return null;
         try {
-            // Check if it's too large for Long
-            if (digits.length() > 18) {
-                // Approximate check for Long.MAX_VALUE (19 digits)
-                // 18 digits is safe. For 19 we use a real try-catch.
-                return Long.MAX_VALUE;
-            }
             return Long.parseLong(digits);
         } catch (NumberFormatException e) {
-            return Long.MAX_VALUE;
+            return null;
         }
     }
 }
