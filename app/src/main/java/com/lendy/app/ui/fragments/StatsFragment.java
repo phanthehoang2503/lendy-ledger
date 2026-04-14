@@ -18,6 +18,7 @@ import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
+import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.lendy.app.R;
 import com.lendy.app.data.entities.Person;
 import com.lendy.app.data.model.SummaryDTO;
@@ -35,7 +36,11 @@ public class StatsFragment extends Fragment {
     private LendyViewModel viewModel;
     private PieChart pieChart;
     private PersonAdapter topDebtorsAdapter;
+    private RecyclerView recyclerViewTopDebtors;
     private View textTopDebtorsTitle, cardTopDebtors;
+    private MaterialButtonToggleGroup toggleGroup;
+    private boolean showReceivables = true;
+    private List<Person> currentPeople = new ArrayList<>();
 
     @Nullable
     @Override
@@ -54,13 +59,21 @@ public class StatsFragment extends Fragment {
     }
 
     private void setupRecyclerView(View view) {
-        RecyclerView recyclerView = view.findViewById(R.id.recyclerViewTopDebtors);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        // Adapter mini cho danh sách Top 3 (Không cần click hay long click phức tạp)
-        topDebtorsAdapter = new PersonAdapter(person -> {
-        }, person -> {
+        recyclerViewTopDebtors = view.findViewById(R.id.recyclerViewTopDebtors);
+        toggleGroup = view.findViewById(R.id.toggleGroupStats);
+        recyclerViewTopDebtors.setLayoutManager(new LinearLayoutManager(requireContext()));
+        
+        // Adapter mini cho danh sách Top 3
+        topDebtorsAdapter = new PersonAdapter(person -> {}, person -> {});
+        topDebtorsAdapter.setUseUnifiedColor(true);
+        recyclerViewTopDebtors.setAdapter(topDebtorsAdapter);
+
+        toggleGroup.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
+            if (isChecked) {
+                showReceivables = (checkedId == R.id.btnReceivables);
+                refreshTopList();
+            }
         });
-        recyclerView.setAdapter(topDebtorsAdapter);
     }
 
     private void setupViewModel() {
@@ -78,27 +91,50 @@ public class StatsFragment extends Fragment {
             }
         });
 
-        // 2. Cập nhật danh sách Top 3 (Lấy từ Active Debts và sắp xếp)
+        // 2. Cập nhật danh sách Top 3
         viewModel.getActiveDebts().observe(getViewLifecycleOwner(), people -> {
-            boolean hasDebts = people != null && !people.isEmpty();
-            if (hasDebts) {
-                textTopDebtorsTitle.setVisibility(View.VISIBLE);
-                cardTopDebtors.setVisibility(View.VISIBLE);
+            this.currentPeople = people != null ? people : new ArrayList<>();
+            refreshTopList();
+        });
+    }
 
-                List<Person> sortedList = new ArrayList<>(people);
-                // Sắp xếp giảm dần theo nợ (Person.totalBalance)
-                Collections.sort(sortedList,
-                        (p1, p2) -> Double.compare(Math.abs(p2.totalBalance), Math.abs(p1.totalBalance)));
+    private void refreshTopList() {
+        boolean hasData = currentPeople != null && !currentPeople.isEmpty();
+        if (hasData) {
+            List<Person> filteredList = new ArrayList<>();
+            for (Person p : currentPeople) {
+                if (showReceivables && p.totalBalance > 0) {
+                    filteredList.add(p);
+                } else if (!showReceivables && p.totalBalance < 0) {
+                    filteredList.add(p);
+                }
+            }
+
+            boolean hasFilteredData = !filteredList.isEmpty();
+            textTopDebtorsTitle.setVisibility(hasFilteredData ? View.VISIBLE : View.GONE);
+            cardTopDebtors.setVisibility(hasFilteredData ? View.VISIBLE : View.GONE);
+            toggleGroup.setVisibility(View.VISIBLE);
+
+            if (hasFilteredData) {
+                // Sắp xếp
+                if (showReceivables) {
+                    // Họ nợ mình:  số lớn nhất lên đầu
+                    Collections.sort(filteredList, (p1, p2) -> Double.compare(p2.totalBalance, p1.totalBalance));
+                } else {
+                    // Mình nợ họ: số âm bé nhất (nợ nhiều nhất) lên đầu
+                    Collections.sort(filteredList, (p1, p2) -> Double.compare(p1.totalBalance, p2.totalBalance));
+                }
 
                 // Lấy tối đa 3 người
-                int limit = Math.min(sortedList.size(), 3);
-                topDebtorsAdapter.setPeople(sortedList.subList(0, limit));
-            } else {
-                textTopDebtorsTitle.setVisibility(View.GONE);
-                cardTopDebtors.setVisibility(View.GONE);
-                topDebtorsAdapter.setPeople(new ArrayList<>());
+                int limit = Math.min(filteredList.size(), 3);
+                topDebtorsAdapter.setPeople(filteredList.subList(0, limit));
             }
-        });
+        } else {
+            textTopDebtorsTitle.setVisibility(View.GONE);
+            cardTopDebtors.setVisibility(View.GONE);
+            toggleGroup.setVisibility(View.GONE);
+            topDebtorsAdapter.setPeople(new ArrayList<>());
+        }
     }
 
     private void updateChart(SummaryDTO summary) {

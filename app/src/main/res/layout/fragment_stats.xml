@@ -53,6 +53,34 @@
             android:textSize="18sp"
             android:textStyle="bold" />
 
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/toggleGroupStats"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_gravity="center_horizontal"
+            app:checkedButton="@+id/btnReceivables"
+            app:singleSelection="true"
+            app:selectionRequired="true">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnReceivables"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Họ nợ mình"
+                android:textSize="13sp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnPayables"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Mình nợ họ"
+                android:textSize="13sp" />
+
+        </com.google.android.material.button.MaterialButtonToggleGroup>
+
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardTopDebtors"
             android:layout_width="match_parent"
