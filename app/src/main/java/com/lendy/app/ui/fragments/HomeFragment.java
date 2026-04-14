@@ -31,10 +31,22 @@ public class HomeFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+            @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
         emptyView = view.findViewById(R.id.layoutEmptyHome);
+
+        // Connect Quick Add Bar
+        View btnQuickAdd = view.findViewById(R.id.cardQuickAdd);
+        if (btnQuickAdd != null) {
+            btnQuickAdd.setOnClickListener(v -> {
+                if (getActivity() instanceof com.lendy.app.ui.activities.MainActivity) {
+                    ((com.lendy.app.ui.activities.MainActivity) getActivity()).showAddPersonDialog();
+                }
+            });
+        }
+
         setupRecyclerView(view);
         setupViewModel();
 
@@ -44,7 +56,7 @@ public class HomeFragment extends Fragment {
     private void setupRecyclerView(View view) {
         RecyclerView recyclerView = view.findViewById(R.id.recyclerViewHome);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        
+
         adapter = new PersonAdapter(person -> {
             // Click: Mở chi tiết
             Intent intent = new Intent(getActivity(), PersonDetailActivity.class);
@@ -55,16 +67,17 @@ public class HomeFragment extends Fragment {
         }, person -> {
             // Long click: Placeholder cho các tính năng khác (như chỉnh sửa)
         });
-        
+
         recyclerView.setAdapter(adapter);
     }
 
     private void setupViewModel() {
-        if (getActivity() == null) return;
-        
+        if (getActivity() == null)
+            return;
+
         LendyRepository repository = new LendyRepository(getActivity().getApplication());
-        // LƯU Ý: Dùng requireActivity() để share ViewModel với MainActivity
-        viewModel = new ViewModelProvider(requireActivity(), new LendyViewModelFactory(repository)).get(LendyViewModel.class);
+        viewModel = new ViewModelProvider(requireActivity(), new LendyViewModelFactory(repository))
+                .get(LendyViewModel.class);
 
         viewModel.getActiveDebts().observe(getViewLifecycleOwner(), people -> {
             if (people == null || people.isEmpty()) {
