@@ -1,5 +1,8 @@
 package com.lendy.app.ui.fragments;
 
+import android.content.Intent;
+import com.lendy.app.ui.activities.PersonDetailActivity;
+
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -63,9 +66,13 @@ public class StatsFragment extends Fragment {
         toggleGroup = view.findViewById(R.id.toggleGroupStats);
         recyclerViewTopDebtors.setLayoutManager(new LinearLayoutManager(requireContext()));
         
-        // Adapter mini cho danh sách Top 3
-        topDebtorsAdapter = new PersonAdapter(person -> {}, person -> {});
-        topDebtorsAdapter.setUseUnifiedColor(true);
+        topDebtorsAdapter = new PersonAdapter(person -> {
+            Intent intent = new Intent(getActivity(), PersonDetailActivity.class);
+            intent.putExtra(PersonDetailActivity.EXTRA_PERSON_ID, person.id);
+            intent.putExtra(PersonDetailActivity.EXTRA_PERSON_NAME, person.name);
+            intent.putExtra(PersonDetailActivity.EXTRA_PERSON_PHONE, person.phoneNumber);
+            startActivity(intent);
+        }, null);
         topDebtorsAdapter.setUseClassicColors(true);
         recyclerViewTopDebtors.setAdapter(topDebtorsAdapter);
 
@@ -142,9 +149,20 @@ public class StatsFragment extends Fragment {
         float lending = summary.totalLending != null ? summary.totalLending.floatValue() : 0f;
         float borrowing = summary.totalBorrowing != null ? summary.totalBorrowing.floatValue() : 0f;
 
+        View emptyText = getView() != null ? getView().findViewById(R.id.textChartEmpty) : null;
+
+        if (lending == 0 && borrowing == 0) {
+            pieChart.setVisibility(View.GONE);
+            if (emptyText != null) emptyText.setVisibility(View.VISIBLE);
+            return;
+        } else {
+            pieChart.setVisibility(View.VISIBLE);
+            if (emptyText != null) emptyText.setVisibility(View.GONE);
+        }
+
         List<PieEntry> entries = new ArrayList<>();
-        entries.add(new PieEntry(lending, getString(R.string.label_lend)));
-        entries.add(new PieEntry(borrowing, getString(R.string.label_borrow)));
+        if (lending > 0) entries.add(new PieEntry(lending, getString(R.string.label_lend)));
+        if (borrowing > 0) entries.add(new PieEntry(borrowing, getString(R.string.label_borrow)));
 
         PieDataSet dataSet = new PieDataSet(entries, "");
         dataSet.setColors(new int[] {

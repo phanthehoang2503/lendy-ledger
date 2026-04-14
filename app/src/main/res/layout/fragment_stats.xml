@@ -39,6 +39,16 @@
                     android:layout_width="match_parent"
                     android:layout_height="300dp"
                     android:layout_marginTop="16dp" />
+
+                <TextView
+                    android:id="@+id/textChartEmpty"
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp"
+                    android:layout_marginTop="16dp"
+                    android:gravity="center"
+                    android:text="Chưa có dữ liệu giao dịch"
+                    android:textColor="@color/outline"
+                    android:visibility="gone" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 

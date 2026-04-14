@@ -31,6 +31,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
     }
 
     public TransactionRecord getTransactionAt(int position) {
+        if (position < 0 || position >= transactions.size()) return null;
         return transactions.get(position);
     }
 
@@ -40,8 +41,10 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
     }
 
     public void setUseClassicColors(boolean useClassicColors) {
-        this.useClassicColors = useClassicColors;
-        notifyDataSetChanged();
+        if (this.useClassicColors != useClassicColors) {
+            this.useClassicColors = useClassicColors;
+            notifyItemRangeChanged(0, getItemCount());
+        }
     }
 
     @NonNull
