@@ -16,7 +16,7 @@ import com.lendy.app.data.entities.TransactionRecord;
  * ../data/LendyDatabase.java - LendyDatabase
  * CHỨC NĂNG: Khởi tạo và quản lý toàn bộ Cơ sở dữ liệu Room của ứng dụng.
  *****************************************************************************/
-@Database(entities = { Person.class, TransactionRecord.class }, version = 2)
+@Database(entities = { Person.class, TransactionRecord.class }, version = 3)
 public abstract class LendyDatabase extends RoomDatabase {
     private static LendyDatabase instance;
 
@@ -49,6 +49,7 @@ public abstract class LendyDatabase extends RoomDatabase {
             instance = Room.databaseBuilder(context.getApplicationContext(),
                     LendyDatabase.class, "lendy_db")
                     .addMigrations(MIGRATION_1_2)
+                    .fallbackToDestructiveMigration()
                     .build();
         }
         return instance;
