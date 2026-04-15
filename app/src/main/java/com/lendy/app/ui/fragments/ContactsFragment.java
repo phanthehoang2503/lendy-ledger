@@ -71,7 +71,7 @@ public class ContactsFragment extends Fragment {
             } else {
                 emptyView.setVisibility(View.GONE);
             }
-            adapter.setPeople(people != null ? people : new ArrayList<>());
+            adapter.submitList(people);
         });
     }
 

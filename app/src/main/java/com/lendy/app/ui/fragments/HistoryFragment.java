@@ -50,7 +50,6 @@ public class HistoryFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         
         adapter = new TransactionAdapter();
-        adapter.setUseClassicColors(true);
         recyclerView.setAdapter(adapter);
     }
 
@@ -64,7 +63,7 @@ public class HistoryFragment extends Fragment {
             } else {
                 emptyView.setVisibility(View.GONE);
             }
-            adapter.setTransactions(transactions != null ? transactions : new ArrayList<>());
+            adapter.submitList(transactions);
         });
     }
 }

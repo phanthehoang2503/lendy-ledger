@@ -135,7 +135,7 @@ public class PersonDetailActivity extends AppCompatActivity {
                         int position = viewHolder.getBindingAdapterPosition();
                         if (position == RecyclerView.NO_POSITION)
                             return;
-                        TransactionRecord record = adapter.getTransactionAt(position);
+                        TransactionRecord record = adapter.getCurrentList().get(position);
 
                         if (direction == ItemTouchHelper.LEFT) {
                             // Vuốt trái -> Xóa
@@ -178,7 +178,7 @@ public class PersonDetailActivity extends AppCompatActivity {
 
         viewModel.getTimeline(personId).observe(this, transactions -> {
             if (transactions != null) {
-                adapter.setTransactions(transactions);
+                adapter.submitList(transactions);
             }
         });
     }

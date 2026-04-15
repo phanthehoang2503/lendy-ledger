@@ -7,6 +7,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.card.MaterialCardView;
@@ -14,25 +16,14 @@ import com.lendy.app.R;
 import com.lendy.app.data.entities.Person;
 import com.lendy.app.utils.FormatUtils;
 
-import java.util.ArrayList;
-import java.util.List;
+/******************************************************************************
+ * PersonAdapter - Sử dụng ListAdapter
+ * CHỨC NĂNG: Hiển thị danh sách khách hàng và số dư nợ.
+ *****************************************************************************/
+public class PersonAdapter extends ListAdapter<Person, PersonAdapter.PersonViewHolder> {
 
-public class PersonAdapter extends RecyclerView.Adapter<PersonAdapter.PersonViewHolder> {
-
-    private List<Person> people = new ArrayList<>();
-    private List<Person> peopleFull = new ArrayList<>();
-    private boolean useUnifiedColor = false;
-    private boolean useClassicColors = false;
     private final OnPersonClickListener listener;
     private final OnPersonLongClickListener longListener;
-
-    private final int[] avatarColorResIds = {
-            R.color.avatar_color_1, R.color.avatar_color_2,
-            R.color.avatar_color_3, R.color.avatar_color_4,
-            R.color.avatar_color_5, R.color.avatar_color_6,
-            R.color.avatar_color_7, R.color.avatar_color_8,
-            R.color.avatar_color_9, R.color.avatar_color_10
-    };
 
     public interface OnPersonClickListener {
         void onPersonClick(Person person);
@@ -43,21 +34,20 @@ public class PersonAdapter extends RecyclerView.Adapter<PersonAdapter.PersonView
     }
 
     public PersonAdapter(OnPersonClickListener listener, OnPersonLongClickListener longListener) {
+        super(new DiffUtil.ItemCallback<Person>() {
+            @Override
+            public boolean areItemsTheSame(@NonNull Person oldItem, @NonNull Person newItem) {
+                return oldItem.id == newItem.id;
+            }
+
+            @Override
+            public boolean areContentsTheSame(@NonNull Person oldItem, @NonNull Person newItem) {
+                return oldItem.equals(newItem);
+            }
+        });
         this.listener = listener;
         this.longListener = longListener;
     }
-
-    public void setPeople(List<Person> people) {
-        this.peopleFull = new ArrayList<>(people);
-        this.people = new ArrayList<>(people);
-        notifyDataSetChanged();
-    }
-
-    public void setUseClassicColors(boolean useClassicColors) {
-        this.useClassicColors = useClassicColors;
-        notifyDataSetChanged();
-    }
-
 
     @NonNull
     @Override
@@ -68,18 +58,19 @@ public class PersonAdapter extends RecyclerView.Adapter<PersonAdapter.PersonView
 
     @Override
     public void onBindViewHolder(@NonNull PersonViewHolder holder, int position) {
-        Person person = people.get(position);
-        holder.bind(person, listener, longListener, avatarColorResIds, useUnifiedColor, useClassicColors);
-    }
-
-    @Override
-    public int getItemCount() {
-        return people.size();
+        holder.bind(getItem(position), listener, longListener);
     }
 
     public static class PersonViewHolder extends RecyclerView.ViewHolder {
         private final TextView textInitial, textName, textPhone, textBalance;
         private final MaterialCardView avatarContainer;
+
+        private final int[] avatarColorResIds = {
+                R.color.avatar_color_1, R.color.avatar_color_2, R.color.avatar_color_3,
+                R.color.avatar_color_4, R.color.avatar_color_5, R.color.avatar_color_6,
+                R.color.avatar_color_7, R.color.avatar_color_8, R.color.avatar_color_9,
+                R.color.avatar_color_10
+        };
 
         public PersonViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -91,48 +82,37 @@ public class PersonAdapter extends RecyclerView.Adapter<PersonAdapter.PersonView
         }
 
         public void bind(final Person person, final OnPersonClickListener listener,
-                final OnPersonLongClickListener longListener, int[] colorResIds, boolean useUnifiedColor, boolean useClassicColors) {
+                final OnPersonLongClickListener longListener) {
             textName.setText(person.name);
             if (person.phoneNumber != null && !person.phoneNumber.isEmpty()) {
-                textPhone.setVisibility(View.VISIBLE);
                 textPhone.setText(person.phoneNumber);
             } else {
-                textPhone.setVisibility(View.VISIBLE);
                 textPhone.setText(itemView.getContext().getString(R.string.no_phone_yet));
             }
 
             if (person.name != null && !person.name.isEmpty()) {
                 textInitial.setText(person.name.substring(0, 1).toUpperCase());
-                int[] colors = new int[colorResIds.length];
-                for (int i = 0; i < colorResIds.length; i++) {
-                    colors[i] = ContextCompat.getColor(itemView.getContext(), colorResIds[i]);
-                }
-                int colorIndex = (person.name.hashCode() & 0x7FFFFFFF) % colors.length;
-                avatarContainer.setCardBackgroundColor(colors[colorIndex]);
+                int colorIndex = (person.name.hashCode() & 0x7FFFFFFF) % avatarColorResIds.length;
+                avatarContainer.setCardBackgroundColor(
+                        ContextCompat.getColor(itemView.getContext(), avatarColorResIds[colorIndex]));
             }
 
             String formattedBalance = FormatUtils.formatCurrencyAbs(person.totalBalance);
 
             if (person.totalBalance > 0) {
-                // Họ nợ mình
                 textBalance.setText(itemView.getContext().getString(R.string.receivable_prefix) + formattedBalance);
-                int colorRes = useClassicColors ? R.color.classic_receivable : R.color.receivable;
-                textBalance.setTextColor(ContextCompat.getColor(itemView.getContext(), colorRes));
+                textBalance.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.receivable));
             } else if (person.totalBalance < 0) {
-                // Mình nợ họ
                 textBalance.setText(itemView.getContext().getString(R.string.payable_prefix) + formattedBalance);
-                int colorRes = useClassicColors ? R.color.classic_payable : R.color.payable;
-                textBalance.setTextColor(ContextCompat.getColor(itemView.getContext(), colorRes));
+                textBalance.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.payable));
             } else {
-                // Bằng 0
                 textBalance.setText(itemView.getContext().getString(R.string.settled_balance));
                 textBalance.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.outline));
             }
 
             itemView.setOnClickListener(v -> {
-                if (listener != null) {
+                if (listener != null)
                     listener.onPersonClick(person);
-                }
             });
             itemView.setOnLongClickListener(v -> {
                 if (longListener != null) {

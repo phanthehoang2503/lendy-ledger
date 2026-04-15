@@ -91,7 +91,7 @@ public class HomeFragment extends Fragment {
             } else {
                 emptyView.setVisibility(View.GONE);
             }
-            adapter.setPeople(people != null ? people : new ArrayList<>());
+            adapter.submitList(people);
         });
     }
     private void showPersonOptionsDialog(Person person) {

@@ -72,7 +72,6 @@ public class StatsFragment extends Fragment {
             intent.putExtra(PersonDetailActivity.EXTRA_PERSON_PHONE, person.phoneNumber);
             startActivity(intent);
         }, null);
-        topDebtorsAdapter.setUseClassicColors(true);
         recyclerViewTopDebtors.setAdapter(topDebtorsAdapter);
 
         toggleGroup.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
@@ -132,13 +131,13 @@ public class StatsFragment extends Fragment {
 
                 // Lấy tối đa 3 người
                 int limit = Math.min(filteredList.size(), 3);
-                topDebtorsAdapter.setPeople(filteredList.subList(0, limit));
+                topDebtorsAdapter.submitList(filteredList.subList(0, limit));
             }
         } else {
             textTopDebtorsTitle.setVisibility(View.GONE);
             recyclerViewTopDebtors.setVisibility(View.GONE);
             toggleGroup.setVisibility(View.GONE);
-            topDebtorsAdapter.setPeople(new ArrayList<>());
+            topDebtorsAdapter.submitList(new ArrayList<>());
         }
     }
 
