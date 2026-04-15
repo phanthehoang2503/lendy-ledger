@@ -83,7 +83,11 @@ public class HomeFragment extends Fragment {
         if (getActivity() == null)
             return;
 
-        viewModel = new ViewModelProvider(requireActivity()).get(LendyViewModel.class);
+        viewModel = new ViewModelProvider(
+                requireActivity(),
+                new LendyViewModelFactory(
+                        LendyRepository.getInstance(requireActivity().getApplication())))
+                .get(LendyViewModel.class);
 
         viewModel.getActiveDebts().observe(getViewLifecycleOwner(), people -> {
             if (people == null || people.isEmpty()) {

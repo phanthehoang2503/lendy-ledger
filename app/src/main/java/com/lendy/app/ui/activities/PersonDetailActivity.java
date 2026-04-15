@@ -33,6 +33,8 @@ import com.lendy.app.utils.FormatUtils;
 import com.lendy.app.viewmodel.LendyViewModel;
 import com.lendy.app.viewmodel.LendyViewModelFactory;
 
+import java.util.List;
+
 public class PersonDetailActivity extends AppCompatActivity {
 
     public static final String EXTRA_PERSON_ID = "extra_person_id";
@@ -135,7 +137,12 @@ public class PersonDetailActivity extends AppCompatActivity {
                         int position = viewHolder.getBindingAdapterPosition();
                         if (position == RecyclerView.NO_POSITION)
                             return;
-                        TransactionRecord record = adapter.getCurrentList().get(position);
+
+                        List<TransactionRecord> current = adapter.getCurrentList();
+                        if (position < 0 || position >= current.size()) {
+                            return;
+                        }
+                        TransactionRecord record = current.get(position);
 
                         if (direction == ItemTouchHelper.LEFT) {
                             // Vuốt trái -> Xóa

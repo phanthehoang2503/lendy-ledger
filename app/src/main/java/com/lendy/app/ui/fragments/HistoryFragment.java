@@ -56,7 +56,11 @@ public class HistoryFragment extends Fragment {
     private void setupViewModel() {
         if (getActivity() == null) return;
 
-        viewModel = new ViewModelProvider(requireActivity()).get(LendyViewModel.class);
+        viewModel = new ViewModelProvider(
+                requireActivity(),
+                new LendyViewModelFactory(
+                        LendyRepository.getInstance(requireActivity().getApplication())))
+                .get(LendyViewModel.class);
         viewModel.getAllTransactions().observe(getViewLifecycleOwner(), transactions -> {
             if (transactions == null || transactions.isEmpty()) {
                 emptyView.setVisibility(View.VISIBLE);

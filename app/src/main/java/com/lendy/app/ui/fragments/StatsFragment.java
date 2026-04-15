@@ -86,7 +86,11 @@ public class StatsFragment extends Fragment {
         if (getActivity() == null)
             return;
 
-        viewModel = new ViewModelProvider(requireActivity()).get(LendyViewModel.class);
+        viewModel = new ViewModelProvider(
+                requireActivity(),
+                new LendyViewModelFactory(
+                        LendyRepository.getInstance(requireActivity().getApplication())))
+                .get(LendyViewModel.class);
 
         // 1. Cập nhật biểu đồ tròn
         viewModel.getGlobalSummary().observe(getViewLifecycleOwner(), summary -> {
