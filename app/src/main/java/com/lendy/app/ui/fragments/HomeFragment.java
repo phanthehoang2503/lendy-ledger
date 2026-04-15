@@ -22,6 +22,7 @@ import com.lendy.app.repository.LendyRepository;
 import com.lendy.app.ui.activities.PersonDetailActivity;
 import com.lendy.app.data.entities.Person;
 import com.lendy.app.ui.adapters.PersonAdapter;
+import com.lendy.app.utils.PersonDialogHelper;
 import com.lendy.app.viewmodel.LendyViewModel;
 import com.lendy.app.viewmodel.LendyViewModelFactory;
 
@@ -82,8 +83,10 @@ public class HomeFragment extends Fragment {
         if (getActivity() == null)
             return;
 
-        LendyRepository repository = new LendyRepository(getActivity().getApplication());
-        viewModel = new ViewModelProvider(requireActivity(), new LendyViewModelFactory(repository))
+        viewModel = new ViewModelProvider(
+                requireActivity(),
+                new LendyViewModelFactory(
+                        LendyRepository.getInstance(requireActivity().getApplication())))
                 .get(LendyViewModel.class);
 
         viewModel.getActiveDebts().observe(getViewLifecycleOwner(), people -> {
@@ -92,7 +95,7 @@ public class HomeFragment extends Fragment {
             } else {
                 emptyView.setVisibility(View.GONE);
             }
-            adapter.setPeople(people != null ? people : new ArrayList<>());
+            adapter.submitList(people);
         });
     }
     private void showPersonOptionsDialog(Person person) {
@@ -101,7 +104,7 @@ public class HomeFragment extends Fragment {
                 .setTitle(person.name)
                 .setItems(options, (dialog, which) -> {
                     if (which == 0) {
-                        showEditPersonDialog(person);
+                        PersonDialogHelper.showEditPersonDialog(requireContext(), viewModel, person);
                     } else {
                         showDeleteConfirmation(person);
                     }
@@ -118,49 +121,6 @@ public class HomeFragment extends Fragment {
                 })
                 .setNegativeButton("Hủy", null)
                 .show();
-    }
-
-    private void showEditPersonDialog(Person person) {
-        View v = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_add_person, null);
-        v.findViewById(R.id.layoutAmount).setVisibility(View.GONE);
-        v.findViewById(R.id.toggleGroup).setVisibility(View.GONE);
-        v.findViewById(R.id.layoutNote).setVisibility(View.GONE);
-        v.findViewById(R.id.scrollChips).setVisibility(View.GONE);
-
-        TextInputEditText editName = v.findViewById(R.id.editName);
-        TextInputEditText editPhone = v.findViewById(R.id.editPhone);
-
-        editName.setText(person.name);
-        editPhone.setText(person.phoneNumber);
-
-        AlertDialog dialog = new MaterialAlertDialogBuilder(requireContext())
-                .setTitle(R.string.edit_person)
-                .setView(v)
-                .setPositiveButton("Lưu", null)
-                .setNegativeButton("Hủy", null)
-                .create();
-
-        dialog.setOnShowListener(dialogInterface -> {
-            android.widget.Button button = dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE);
-            button.setOnClickListener(view -> {
-                String name = editName.getText().toString().trim();
-                String phone = editPhone.getText().toString().trim();
-
-                if (name.isEmpty()) {
-                    editName.setError("Vui lòng nhập tên người nợ");
-                    return;
-                }
-
-                person.name = name;
-                person.phoneNumber = phone;
-                person.updatedAt = System.currentTimeMillis();
-
-                viewModel.updatePerson(person);
-                dialog.dismiss();
-            });
-        });
-
-        dialog.show();
     }
 
     @Override

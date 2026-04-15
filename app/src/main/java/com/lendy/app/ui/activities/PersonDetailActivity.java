@@ -5,11 +5,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
-import androidx.appcompat.app.AlertDialog;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
@@ -27,7 +26,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.lendy.app.R;
 import com.lendy.app.data.TransactionType;
-import com.lendy.app.data.entities.Person;
 import com.lendy.app.data.entities.TransactionRecord;
 import com.lendy.app.repository.LendyRepository;
 import com.lendy.app.ui.adapters.TransactionAdapter;
@@ -35,8 +33,7 @@ import com.lendy.app.utils.FormatUtils;
 import com.lendy.app.viewmodel.LendyViewModel;
 import com.lendy.app.viewmodel.LendyViewModelFactory;
 
-import java.text.NumberFormat;
-import java.util.Locale;
+import java.util.List;
 
 public class PersonDetailActivity extends AppCompatActivity {
 
@@ -140,7 +137,12 @@ public class PersonDetailActivity extends AppCompatActivity {
                         int position = viewHolder.getBindingAdapterPosition();
                         if (position == RecyclerView.NO_POSITION)
                             return;
-                        TransactionRecord record = adapter.getTransactionAt(position);
+
+                        List<TransactionRecord> current = adapter.getCurrentList();
+                        if (position < 0 || position >= current.size()) {
+                            return;
+                        }
+                        TransactionRecord record = current.get(position);
 
                         if (direction == ItemTouchHelper.LEFT) {
                             // Vuốt trái -> Xóa
@@ -163,7 +165,7 @@ public class PersonDetailActivity extends AppCompatActivity {
     }
 
     private void setupViewModel() {
-        LendyRepository repository = new LendyRepository(getApplication());
+        LendyRepository repository = LendyRepository.getInstance(getApplication());
         LendyViewModelFactory factory = new LendyViewModelFactory(repository);
         viewModel = new ViewModelProvider(this, factory).get(LendyViewModel.class);
 
@@ -183,7 +185,7 @@ public class PersonDetailActivity extends AppCompatActivity {
 
         viewModel.getTimeline(personId).observe(this, transactions -> {
             if (transactions != null) {
-                adapter.setTransactions(transactions);
+                adapter.submitList(transactions);
             }
         });
     }

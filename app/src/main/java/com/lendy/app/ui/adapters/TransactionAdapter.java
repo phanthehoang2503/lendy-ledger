@@ -7,44 +7,42 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.lendy.app.R;
 import com.lendy.app.data.entities.TransactionRecord;
 import com.lendy.app.utils.FormatUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.TransactionViewHolder> {
+/******************************************************************************
+ * TransactionAdapter - Sử dụng ListAdapter
+ * CHỨC NĂNG: Hiển thị lịch sử giao dịch chi tiết.
+ *****************************************************************************/
+public class TransactionAdapter extends ListAdapter<TransactionRecord, TransactionAdapter.TransactionViewHolder> {
 
     public interface OnTransactionLongClickListener {
         void onTransactionLongClick(TransactionRecord record);
     }
 
-    private List<TransactionRecord> transactions = new ArrayList<>();
     private OnTransactionLongClickListener longClickListener;
-    private boolean useClassicColors = false;
+
+    public TransactionAdapter() {
+        super(new DiffUtil.ItemCallback<TransactionRecord>() {
+            @Override
+            public boolean areItemsTheSame(@NonNull TransactionRecord oldItem, @NonNull TransactionRecord newItem) {
+                return oldItem.id == newItem.id;
+            }
+
+            @Override
+            public boolean areContentsTheSame(@NonNull TransactionRecord oldItem, @NonNull TransactionRecord newItem) {
+                return oldItem.equals(newItem);
+            }
+        });
+    }
 
     public void setOnTransactionLongClickListener(OnTransactionLongClickListener listener) {
         this.longClickListener = listener;
-    }
-
-    public TransactionRecord getTransactionAt(int position) {
-        if (position < 0 || position >= transactions.size()) return null;
-        return transactions.get(position);
-    }
-
-    public void setTransactions(List<TransactionRecord> transactions) {
-        this.transactions = transactions;
-        notifyDataSetChanged();
-    }
-
-    public void setUseClassicColors(boolean useClassicColors) {
-        if (this.useClassicColors != useClassicColors) {
-            this.useClassicColors = useClassicColors;
-            notifyItemRangeChanged(0, getItemCount());
-        }
     }
 
     @NonNull
@@ -56,8 +54,8 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull TransactionViewHolder holder, int position) {
-        TransactionRecord record = transactions.get(position);
-        holder.bind(record, useClassicColors);
+        TransactionRecord record = getItem(position);
+        holder.bind(record);
 
         holder.itemView.setOnLongClickListener(v -> {
             if (longClickListener != null) {
@@ -68,19 +66,9 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         });
     }
 
-    @Override
-    public int getItemCount() {
-        return transactions.size();
-    }
-
     static class TransactionViewHolder extends RecyclerView.ViewHolder {
         private final View indicator;
-        private final TextView textPersonName;
-        private final TextView textType;
-        private final TextView textAmount;
-        private final TextView textBalanceSnapshot;
-        private final TextView textNote;
-        private final TextView textDate;
+        private final TextView textPersonName, textType, textAmount, textBalanceSnapshot, textNote, textDate;
 
         public TransactionViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -93,52 +81,45 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
             textDate = itemView.findViewById(R.id.textDate);
         }
 
-        public void bind(TransactionRecord record, boolean useClassicColors) {
-            // Hiển thị tên (snapshot)
-            textPersonName.setText(record.personNameSnapshot != null ? record.personNameSnapshot : itemView.getContext().getString(R.string.anonymous_person));
-
-            // Hiển thị số tiền
+        public void bind(TransactionRecord record) {
+            textPersonName.setText(record.personNameSnapshot != null ? record.personNameSnapshot
+                    : itemView.getContext().getString(R.string.anonymous_person));
             textAmount.setText(FormatUtils.formatCurrency(record.amount));
 
-            // Hiển thị số nợ sau giao dịch
-            String formattedBalance = FormatUtils.formatCurrencyAbs(record.balanceSnapshot != null ? record.balanceSnapshot : 0);
-            textBalanceSnapshot.setText(itemView.getContext().getString(R.string.remaining_debt_format, formattedBalance));
+            String formattedBalance = FormatUtils
+                    .formatCurrencyAbs(record.balanceSnapshot != null ? record.balanceSnapshot : 0);
+            textBalanceSnapshot
+                    .setText(itemView.getContext().getString(R.string.remaining_debt_format, formattedBalance));
 
-            // Hiển thị ghi chú và ngày tháng
-            textNote.setText(record.note != null && !record.note.isEmpty() ? record.note : itemView.getContext().getString(R.string.no_note));
+            textNote.setText(record.note != null && !record.note.isEmpty() ? record.note
+                    : itemView.getContext().getString(R.string.no_note));
             textDate.setText(FormatUtils.formatDateTime(record.timestamp));
 
-            // Định dạng màu sắc và tag dựa trên loại giao dịch
-            int color;
-            String typeText;
+            int colorRes = R.color.outline;
+            String typeText = itemView.getContext().getString(R.string.transaction_type_default);
 
-            if (record.type == null) {
-                color = ContextCompat.getColor(itemView.getContext(), R.color.outline);
-                typeText = itemView.getContext().getString(R.string.transaction_type_default);
-            } else {
+            if (record.type != null) {
                 switch (record.type) {
                     case LEND:
-                        color = ContextCompat.getColor(itemView.getContext(), useClassicColors ? R.color.classic_receivable : R.color.receivable);
+                        colorRes = R.color.receivable;
                         typeText = itemView.getContext().getString(R.string.transaction_type_lend);
                         break;
                     case REPAY:
-                        color = ContextCompat.getColor(itemView.getContext(), useClassicColors ? R.color.classic_payable : R.color.payable);
+                        colorRes = R.color.payable;
                         typeText = itemView.getContext().getString(R.string.transaction_type_repay);
                         break;
                     case BORROW:
-                        color = ContextCompat.getColor(itemView.getContext(), useClassicColors ? R.color.classic_payable : R.color.payable);
+                        colorRes = R.color.payable;
                         typeText = itemView.getContext().getString(R.string.transaction_type_borrow);
                         break;
                     case PAY_BACK:
-                        color = ContextCompat.getColor(itemView.getContext(), useClassicColors ? R.color.classic_receivable : R.color.receivable);
+                        colorRes = R.color.receivable;
                         typeText = itemView.getContext().getString(R.string.transaction_type_pay_back);
                         break;
-                    default:
-                        color = ContextCompat.getColor(itemView.getContext(), R.color.outline);
-                        typeText = itemView.getContext().getString(R.string.transaction_type_default);
                 }
             }
 
+            int color = ContextCompat.getColor(itemView.getContext(), colorRes);
             indicator.setBackgroundColor(color);
             textType.setText(typeText);
             textAmount.setTextColor(color);

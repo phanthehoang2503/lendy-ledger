@@ -50,23 +50,24 @@ public class HistoryFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         
         adapter = new TransactionAdapter();
-        adapter.setUseClassicColors(true);
         recyclerView.setAdapter(adapter);
     }
 
     private void setupViewModel() {
         if (getActivity() == null) return;
-        
-        LendyRepository repository = new LendyRepository(getActivity().getApplication());
-        viewModel = new ViewModelProvider(requireActivity(), new LendyViewModelFactory(repository)).get(LendyViewModel.class);
 
+        viewModel = new ViewModelProvider(
+                requireActivity(),
+                new LendyViewModelFactory(
+                        LendyRepository.getInstance(requireActivity().getApplication())))
+                .get(LendyViewModel.class);
         viewModel.getAllTransactions().observe(getViewLifecycleOwner(), transactions -> {
             if (transactions == null || transactions.isEmpty()) {
                 emptyView.setVisibility(View.VISIBLE);
             } else {
                 emptyView.setVisibility(View.GONE);
             }
-            adapter.setTransactions(transactions != null ? transactions : new ArrayList<>());
+            adapter.submitList(transactions);
         });
     }
 }
