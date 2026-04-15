@@ -24,11 +24,16 @@ public class CurrencyTextWatcher implements TextWatcher {
             editText.removeTextChangedListener(this);
             String cleanString = s.toString().replaceAll("[^\\d]", "");
             if (!cleanString.isEmpty()) {
-                long parsed = Long.parseLong(cleanString);
-                String formatted = FormatUtils.formatThousand(parsed);
-                current = formatted;
-                editText.setText(formatted);
-                editText.setSelection(formatted.length());
+                try {
+                    long parsed = Long.parseLong(cleanString);
+                    String formatted = FormatUtils.formatThousand(parsed);
+                    current = formatted;
+                    editText.setText(formatted);
+                    editText.setSelection(formatted.length());
+                } catch (NumberFormatException ignored) {
+                    editText.setText(current);
+                    editText.setSelection(current.length());
+                }
             } else {
                 current = "";
                 editText.setText("");

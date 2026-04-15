@@ -4,6 +4,8 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 
+import androidx.appcompat.app.AlertDialog;
+
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 import com.lendy.app.R;
@@ -22,16 +24,26 @@ public class PersonDialogHelper {
         TextInputEditText editPhone = v.findViewById(R.id.editPhone);
         editName.setText(person.name);
         editPhone.setText(person.phoneNumber);
-        new MaterialAlertDialogBuilder(context)
+        AlertDialog dialog = new MaterialAlertDialogBuilder(context)
                 .setTitle("Chỉnh sửa thông tin")
                 .setView(v)
-                .setPositiveButton("Lưu", (d, w) -> {
-                    person.name = editName.getText().toString().trim();
-                    person.phoneNumber = editPhone.getText().toString().trim();
-                    person.updatedAt = System.currentTimeMillis();
-                    viewModel.updatePerson(person);
-                })
+                .setPositiveButton("Lưu", null)
                 .setNegativeButton("Hủy", null)
-                .show();
+                .create();
+
+        dialog.show();
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(button -> {
+            String name = editName.getText().toString().trim();
+            if (name.isEmpty()) {
+                editName.setError("Name required");
+                return;
+            }
+
+            person.name = name;
+            person.phoneNumber = editPhone.getText().toString().trim();
+            person.updatedAt = System.currentTimeMillis();
+            viewModel.updatePerson(person);
+            dialog.dismiss();
+        });
     }
 }
