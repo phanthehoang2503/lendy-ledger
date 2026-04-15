@@ -24,6 +24,7 @@ import com.lendy.app.data.TransactionType;
 import com.lendy.app.data.entities.Person;
 import com.lendy.app.repository.LendyRepository;
 import com.lendy.app.ui.adapters.MainPagerAdapter;
+import com.lendy.app.utils.CurrencyTextWatcher;
 import com.lendy.app.viewmodel.LendyViewModel;
 import com.lendy.app.viewmodel.LendyViewModelFactory;
 
@@ -131,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements com.lendy.app.ui.
     }
 
     private void setupViewModel() {
-        LendyRepository repository = new LendyRepository(getApplication());
+        LendyRepository repository = LendyRepository.getInstance(getApplication());
         viewModel = new ViewModelProvider(this, new LendyViewModelFactory(repository)).get(LendyViewModel.class);
 
         viewModel.getGlobalSummary().observe(this, summary -> {
@@ -194,36 +195,7 @@ public class MainActivity extends AppCompatActivity implements com.lendy.app.ui.
         setupQuickAddChips(dialogView, editAmount);
 
         // Format tiền
-        editAmount.addTextChangedListener(new android.text.TextWatcher() {
-            private String current = "";
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
-
-            @Override
-            public void afterTextChanged(android.text.Editable s) {
-                if (!s.toString().equals(current)) {
-                    editAmount.removeTextChangedListener(this);
-                    String cleanString = s.toString().replaceAll("[^\\d]", "");
-                    Long parsed = parseAmountSafely(cleanString);
-                    if (parsed != null) {
-                        String formatted = com.lendy.app.utils.FormatUtils.formatThousand(parsed);
-                        current = formatted;
-                        editAmount.setText(formatted);
-                        editAmount.setSelection(formatted.length());
-                    } else if (cleanString.isEmpty()) {
-                        current = "";
-                        editAmount.setText("");
-                    }
-                    editAmount.addTextChangedListener(this);
-                }
-            }
-        });
+        editAmount.addTextChangedListener(new CurrencyTextWatcher(editAmount));
 
         AlertDialog dialog = new MaterialAlertDialogBuilder(this)
                 .setTitle("Thêm người nợ mới")

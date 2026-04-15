@@ -158,7 +158,7 @@ public class PersonDetailActivity extends AppCompatActivity {
     }
 
     private void setupViewModel() {
-        LendyRepository repository = new LendyRepository(getApplication());
+        LendyRepository repository = LendyRepository.getInstance(getApplication());
         LendyViewModelFactory factory = new LendyViewModelFactory(repository);
         viewModel = new ViewModelProvider(this, factory).get(LendyViewModel.class);
 
