@@ -1,6 +1,8 @@
 package com.lendy.app.repository;
 
 import android.app.Application;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import androidx.annotation.VisibleForTesting;
@@ -26,6 +28,10 @@ import java.util.concurrent.Executors;
  * Đóng gói các thao tác nền, đảm bảo tính nguyên tử qua bộ máy chạy ngầm.
  *****************************************************************************/
 public class LendyRepository {
+    public interface PersonExistsCallback {
+        void onResult(boolean exists);
+    }
+
     private static final String TAG = "LendyRepository";
     private final LendyDatabase db;
     private final TransactionDao transactionDao;
@@ -126,6 +132,21 @@ public class LendyRepository {
             } catch (Exception e) {
                 postError("Lỗi lưu người nợ.", e);
             }
+        });
+    }
+
+    public void checkActivePersonExists(String name, String phone, PersonExistsCallback callback) {
+        executor.execute(() -> {
+            boolean exists;
+            try {
+                exists = personDao.findActivePerson(name, phone) != null;
+            } catch (Exception e) {
+                postError("Lỗi kiểm tra trùng người nợ.", e);
+                exists = false;
+            }
+
+            boolean result = exists;
+            new Handler(Looper.getMainLooper()).post(() -> callback.onResult(result));
         });
     }
 

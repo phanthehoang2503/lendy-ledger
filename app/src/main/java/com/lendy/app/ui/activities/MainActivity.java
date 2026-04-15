@@ -217,18 +217,27 @@ public class MainActivity extends AppCompatActivity implements com.lendy.app.ui.
                     return;
                 }
 
-                Person person = new Person();
-                person.name = name;
-                person.phoneNumber = phone;
-                person.updatedAt = System.currentTimeMillis();
+                button.setEnabled(false);
+                viewModel.checkActivePersonExists(name, phone, exists -> {
+                    if (exists) {
+                        editName.setError("Người này đã tồn tại");
+                        button.setEnabled(true);
+                        return;
+                    }
 
-                long amount = com.lendy.app.utils.FormatUtils.parseFormattedNumber(amountStr);
-                TransactionType type = (toggleGroup.getCheckedButtonId() == R.id.btnLending)
-                        ? TransactionType.LEND
-                        : TransactionType.BORROW;
+                    Person person = new Person();
+                    person.name = name;
+                    person.phoneNumber = phone;
+                    person.updatedAt = System.currentTimeMillis();
 
-                viewModel.addPersonWithInitialBalance(person, amount, type, note);
-                dialog.dismiss();
+                    long amount = com.lendy.app.utils.FormatUtils.parseFormattedNumber(amountStr);
+                    TransactionType type = (toggleGroup.getCheckedButtonId() == R.id.btnLending)
+                            ? TransactionType.LEND
+                            : TransactionType.BORROW;
+
+                    viewModel.addPersonWithInitialBalance(person, amount, type, note);
+                    dialog.dismiss();
+                });
             });
         });
 

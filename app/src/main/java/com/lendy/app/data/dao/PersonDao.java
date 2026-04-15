@@ -3,6 +3,8 @@ package com.lendy.app.data.dao;
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
+import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 import androidx.room.Upsert;
@@ -13,21 +15,15 @@ import java.util.List;
 
 @Dao
 public interface PersonDao {
-    @Upsert
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     long insert(Person person);
 
-    @Upsert
+    @Update
     void update(Person person);
 
-    /**
-     * XÓA MỀM (SOFT DELETE):
-     * Thay vì xóa thật, chúng ta chỉ đánh dấu isDeleted = 1 để giữ lại lịch sử giao
-     * dịch.
-     */
     @Query("UPDATE people SET isDeleted = 1 WHERE id = :id")
     void softDelete(long id);
 
-    // LỆNH XÓA SẠCH DỮ LIỆU
     @Query("DELETE FROM people")
     void deleteAll();
 
@@ -45,6 +41,9 @@ public interface PersonDao {
 
     @Query("SELECT * FROM people WHERE id = :id")
     LiveData<Person> getPersonByIdIncludingDeleted(long id);
+
+    @Query("SELECT * FROM people WHERE name = :name AND phoneNumber = :phone AND isDeleted = 0 LIMIT 1")
+    Person findActivePerson(String name, String phone);
 
     @Query("SELECT " +
             "COALESCE(SUM(CASE WHEN totalBalance > 0 THEN totalBalance ELSE 0 END), 0) as totalLending, " +

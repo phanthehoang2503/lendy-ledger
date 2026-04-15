@@ -79,6 +79,10 @@ public class LendyViewModel extends ViewModel {
         repository.upsertPerson(person);
     }
 
+    public void checkActivePersonExists(String name, String phone, LendyRepository.PersonExistsCallback callback) {
+        repository.checkActivePersonExists(name, phone, callback);
+    }
+
     public void removePerson(Person person) {
         repository.deletePerson(person);
     }
