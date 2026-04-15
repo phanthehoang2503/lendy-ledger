@@ -16,7 +16,7 @@ public interface PersonDao {
     @Upsert
     long insert(Person person);
 
-    @Update
+    @Upsert
     void update(Person person);
 
     /**

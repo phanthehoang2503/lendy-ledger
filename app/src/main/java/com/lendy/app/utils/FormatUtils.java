@@ -7,8 +7,6 @@ import java.util.Locale;
 
 public class FormatUtils {
     private static final Locale VIETNAM = Locale.forLanguageTag("vi-VN");
-    private static final NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(VIETNAM);
-
     public static String formatCurrency(long amount) {
         return formatThousand(amount) + " ₫";
     }

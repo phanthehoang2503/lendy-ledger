@@ -1,18 +1,12 @@
 package com.lendy.app.ui.activities;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.transition.TransitionManager;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -28,13 +22,10 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.lendy.app.R;
 import com.lendy.app.data.TransactionType;
 import com.lendy.app.data.entities.Person;
+import com.lendy.app.repository.LendyRepository;
 import com.lendy.app.ui.adapters.MainPagerAdapter;
 import com.lendy.app.viewmodel.LendyViewModel;
 import com.lendy.app.viewmodel.LendyViewModelFactory;
-import com.lendy.app.repository.LendyRepository;
-
-import java.text.NumberFormat;
-import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements com.lendy.app.ui.fragments.HomeFragment.AddPersonDialogHost {
 

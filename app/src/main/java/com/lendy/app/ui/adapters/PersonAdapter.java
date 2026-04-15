@@ -1,10 +1,10 @@
 package com.lendy.app.ui.adapters;
 
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
@@ -13,6 +13,7 @@ import com.google.android.material.card.MaterialCardView;
 import com.lendy.app.R;
 import com.lendy.app.data.entities.Person;
 import com.lendy.app.utils.FormatUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,38 +53,11 @@ public class PersonAdapter extends RecyclerView.Adapter<PersonAdapter.PersonView
         notifyDataSetChanged();
     }
 
-    public void setUseUnifiedColor(boolean useUnifiedColor) {
-        this.useUnifiedColor = useUnifiedColor;
-        notifyDataSetChanged();
-    }
-
     public void setUseClassicColors(boolean useClassicColors) {
         this.useClassicColors = useClassicColors;
         notifyDataSetChanged();
     }
 
-    public void filter(String k) {
-        people.clear();
-        if (k.isEmpty()) {
-            people.addAll(peopleFull);
-        } else {
-            String filterPattern = k.toLowerCase().trim();
-            for (Person item : peopleFull) {
-                if (item.name.toLowerCase().contains(filterPattern) ||
-                        (item.phoneNumber != null && item.phoneNumber.contains(filterPattern))) {
-                    people.add(item);
-                }
-            }
-        }
-        notifyDataSetChanged();
-    }
-
-    public Person getPersonAt(int position) {
-        if (position >= 0 && position < people.size()) {
-            return people.get(position);
-        }
-        return null;
-    }
 
     @NonNull
     @Override

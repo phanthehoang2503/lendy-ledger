@@ -5,11 +5,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
-import androidx.appcompat.app.AlertDialog;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
@@ -27,16 +26,12 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.lendy.app.R;
 import com.lendy.app.data.TransactionType;
-import com.lendy.app.data.entities.Person;
 import com.lendy.app.data.entities.TransactionRecord;
 import com.lendy.app.repository.LendyRepository;
 import com.lendy.app.ui.adapters.TransactionAdapter;
 import com.lendy.app.utils.FormatUtils;
 import com.lendy.app.viewmodel.LendyViewModel;
 import com.lendy.app.viewmodel.LendyViewModelFactory;
-
-import java.text.NumberFormat;
-import java.util.Locale;
 
 public class PersonDetailActivity extends AppCompatActivity {
 
