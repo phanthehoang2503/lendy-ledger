@@ -3,6 +3,7 @@ package com.lendy.app.ui.activities;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
@@ -11,6 +12,9 @@ import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -75,6 +79,41 @@ public class PersonDetailActivity extends AppCompatActivity {
         setupRecyclerView();
         setupViewModel();
         setupFab();
+        setupEdgeToEdgeInsets();
+    }
+
+    private void setupEdgeToEdgeInsets() {
+        View appBar = findViewById(R.id.detail_app_bar);
+        RecyclerView recyclerView = findViewById(R.id.recyclerViewTimeline);
+        FloatingActionButton fab = findViewById(R.id.fabAddTransaction);
+
+        final int initialAppBarTopPadding = appBar.getPaddingTop();
+        final int initialRecyclerBottomPadding = recyclerView.getPaddingBottom();
+        final int initialFabBottomMargin = ((ViewGroup.MarginLayoutParams) fab.getLayoutParams()).bottomMargin;
+
+        ViewCompat.setOnApplyWindowInsetsListener(appBar, (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(v.getPaddingLeft(), initialAppBarTopPadding + systemBars.top, v.getPaddingRight(),
+                    v.getPaddingBottom());
+            return insets;
+        });
+
+        ViewCompat.setOnApplyWindowInsetsListener(recyclerView, (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(v.getPaddingLeft(), v.getPaddingTop(), v.getPaddingRight(),
+                    initialRecyclerBottomPadding + systemBars.bottom);
+            return insets;
+        });
+
+        ViewCompat.setOnApplyWindowInsetsListener(fab, (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams) v.getLayoutParams();
+            layoutParams.bottomMargin = initialFabBottomMargin + systemBars.bottom;
+            v.setLayoutParams(layoutParams);
+            return insets;
+        });
+
+        ViewCompat.requestApplyInsets(findViewById(android.R.id.content));
     }
 
     private void setupRecyclerView() {
@@ -98,7 +137,7 @@ public class PersonDetailActivity extends AppCompatActivity {
 
                     @Override
                     public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                        int position = viewHolder.getAdapterPosition();
+                        int position = viewHolder.getBindingAdapterPosition();
                         if (position == RecyclerView.NO_POSITION)
                             return;
                         TransactionRecord record = adapter.getTransactionAt(position);
@@ -154,20 +193,18 @@ public class PersonDetailActivity extends AppCompatActivity {
 
         if (balance > 0) {
             // Nợ thu (Họ nợ mình)
-            String text = "+ " + formatted;
-            textBalance.setText(text);
+            textBalance.setText(formatted);
             textBalance.setContentDescription(getString(R.string.balance_receivable_talkback, formatted));
-            textBalance.setTextColor(ContextCompat.getColor(this, R.color.classic_receivable));
+            textBalance.setTextColor(ContextCompat.getColor(this, R.color.black));
         } else if (balance < 0) {
             // Nợ trả (Mình nợ họ)
-            String text = "- " + formatted;
-            textBalance.setText(text);
+            textBalance.setText(formatted);
             textBalance.setContentDescription(getString(R.string.balance_payable_talkback, formatted));
-            textBalance.setTextColor(ContextCompat.getColor(this, R.color.classic_payable));
+            textBalance.setTextColor(ContextCompat.getColor(this, R.color.black));
         } else {
             textBalance.setText(getString(R.string.zero_balance));
             textBalance.setContentDescription(getString(R.string.zero_balance));
-            textBalance.setTextColor(ContextCompat.getColor(this, R.color.outline));
+            textBalance.setTextColor(ContextCompat.getColor(this, R.color.black));
         }
     }
 

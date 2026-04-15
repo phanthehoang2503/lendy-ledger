@@ -1,8 +1,8 @@
 <resources>
-    <!-- App Name -->
+    <!-- Tên app -->
     <string name="app_name">L E N D Y</string>
 
-    <!-- Actions -->
+    <!-- Thao tác -->
     <string name="action_history">Lịch sử nợ</string>
     <string name="action_contacts">Danh bạ</string>
     <string name="action_reset">Xóa sạch dữ liệu</string>
@@ -11,28 +11,28 @@
     <string name="save">Lưu</string>
     <string name="cancel">Hủy</string>
 
-    <!-- Titles -->
+    <!-- Tiêu đề -->
     <string name="title_completed_debts">Nợ đã hoàn thành</string>
     <string name="title_contacts">Danh sách liên lạc</string>
     <string name="statistics">Thống kê</string>
 
-    <!-- Confirmations -->
+    <!-- Xác nhận -->
     <string name="confirm_reset_title">Xóa toàn bộ dữ liệu?</string>
     <string name="confirm_reset_message">Hành động này sẽ xóa sạch tất cả người nợ và lịch sử giao dịch. Bạn không thể hoàn tác!</string>
     <string name="confirm_delete_person_title">Xóa người này?</string>
     <string name="confirm_delete_person_message">Tất cả lịch sử giao dịch liên quan đến người này cũng sẽ bị xóa vĩnh viễn.</string>
 
-    <!-- Form Fields -->
+    <!-- Trường nhập -->
     <string name="amount">Số tiền</string>
     <string name="transaction_note">Ghi chú (tùy chọn)</string>
 
-    <!-- Navigation -->
+    <!-- Điều hướng -->
     <string name="home">Trang chủ</string>
     <string name="stats">Thống kê</string>
     <string name="history">Lịch sử</string>
     <string name="contacts">Danh bạ</string>
 
-    <!-- Empty States -->
+    <!-- Màn hình trống -->
     <string name="home_quick_add_hint">Ghi khoản nợ mới…</string>
     <string name="home_empty_title">Sổ nợ đang trống</string>
     <string name="home_empty_subtitle">Hãy nhấn thanh nhập phía trên để
@@ -49,18 +49,18 @@ sẽ xuất hiện tại đây.</string>
     <string name="no_completed_debts">Chưa có khoản nợ nào hoàn thành</string>
     <string name="no_contacts">Chưa có liên lạc nào</string>
 
-    <!-- Tab Titles -->
+    <!-- Tên tab -->
     <string name="tab_home">L E N D Y</string>
     <string name="tab_stats">THỐNG KÊ</string>
     <string name="tab_history">LỊCH SỬ</string>
     <string name="tab_contacts">DANH BẠ</string>
 
-    <!-- Stats & Charts -->
+    <!-- Thống kê và biểu đồ -->
     <string name="label_lend">Họ nợ mình</string>
     <string name="label_borrow">Mình nợ họ</string>
     <string name="total_debt_center">Tổng nợ</string>
 
-    <!-- Transactions -->
+    <!-- Giao dịch -->
     <string name="anonymous_person">Người nợ ẩn danh</string>
     <string name="remaining_debt_format">Số nợ còn lại: %s</string>
     <string name="no_note">Không có ghi chú</string>
@@ -70,18 +70,18 @@ sẽ xuất hiện tại đây.</string>
     <string name="transaction_type_pay_back">MÌNH TRẢ NỢ</string>
     <string name="transaction_type_default">GIAO DỊCH</string>
 
-    <!-- Accessibility -->
+    <!-- Hỗ trợ đọc màn hình -->
     <string name="add_item">Thêm khoản nợ mới</string>
     <string name="balance_receivable_talkback">Khoản thu: %s</string>
     <string name="balance_payable_talkback">Khoản trả: %s</string>
 
-    <!-- Hard-coded strings moved from code -->
+    <!-- Chuỗi chuyển từ code -->
     <string name="no_phone_number">Không có số điện thoại</string>
     <string name="no_phone_short">Không có SĐT</string>
     <string name="zero_balance">0 đ</string>
     <string name="receivable_prefix">Nợ bạn: </string>
     <string name="payable_prefix">Bạn nợ: </string>
-    <string name="settled_balance">Đã hết nợ</string>
+    <string name="settled_balance"> </string>
     <string name="no_phone_yet">Chưa có SĐT</string>
     <string name="note_hint">Lý do / Ghi chú (tùy chọn)</string>
     <string name="phone_hint">Số điện thoại (không bắt buộc)</string>

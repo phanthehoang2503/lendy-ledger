@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Nút outlined nền trắng -->
     <style name="Widget.Lendy.Button.WhiteOutlined" parent="Widget.Material3.Button.OutlinedButton">
         <item name="backgroundTint">@color/white</item>
         <item name="android:backgroundTint">@color/white</item>

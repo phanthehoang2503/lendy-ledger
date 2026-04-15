@@ -40,7 +40,7 @@ public class StatsFragment extends Fragment {
     private PieChart pieChart;
     private PersonAdapter topDebtorsAdapter;
     private RecyclerView recyclerViewTopDebtors;
-    private View textTopDebtorsTitle, cardTopDebtors;
+    private View textTopDebtorsTitle;
     private MaterialButtonToggleGroup toggleGroup;
     private boolean showReceivables = true;
     private List<Person> currentPeople = new ArrayList<>();
@@ -53,7 +53,6 @@ public class StatsFragment extends Fragment {
 
         pieChart = view.findViewById(R.id.pieChart);
         textTopDebtorsTitle = view.findViewById(R.id.textTopDebtorsTitle);
-        cardTopDebtors = view.findViewById(R.id.cardTopDebtors);
 
         setupRecyclerView(view);
         setupViewModel();
@@ -120,7 +119,7 @@ public class StatsFragment extends Fragment {
 
             boolean hasFilteredData = !filteredList.isEmpty();
             textTopDebtorsTitle.setVisibility(hasFilteredData ? View.VISIBLE : View.GONE);
-            cardTopDebtors.setVisibility(hasFilteredData ? View.VISIBLE : View.GONE);
+            recyclerViewTopDebtors.setVisibility(hasFilteredData ? View.VISIBLE : View.GONE);
             toggleGroup.setVisibility(View.VISIBLE);
 
             if (hasFilteredData) {
@@ -139,7 +138,7 @@ public class StatsFragment extends Fragment {
             }
         } else {
             textTopDebtorsTitle.setVisibility(View.GONE);
-            cardTopDebtors.setVisibility(View.GONE);
+            recyclerViewTopDebtors.setVisibility(View.GONE);
             toggleGroup.setVisibility(View.GONE);
             topDebtorsAdapter.setPeople(new ArrayList<>());
         }

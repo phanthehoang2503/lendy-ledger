@@ -1,9 +1,45 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
+<resources>
+    <!-- Base theme: Light -->
     <style name="Base.Theme.Lendy" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <!-- Brand colors -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorSecondary">@color/primary_light</item>
+        <item name="colorTertiary">@color/primary_dark</item>
+
+        <!-- Containers -->
+        <item name="colorPrimaryContainer">@color/primary_container</item>
+        <item name="colorSecondaryContainer">@color/primary_container</item>
+        <item name="colorTertiaryContainer">@color/primary_container</item>
+
+        <!-- Surface: ép tất cả về trắng để tránh tint M3 -->
+        <item name="colorSurface">@color/white</item>
+        <item name="colorSurfaceContainer">@color/white</item>
+        <item name="colorSurfaceContainerLow">@color/white</item>
+        <item name="colorSurfaceContainerHigh">@color/white</item>
+        <item name="colorSurfaceContainerHighest">@color/white</item>
+
+        <!-- Text / outline -->
+        <item name="colorOnSurface">@color/black</item>
+        <item name="colorOutline">@color/outline</item>
+
+        <!-- System bars -->
+        <item name="android:statusBarColor">@color/primary_dark</item>
+        <item name="android:navigationBarColor">@color/white</item>
+
+        <!-- Elevation overlay: tắt vì Surface đã trắng -->
+        <item name="elevationOverlayEnabled">false</item>
+
+        <!-- Dialog -->
+        <item name="materialAlertDialogTheme">@style/CustomAlertDialog</item>
     </style>
 
     <style name="Theme.Lendy" parent="Base.Theme.Lendy" />
+
+    <!-- Dialog dùng colorSurfaceContainerHighest -->
+    <style name="CustomAlertDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="colorSurface">@color/white</item>
+        <item name="colorSurfaceContainerHigh">@color/white</item>
+        <item name="colorSurfaceContainerHighest">@color/white</item>
+    </style>
+
 </resources>

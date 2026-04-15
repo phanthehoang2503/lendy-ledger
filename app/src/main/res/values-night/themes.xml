@@ -1,7 +1,43 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
+<resources>
+    <!-- Base theme: Dark (Night) -->
     <style name="Base.Theme.Lendy" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+        <!-- Brand colors (sáng hơn để hiển thị trên nền tối) -->
+        <item name="colorPrimary">@color/primary_light</item>
+        <item name="colorSecondary">@color/primary_light</item>
+        <item name="colorTertiary">@color/primary</item>
+
+        <!-- Containers -->
+        <item name="colorPrimaryContainer">@color/primary_dark</item>
+        <item name="colorSecondaryContainer">@color/primary_dark</item>
+        <item name="colorTertiaryContainer">@color/primary_dark</item>
+
+        <!-- Surface: ép về đen để tránh tint M3 -->
+        <item name="colorSurface">@color/black</item>
+        <item name="colorSurfaceContainer">@color/black</item>
+        <item name="colorSurfaceContainerLow">@color/black</item>
+        <item name="colorSurfaceContainerHigh">@color/black</item>
+        <item name="colorSurfaceContainerHighest">@color/black</item>
+
+        <!-- Text / outline -->
+        <item name="colorOnSurface">@color/white</item>
+        <item name="colorOutline">@color/outline</item>
+
+        <!-- System bars -->
+        <item name="android:statusBarColor">@color/primary_dark</item>
+        <item name="android:navigationBarColor">@color/black</item>
+
+        <!-- Elevation overlay: tắt vì Surface đã đen -->
+        <item name="elevationOverlayEnabled">false</item>
+
+        <!-- Dialog -->
+        <item name="materialAlertDialogTheme">@style/CustomAlertDialog</item>
     </style>
+
+    <!-- CustomAlertDialog cho dark mode -->
+    <style name="CustomAlertDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="colorSurface">@color/black</item>
+        <item name="colorSurfaceContainerHigh">@color/black</item>
+        <item name="colorSurfaceContainerHighest">@color/black</item>
+    </style>
+
 </resources>
