@@ -62,9 +62,8 @@ public class ContactsFragment extends Fragment {
 
     private void setupViewModel() {
         if (getActivity() == null) return;
-        
-        LendyRepository repository = new LendyRepository(getActivity().getApplication());
-        viewModel = new ViewModelProvider(requireActivity(), new LendyViewModelFactory(repository)).get(LendyViewModel.class);
+
+        viewModel = new ViewModelProvider(requireActivity()).get(LendyViewModel.class);
 
         viewModel.getAllPeople().observe(getViewLifecycleOwner(), people -> {
             if (people == null || people.isEmpty()) {

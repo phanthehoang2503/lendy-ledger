@@ -3,20 +3,22 @@ package com.lendy.app.repository;
 import android.app.Application;
 import android.util.Log;
 
+import androidx.annotation.VisibleForTesting;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+
 import com.lendy.app.data.LendyDatabase;
-import com.lendy.app.data.dao.TransactionDao;
+import com.lendy.app.data.TransactionType;
 import com.lendy.app.data.dao.PersonDao;
-import com.lendy.app.utils.Event;
+import com.lendy.app.data.dao.TransactionDao;
 import com.lendy.app.data.entities.Person;
 import com.lendy.app.data.entities.TransactionRecord;
 import com.lendy.app.data.model.SummaryDTO;
-import com.lendy.app.data.TransactionType;
-import androidx.lifecycle.MutableLiveData;
+import com.lendy.app.utils.Event;
+
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import androidx.annotation.VisibleForTesting;
 
 /******************************************************************************
  * ../repository/LendyRepository.java - LendyRepository
@@ -30,10 +32,18 @@ public class LendyRepository {
     private final PersonDao personDao;
     private final MutableLiveData<Event<String>> errorNotifier = new MutableLiveData<>();
     private final ExecutorService executor;
+    private static LendyRepository instance;
 
     // Default Constructor for App usage
-    public LendyRepository(Application application) {
+    private LendyRepository(Application application) {
         this(LendyDatabase.getInstance(application), Executors.newSingleThreadExecutor());
+    }
+
+    public static synchronized LendyRepository getInstance(Application application) {
+        if (instance == null) {
+            instance = new LendyRepository(application);
+        }
+        return instance;
     }
 
     // Constructor for Testing (DI - DI là gì thì lên mạng search ngen)
