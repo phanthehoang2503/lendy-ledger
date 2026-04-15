@@ -34,7 +34,7 @@
                 android:textStyle="bold"
                 android:letterSpacing="0.2"
                 android:fontFamily="sans-serif-medium"
-                android:shadowColor="#40000000"
+                android:shadowColor="@color/shadow_black"
                 android:shadowDx="0"
                 android:shadowDy="2"
                 android:shadowRadius="4" />
