@@ -68,7 +68,7 @@ public class PersonDetailActivity extends AppCompatActivity {
         textBalance = findViewById(R.id.textDetailBalance);
 
         textName.setText(name);
-        textPhone.setText(phone != null && !phone.isEmpty() ? phone : "Không có số điện thoại");
+        textPhone.setText(phone != null && !phone.isEmpty() ? phone : getString(R.string.no_phone_number));
 
         findViewById(R.id.toolbar).setOnClickListener(v -> finish());
 
@@ -138,7 +138,7 @@ public class PersonDetailActivity extends AppCompatActivity {
                 textName.setText(displayName);
                 textPhone.setText(person.phoneNumber != null && !person.phoneNumber.isEmpty()
                         ? person.phoneNumber
-                        : "Không có SĐT");
+                        : getString(R.string.no_phone_short));
             }
         });
 
@@ -165,8 +165,8 @@ public class PersonDetailActivity extends AppCompatActivity {
             textBalance.setContentDescription(getString(R.string.balance_payable_talkback, formatted));
             textBalance.setTextColor(ContextCompat.getColor(this, R.color.classic_payable));
         } else {
-            textBalance.setText("0 đ");
-            textBalance.setContentDescription("0 đ");
+            textBalance.setText(getString(R.string.zero_balance));
+            textBalance.setContentDescription(getString(R.string.zero_balance));
             textBalance.setTextColor(ContextCompat.getColor(this, R.color.outline));
         }
     }

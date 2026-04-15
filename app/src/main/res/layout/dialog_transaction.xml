@@ -18,7 +18,7 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnLending"
-            style="?attr/materialButtonOutlinedStyle"
+            style="@style/Widget.Lendy.Button.WhiteOutlined"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -26,7 +26,7 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnBorrowing"
-            style="?attr/materialButtonOutlinedStyle"
+            style="@style/Widget.Lendy.Button.WhiteOutlined"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -107,7 +107,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:hint="Lý do / Ghi chú (tùy chọn)"
+        android:hint="@string/note_hint"
         app:startIconDrawable="@android:drawable/ic_menu_edit">
 
         <com.google.android.material.textfield.TextInputEditText

@@ -28,7 +28,7 @@
         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Số điện thoại (không bắt buộc)"
+        android:hint="@string/phone_hint"
         android:layout_marginBottom="12dp"
         app:boxBackgroundColor="?attr/colorSurface">
 
@@ -46,7 +46,7 @@
         android:layout_height="wrap_content"
         android:hint="Số tiền"
         android:layout_marginBottom="8dp"
-        app:suffixText="đ"
+        app:suffixText="@string/currency_symbol"
         app:boxBackgroundColor="?attr/colorSurface">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -120,7 +120,7 @@
         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Lý do / Ghi chú (tùy chọn)"
+        android:hint="@string/note_hint"
         android:layout_marginBottom="16dp"
         app:startIconDrawable="@android:drawable/ic_menu_edit"
         app:boxBackgroundColor="?attr/colorSurface">
@@ -143,7 +143,7 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnLending"
-            style="@style/Widget.Material3.Button.OutlinedButton"
+            style="@style/Widget.Lendy.Button.WhiteOutlined"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -151,7 +151,7 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnBorrowing"
-            style="@style/Widget.Material3.Button.OutlinedButton"
+            style="@style/Widget.Lendy.Button.WhiteOutlined"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"

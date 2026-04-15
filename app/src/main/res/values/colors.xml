@@ -2,8 +2,15 @@
 <resources>
     <color name="black">#FF1A1C1E</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="transparent">#00000000</color>
 
-    <!-- Deep Navy Theme - Light Version -->
+    <!-- Semi-transparent Colors -->
+    <color name="text_semi_white">#CCFFFFFF</color> <!-- Semi-transparent white for secondary text -->
+    <color name="shadow_black">#40000000</color>     <!-- Semi-transparent black for shadows -->
+    <color name="semi_black">#44000000</color>       <!-- Semi-transparent black -->
+    <color name="semi_white">#33FFFFFF</color>       <!-- Semi-transparent white -->
+
+    <!-- Theme Colors - Deep Navy Theme - Light Version -->
     <!-- Gradient Colors - Deep Ocean -->
     <color name="primary">#0D47A1</color>
     <color name="primary_gradient_start">#0D47A1</color>
@@ -13,15 +20,28 @@
     <color name="primary_container">#E3F2FD</color>
     <color name="text_white_secondary">#B3FFFFFF</color>
 
-    <!-- Neutral Status Colors -->
+    <!-- Status Colors -->
+    <!-- Neutral Status Colors for general use -->
     <color name="receivable">#34495E</color> <!-- Deep Slate Blue (Họ nợ mình - Tin cậy) -->
-    <color name="payable">#5D6D7E</color>    <!-- Warm Charcoal (Mình nợ họ - Nhẹ nhàng) -->
+    <color name="payable">#5D6D7E</color>    <!-- Warm Charcoal (Mình nợ họ - Nhẹ nhàng) --> 
 
-    <!-- Classic Status Colors for Stats/History (Muted variants) -->
-    <color name="classic_receivable">#2E7D32</color> <!-- Muted Dark Green -->
-    <color name="classic_payable">#C62828</color>    <!-- Muted Dark Red -->
+    <!-- PieChart Colors for Stats Fragment -->
+    <color name="classic_receivable">#00c728</color> <!-- màu thuộc tính nợ mình-->
+    <color name="classic_payable">#7df595</color> <!-- màu thuộc tính mình nợ -->
 
-    <!-- Backgrounds -->
+    <!-- Avatar Colors for Person Avatars -->
+    <color name="avatar_color_1">#EF5350</color>
+    <color name="avatar_color_2">#EC407A</color>
+    <color name="avatar_color_3">#AB47BC</color>
+    <color name="avatar_color_4">#7E57C2</color>
+    <color name="avatar_color_5">#5C6BC0</color>
+    <color name="avatar_color_6">#42A5F5</color>
+    <color name="avatar_color_7">#26A69A</color>
+    <color name="avatar_color_8">#66BB6A</color>
+    <color name="avatar_color_9">#FFA726</color>
+    <color name="avatar_color_10">#8D6E63</color>
+
+    <!-- Backgrounds and Surfaces -->
     <color name="background">#F0F2F5</color>
     <color name="surface">#FFFFFF</color>
     <color name="outline">#72777E</color>
@@ -31,4 +51,7 @@
     <!-- Decoration Colors -->
     <color name="divider">#EEEEEE</color>
     <color name="border_light">#EEEEEE</color>
+
+    <!-- Android Green for Launcher Icon -->
+    <color name="android_green">#3DDC84</color>
 </resources>
