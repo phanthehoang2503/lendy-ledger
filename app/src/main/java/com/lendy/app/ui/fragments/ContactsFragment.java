@@ -1,6 +1,7 @@
 package com.lendy.app.ui.fragments;
 
 import android.content.Intent;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -48,8 +49,13 @@ public class ContactsFragment extends Fragment {
         }
 
         setupRecyclerView(view);
-        setupViewModel();
         return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        setupViewModel();
     }
 
     private void showAddContactDialog() {
@@ -85,31 +91,35 @@ public class ContactsFragment extends Fragment {
                 }
 
                 button.setEnabled(false);
-                viewModel.checkActivePersonExists(name, phone, new LendyRepository.PersonExistsCallback() {
+                Person person = new Person();
+                person.name = name;
+                person.phoneNumber = phone;
+                person.updatedAt = System.currentTimeMillis();
+
+                viewModel.addOrUpdatePersonTransactional(person, new LendyRepository.PersonUpsertCallback() {
                     @Override
-                    public void onResult(boolean exists) {
-                        if (exists) {
-                            editName.setError("Người này đã có trong danh bạ");
-                            button.setEnabled(true);
-                            return;
-                        }
-
-                        // 4. Lưu vào Database thông qua ViewModel
-                        Person person = new Person();
-                        person.name = name;
-                        person.phoneNumber = phone;
-                        person.updatedAt = System.currentTimeMillis();
-
-                        // Hàm addPerson sẽ tạo người với totalBalance = 0
-                        viewModel.addPerson(person);
-
+                    public void onSuccess() {
                         dialog.dismiss();
                     }
 
                     @Override
-                    public void onError(Exception exception) {
+                    public void onDuplicate() {
+                        editName.setError("Người này đã có trong danh bạ");
                         button.setEnabled(true);
-                        android.widget.Toast.makeText(requireContext(), "Không thể kiểm tra trùng danh bạ", android.widget.Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onError(Exception exception) {
+                        if (!isAdded()) {
+                            return;
+                        }
+                        button.setEnabled(true);
+                        Context context = getContext();
+                        if (context != null) {
+                            android.widget.Toast
+                                    .makeText(context, "Không thể lưu danh bạ", android.widget.Toast.LENGTH_SHORT)
+                                    .show();
+                        }
                     }
                 });
             });
@@ -210,28 +220,34 @@ public class ContactsFragment extends Fragment {
                 }
 
                 button.setEnabled(false);
-                viewModel.checkActivePersonExistsExceptId(name, phone, person.id,
-                        new LendyRepository.PersonExistsCallback() {
+                person.name = name;
+                person.phoneNumber = phone;
+                person.updatedAt = System.currentTimeMillis();
+
+                viewModel.addOrUpdatePersonTransactional(person,
+                        new LendyRepository.PersonUpsertCallback() {
                             @Override
-                            public void onResult(boolean exists) {
-                                if (exists) {
-                                    editName.setError("Tên đã tồn tại");
-                                    button.setEnabled(true);
-                                    return;
-                                }
-
-                                person.name = name;
-                                person.phoneNumber = phone;
-                                person.updatedAt = System.currentTimeMillis();
-
-                                viewModel.updatePerson(person);
+                            public void onSuccess() {
                                 dialog.dismiss();
                             }
 
                             @Override
-                            public void onError(Exception exception) {
+                            public void onDuplicate() {
+                                editName.setError("Tên đã tồn tại");
                                 button.setEnabled(true);
-                                android.widget.Toast.makeText(requireContext(), "Không thể kiểm tra trùng danh bạ", android.widget.Toast.LENGTH_SHORT).show();
+                            }
+
+                            @Override
+                            public void onError(Exception exception) {
+                                if (!isAdded()) {
+                                    return;
+                                }
+                                button.setEnabled(true);
+                                Context context = getContext();
+                                if (context != null) {
+                                    android.widget.Toast.makeText(context, "Không thể lưu danh bạ",
+                                            android.widget.Toast.LENGTH_SHORT).show();
+                                }
                             }
                         });
             });

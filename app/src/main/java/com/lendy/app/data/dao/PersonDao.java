@@ -6,6 +6,7 @@ import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
+import androidx.room.Transaction;
 import androidx.room.Update;
 import androidx.room.Upsert;
 import com.lendy.app.data.entities.Person;
@@ -15,6 +16,9 @@ import java.util.List;
 
 @Dao
 public interface PersonDao {
+    int RESULT_SUCCESS = 1;
+    int RESULT_DUPLICATE = 0;
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     long insert(Person person);
 
@@ -47,6 +51,21 @@ public interface PersonDao {
 
     @Query("SELECT * FROM people WHERE name = :name AND phoneNumber = :phone AND isDeleted = 0 AND id != :excludeId LIMIT 1")
     Person findActivePersonExceptId(String name, String phone, long excludeId);
+
+    @Transaction
+    default int addOrUpdatePerson(Person person) {
+        if (person.id > 0) {
+            Person duplicate = findActivePersonExceptId(person.name, person.phoneNumber, person.id);
+            if (duplicate != null) {
+                return RESULT_DUPLICATE;
+            }
+            update(person);
+            return RESULT_SUCCESS;
+        }
+
+        long rowId = insert(person);
+        return rowId == -1L ? RESULT_DUPLICATE : RESULT_SUCCESS;
+    }
 
     @Query("SELECT " +
             "COALESCE(SUM(CASE WHEN totalBalance > 0 THEN totalBalance ELSE 0 END), 0) as totalLending, " +

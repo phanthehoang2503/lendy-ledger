@@ -2,6 +2,7 @@
 package com.lendy.app.data.entities;
 
 import androidx.room.Entity;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,7 +15,11 @@ import lombok.AllArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(tableName = "people")
+@Entity(
+    tableName = "people",
+    indices = {
+        @Index(value = { "name", "phoneNumber" }, unique = true)
+    })
 public class Person {
     @PrimaryKey(autoGenerate = true)
     public long id;

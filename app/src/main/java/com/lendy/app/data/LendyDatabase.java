@@ -16,7 +16,7 @@ import com.lendy.app.data.entities.TransactionRecord;
  * ../data/LendyDatabase.java - LendyDatabase
  * CHỨC NĂNG: Khởi tạo và quản lý toàn bộ Cơ sở dữ liệu Room của ứng dụng.
  *****************************************************************************/
-@Database(entities = { Person.class, TransactionRecord.class }, version = 3)
+@Database(entities = { Person.class, TransactionRecord.class }, version = 4)
 public abstract class LendyDatabase extends RoomDatabase {
     private static LendyDatabase instance;
 
@@ -40,6 +40,14 @@ public abstract class LendyDatabase extends RoomDatabase {
         }
     };
 
+    static final Migration MIGRATION_3_4 = new Migration(3, 4) {
+        @Override
+        public void migrate(SupportSQLiteDatabase database) {
+            database.execSQL("DELETE FROM people WHERE id NOT IN (SELECT MIN(id) FROM people GROUP BY name, phoneNumber)");
+            database.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS index_people_name_phoneNumber ON people(name, phoneNumber)");
+        }
+    };
+
     /**
      * HÀM LẤY KẾT NỐI:
      * Đảm bảo app chỉ mở duy nhất 1 "cửa" vào Database để tránh xung đột dữ liệu.
@@ -49,6 +57,7 @@ public abstract class LendyDatabase extends RoomDatabase {
             instance = Room.databaseBuilder(context.getApplicationContext(),
                     LendyDatabase.class, "lendy_db")
                     .addMigrations(MIGRATION_1_2)
+                    .addMigrations(MIGRATION_3_4)
                     .fallbackToDestructiveMigration()
                     .build();
         }
