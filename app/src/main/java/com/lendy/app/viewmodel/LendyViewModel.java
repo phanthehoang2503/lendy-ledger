@@ -30,6 +30,8 @@ public class LendyViewModel extends ViewModel {
     private final LiveData<SummaryDTO> globalSummary;
     @Getter
     private final LiveData<Event<String>> errorObserver;
+    @Getter
+    private final LiveData<Event<Boolean>> transactionAddedObserver;
 
     public LendyViewModel(LendyRepository repository) {
         this.repository = Objects.requireNonNull(repository, "repository must not be null");
@@ -37,6 +39,7 @@ public class LendyViewModel extends ViewModel {
         this.completedDebts = repository.getCompletedDebts();
         this.globalSummary = repository.getGlobalSummary();
         this.errorObserver = repository.getErrorNotifier();
+        this.transactionAddedObserver = repository.getTransactionAddedNotifier();
     }
 
     public LiveData<List<Person>> getAllPeople() {

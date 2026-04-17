@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -42,6 +43,8 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.AddD
     private BottomNavigationView bottomNav;
     private TextView textTotalLending, textTotalBorrowing, textAppTitle;
     private View welcomeContainer, summaryCard;
+    private Observer<List<Person>> addDebtFlowObserver;
+    private AlertDialog pendingAddTransactionDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,7 +96,11 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.AddD
 
     @Override
     public void showAddDebtFlow() {
-        viewModel.getAllPeople().observe(this, people -> {
+        if (addDebtFlowObserver != null) {
+            viewModel.getAllPeople().removeObserver(addDebtFlowObserver);
+        }
+
+        addDebtFlowObserver = people -> {
             if (people == null || people.isEmpty()) {
                 // Danh bạ trống -> Nhảy thẳng bước thêm người mới
                 showAddNewPersonDialog();
@@ -101,9 +108,14 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.AddD
                 // Có người -> Hiện dialog chọn người
                 showSelectPersonDialog(people);
             }
-            // Sau khi check xong thì remove observer để tránh bị gọi lại nhiều lần
-            viewModel.getAllPeople().removeObservers(this);
-        });
+            // Sau khi check xong thì remove đúng observer one-shot
+            if (addDebtFlowObserver != null) {
+                viewModel.getAllPeople().removeObserver(addDebtFlowObserver);
+                addDebtFlowObserver = null;
+            }
+        };
+
+        viewModel.getAllPeople().observe(this, addDebtFlowObserver);
     }
 
     private void showSelectPersonDialog(List<Person> people) {
@@ -218,6 +230,23 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.AddD
             String errorMsg = event.getContentIfNotHandled();
             if (errorMsg != null) {
                 Toast.makeText(this, errorMsg, Toast.LENGTH_SHORT).show();
+                if (pendingAddTransactionDialog != null && pendingAddTransactionDialog.isShowing()) {
+                    android.widget.Button saveButton = pendingAddTransactionDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                    if (saveButton != null) {
+                        saveButton.setEnabled(true);
+                    }
+                }
+            }
+        });
+
+        viewModel.getTransactionAddedObserver().observe(this, event -> {
+            Boolean added = event.getContentIfNotHandled();
+            if (Boolean.TRUE.equals(added)) {
+                Toast.makeText(this, "Đã thêm giao dịch", Toast.LENGTH_SHORT).show();
+                if (pendingAddTransactionDialog != null && pendingAddTransactionDialog.isShowing()) {
+                    pendingAddTransactionDialog.dismiss();
+                }
+                pendingAddTransactionDialog = null;
             }
         });
     }
@@ -354,6 +383,12 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.AddD
                 .setNegativeButton("Hủy", null)
                 .create();
 
+        dialog.setOnDismissListener(d -> {
+            if (pendingAddTransactionDialog == dialog) {
+                pendingAddTransactionDialog = null;
+            }
+        });
+
         dialog.setOnShowListener(dialogInterface -> {
             android.widget.Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
             positiveButton.setOnClickListener(buttonView -> {
@@ -380,9 +415,9 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.AddD
                 record.note = editNote.getText().toString().trim();
                 record.timestamp = System.currentTimeMillis();
 
+                positiveButton.setEnabled(false);
+                pendingAddTransactionDialog = dialog;
                 viewModel.addTransaction(record);
-                Toast.makeText(this, "Đã thêm giao dịch", Toast.LENGTH_SHORT).show();
-                dialog.dismiss();
             });
         });
 

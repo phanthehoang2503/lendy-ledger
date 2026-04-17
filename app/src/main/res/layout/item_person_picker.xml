@@ -36,14 +36,14 @@
       android:id="@+id/textName"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:textColor="@color/black"
+      android:textColor="?attr/colorOnSurface"
       android:textSize="16sp"
       android:textStyle="bold" />
     <TextView
       android:id="@+id/textPhone"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:textColor="@color/outline"
+      android:textColor="?attr/colorOnSurfaceVariant"
       android:textSize="12sp" />
   </LinearLayout>
 </LinearLayout>

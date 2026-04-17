@@ -19,6 +19,7 @@ import com.lendy.app.data.model.SummaryDTO;
 import com.lendy.app.utils.Event;
 
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -37,6 +38,7 @@ public class LendyRepository {
     private final TransactionDao transactionDao;
     private final PersonDao personDao;
     private final MutableLiveData<Event<String>> errorNotifier = new MutableLiveData<>();
+    private final MutableLiveData<Event<Boolean>> transactionAddedNotifier = new MutableLiveData<>();
     private final ExecutorService executor;
     private static LendyRepository instance;
 
@@ -99,6 +101,7 @@ public class LendyRepository {
         executor.execute(() -> {
             try {
                 transactionDao.addTransaction(record);
+                transactionAddedNotifier.postValue(new Event<>(true));
             } catch (Exception e) {
                 postError("Lỗi lưu giao dịch.", e);
             }
@@ -136,25 +139,18 @@ public class LendyRepository {
     }
 
     public void checkActivePersonExists(String name, String phone, PersonExistsCallback callback) {
-        executor.execute(() -> {
-            boolean exists;
-            try {
-                exists = personDao.findActivePerson(name, phone) != null;
-            } catch (Exception e) {
-                postError("Lỗi kiểm tra trùng người nợ.", e);
-                exists = false;
-            }
-
-            boolean result = exists;
-            new Handler(Looper.getMainLooper()).post(() -> callback.onResult(result));
-        });
+        executePersonExistenceCheck(() -> personDao.findActivePerson(name, phone) != null, callback);
     }
 
     public void checkActivePersonExistsExceptId(String name, String phone, long excludeId, PersonExistsCallback callback) {
+        executePersonExistenceCheck(() -> personDao.findActivePersonExceptId(name, phone, excludeId) != null, callback);
+    }
+
+    private void executePersonExistenceCheck(Callable<Boolean> checker, PersonExistsCallback callback) {
         executor.execute(() -> {
             boolean exists;
             try {
-                exists = personDao.findActivePersonExceptId(name, phone, excludeId) != null;
+                exists = checker.call();
             } catch (Exception e) {
                 postError("Lỗi kiểm tra trùng người nợ.", e);
                 exists = false;
@@ -210,5 +206,9 @@ public class LendyRepository {
 
     public LiveData<Event<String>> getErrorNotifier() {
         return errorNotifier;
+    }
+
+    public LiveData<Event<Boolean>> getTransactionAddedNotifier() {
+        return transactionAddedNotifier;
     }
 }

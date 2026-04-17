@@ -54,7 +54,7 @@ public class PersonPickerAdapter extends ListAdapter<Person, PersonPickerAdapter
             List<Person> filtered = new ArrayList<>();
             String lower = query.toLowerCase().trim();
             for (Person p : fullList) {
-                if (p.name.toLowerCase().contains(lower) ||
+                if ((p.name != null && p.name.toLowerCase().contains(lower)) ||
                         (p.phoneNumber != null && p.phoneNumber.contains(lower))) {
                     filtered.add(p);
                 }

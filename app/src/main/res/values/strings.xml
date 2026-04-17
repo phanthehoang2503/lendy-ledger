@@ -5,6 +5,7 @@
     <!-- Thao tác -->
     <string name="action_history">Lịch sử nợ</string>
     <string name="action_contacts">Danh bạ</string>
+    <string name="add_contact">Thêm liên lạc</string>
     <string name="action_reset">Xóa sạch dữ liệu</string>
     <string name="action_search">Tìm kiếm…</string>
     <string name="edit_person">Sửa thông tin</string>
