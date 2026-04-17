@@ -13,6 +13,8 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -24,11 +26,15 @@ import com.lendy.app.data.TransactionType;
 import com.lendy.app.data.entities.Person;
 import com.lendy.app.repository.LendyRepository;
 import com.lendy.app.ui.adapters.MainPagerAdapter;
+import com.lendy.app.ui.adapters.PersonPickerAdapter;
+import com.lendy.app.ui.fragments.HomeFragment;
 import com.lendy.app.utils.CurrencyTextWatcher;
 import com.lendy.app.viewmodel.LendyViewModel;
 import com.lendy.app.viewmodel.LendyViewModelFactory;
 
-public class MainActivity extends AppCompatActivity implements com.lendy.app.ui.fragments.HomeFragment.AddPersonDialogHost {
+import java.util.List;
+
+public class MainActivity extends AppCompatActivity implements HomeFragment.AddDebtFlowHost {
 
     private LendyViewModel viewModel;
     private ViewPager2 viewPager;
@@ -82,6 +88,62 @@ public class MainActivity extends AppCompatActivity implements com.lendy.app.ui.
             }
             return insets;
         });
+    }
+
+    @Override
+    public void showAddDebtFlow() {
+        viewModel.getAllPeople().observe(this, people -> {
+            if (people == null || people.isEmpty()) {
+                // Danh bạ trống -> Nhảy thẳng bước thêm người mới
+                showAddNewPersonDialog();
+            } else {
+                // Có người -> Hiện dialog chọn người
+                showSelectPersonDialog(people);
+            }
+            // Sau khi check xong thì remove observer để tránh bị gọi lại nhiều lần
+            viewModel.getAllPeople().removeObservers(this);
+        });
+    }
+
+    private void showSelectPersonDialog(List<Person> people) {
+        View v = getLayoutInflater().inflate(R.layout.dialog_select_person, null);
+        RecyclerView rv = v.findViewById(R.id.recyclerViewPicker);
+        com.google.android.material.textfield.TextInputEditText editSearch = v.findViewById(R.id.editSearch);
+
+        // Setup Adapter
+        PersonPickerAdapter adapter = new PersonPickerAdapter(person -> {
+            // KHI CHỌN 1 NGƯỜI:
+            // 1. Đóng dialog hiện tại
+            // 2. Mở dialog nhập tiền cho người đó
+        });
+        rv.setLayoutManager(new LinearLayoutManager(this));
+        rv.setAdapter(adapter);
+        adapter.setFullList(people);
+        // Xử lý Search Bar
+        editSearch.addTextChangedListener(new android.text.TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(android.text.Editable s) {
+                adapter.filter(s.toString());
+            }
+        });
+
+        AlertDialog dialog = new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+                .setView(v)
+                .create();
+        // Nút "Thêm người mới" trong dialog
+        v.findViewById(R.id.btnAddNewPerson).setOnClickListener(view -> {
+            dialog.dismiss();
+            showAddNewPersonDialog();
+        });
+        dialog.show();
     }
 
     private void setupNavigation() {
@@ -182,8 +244,7 @@ public class MainActivity extends AppCompatActivity implements com.lendy.app.ui.
         }
     }
 
-    @Override
-    public void showAddPersonDialog() {
+    private void showAddNewPersonDialog() {
         View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_add_person, null);
         TextInputEditText editName = dialogView.findViewById(R.id.editName);
         TextInputEditText editPhone = dialogView.findViewById(R.id.editPhone);

@@ -8,14 +8,12 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.textfield.TextInputEditText;
 
 import com.lendy.app.R;
 import com.lendy.app.repository.LendyRepository;
@@ -26,18 +24,16 @@ import com.lendy.app.utils.PersonDialogHelper;
 import com.lendy.app.viewmodel.LendyViewModel;
 import com.lendy.app.viewmodel.LendyViewModelFactory;
 
-import java.util.ArrayList;
-
 public class HomeFragment extends Fragment {
 
-    public interface AddPersonDialogHost {
-        void showAddPersonDialog();
+    public interface AddDebtFlowHost {
+        void showAddDebtFlow();
     }
 
     private LendyViewModel viewModel;
     private PersonAdapter adapter;
     private View emptyView;
-    private AddPersonDialogHost dialogHost;
+    private AddDebtFlowHost dialogHost;
 
     @Nullable
     @Override
@@ -52,7 +48,7 @@ public class HomeFragment extends Fragment {
         if (btnQuickAdd != null) {
             btnQuickAdd.setOnClickListener(v -> {
                 if (dialogHost != null) {
-                    dialogHost.showAddPersonDialog();
+                    dialogHost.showAddDebtFlow();
                 }
             });
         }
@@ -126,8 +122,8 @@ public class HomeFragment extends Fragment {
     @Override
     public void onAttach(@NonNull android.content.Context context) {
         super.onAttach(context);
-        if (context instanceof AddPersonDialogHost) {
-            dialogHost = (AddPersonDialogHost) context;
+        if (context instanceof AddDebtFlowHost) {
+            dialogHost = (AddDebtFlowHost) context;
         }
     }
 
