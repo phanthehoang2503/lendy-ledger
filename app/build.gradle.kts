@@ -4,11 +4,8 @@ plugins {
 
 android {
     namespace = "com.lendy.app"
-    compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
-    }
+    compileSdk = 36
+    compileSdkMinor = 1
 
     defaultConfig {
         applicationId = "com.lendy.app"

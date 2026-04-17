@@ -24,6 +24,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.lendy.app.R;
 import com.lendy.app.data.TransactionType;
 import com.lendy.app.data.entities.Person;
+import com.lendy.app.data.entities.TransactionRecord;
 import com.lendy.app.repository.LendyRepository;
 import com.lendy.app.ui.adapters.MainPagerAdapter;
 import com.lendy.app.ui.adapters.PersonPickerAdapter;
@@ -108,26 +109,31 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.AddD
     private void showSelectPersonDialog(List<Person> people) {
         View v = getLayoutInflater().inflate(R.layout.dialog_select_person, null);
         RecyclerView rv = v.findViewById(R.id.recyclerViewPicker);
-        com.google.android.material.textfield.TextInputEditText editSearch = v.findViewById(R.id.editSearch);
+        TextInputEditText editSearch = v.findViewById(R.id.editSearch);
+        AlertDialog dialog = new MaterialAlertDialogBuilder(this)
+                .setView(v)
+                .create();
 
         // Setup Adapter
         PersonPickerAdapter adapter = new PersonPickerAdapter(person -> {
             // KHI CHỌN 1 NGƯỜI:
             // 1. Đóng dialog hiện tại
             // 2. Mở dialog nhập tiền cho người đó
+            dialog.dismiss();
+            showAddTransactionForPerson(person);
         });
+
         rv.setLayoutManager(new LinearLayoutManager(this));
         rv.setAdapter(adapter);
         adapter.setFullList(people);
+
         // Xử lý Search Bar
         editSearch.addTextChangedListener(new android.text.TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
 
             @Override
             public void afterTextChanged(android.text.Editable s) {
@@ -135,10 +141,6 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.AddD
             }
         });
 
-        AlertDialog dialog = new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
-                .setView(v)
-                .create();
-        // Nút "Thêm người mới" trong dialog
         v.findViewById(R.id.btnAddNewPerson).setOnClickListener(view -> {
             dialog.dismiss();
             showAddNewPersonDialog();
@@ -325,6 +327,68 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.AddD
             }
         }
     }
+
+    private void showAddTransactionForPerson(Person person) {
+        View v = getLayoutInflater().inflate(R.layout.dialog_transaction, null);
+        TextInputEditText editAmount = v.findViewById(R.id.editAmount);
+        TextInputEditText editNote = v.findViewById(R.id.editNote);
+        MaterialButtonToggleGroup toggleGroup = v.findViewById(R.id.toggleGroup);
+
+        // 2. Format tiền & setup chips (mượn lại hàm setup đã có)
+        editAmount.addTextChangedListener(new CurrencyTextWatcher(editAmount));
+        setupQuickAddChips(v, editAmount);
+
+        // 3. Logic Toggle Button
+        if (person.totalBalance == 0) {
+            toggleGroup.check(R.id.btnLending); // Mặc định cho vay
+        } else if (person.totalBalance > 0) {
+            toggleGroup.check(R.id.btnLending); // Đang nợ mình -> mặc định cho vay thêm
+        } else {
+            toggleGroup.check(R.id.btnBorrowing); // Mình đang nợ họ -> mặc định vay thêm
+        }
+
+        AlertDialog dialog = new MaterialAlertDialogBuilder(this)
+                .setTitle("Ghi khoản nợ mới")
+                .setView(v)
+                .setPositiveButton("Lưu", null)
+                .setNegativeButton("Hủy", null)
+                .create();
+
+        dialog.setOnShowListener(dialogInterface -> {
+            android.widget.Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+            positiveButton.setOnClickListener(buttonView -> {
+                long amount = com.lendy.app.utils.FormatUtils.parseFormattedNumber(editAmount.getText().toString());
+                if (amount <= 0) {
+                    editAmount.setError("Vui lòng nhập số tiền hợp lệ");
+                    return;
+                }
+
+                // Xác định loại giao dịch dựa trên toggle và số dư hiện tại
+                com.lendy.app.data.TransactionType type;
+                int checkedId = toggleGroup.getCheckedButtonId();
+
+                if (checkedId == R.id.btnLending) {
+                    type = (person.totalBalance >= 0) ? com.lendy.app.data.TransactionType.LEND : com.lendy.app.data.TransactionType.PAY_BACK;
+                } else {
+                    type = (person.totalBalance <= 0) ? com.lendy.app.data.TransactionType.BORROW : com.lendy.app.data.TransactionType.REPAY;
+                }
+
+                TransactionRecord record = new TransactionRecord();
+                record.personId = person.id;
+                record.amount = amount;
+                record.type = type;
+                record.note = editNote.getText().toString().trim();
+                record.timestamp = System.currentTimeMillis();
+
+                viewModel.addTransaction(record);
+                Toast.makeText(this, "Đã thêm giao dịch", Toast.LENGTH_SHORT).show();
+                dialog.dismiss();
+            });
+        });
+
+        dialog.show();
+    }
+
 
     private Long parseAmountSafely(String digits) {
         if (digits == null || digits.isEmpty()) return null;

@@ -150,6 +150,21 @@ public class LendyRepository {
         });
     }
 
+    public void checkActivePersonExistsExceptId(String name, String phone, long excludeId, PersonExistsCallback callback) {
+        executor.execute(() -> {
+            boolean exists;
+            try {
+                exists = personDao.findActivePersonExceptId(name, phone, excludeId) != null;
+            } catch (Exception e) {
+                postError("Lỗi kiểm tra trùng người nợ.", e);
+                exists = false;
+            }
+
+            boolean result = exists;
+            new Handler(Looper.getMainLooper()).post(() -> callback.onResult(result));
+        });
+    }
+
     public void deletePerson(Person person) {
         executor.execute(() -> {
             try {

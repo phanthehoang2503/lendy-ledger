@@ -45,6 +45,9 @@ public interface PersonDao {
     @Query("SELECT * FROM people WHERE name = :name AND phoneNumber = :phone AND isDeleted = 0 LIMIT 1")
     Person findActivePerson(String name, String phone);
 
+    @Query("SELECT * FROM people WHERE name = :name AND phoneNumber = :phone AND isDeleted = 0 AND id != :excludeId LIMIT 1")
+    Person findActivePersonExceptId(String name, String phone, long excludeId);
+
     @Query("SELECT " +
             "COALESCE(SUM(CASE WHEN totalBalance > 0 THEN totalBalance ELSE 0 END), 0) as totalLending, " +
             "COALESCE(SUM(CASE WHEN totalBalance < 0 THEN ABS(totalBalance) ELSE 0 END), 0) as totalBorrowing " +

@@ -83,6 +83,11 @@ public class LendyViewModel extends ViewModel {
         repository.checkActivePersonExists(name, phone, callback);
     }
 
+    public void checkActivePersonExistsExceptId(String name, String phone, long excludeId,
+            LendyRepository.PersonExistsCallback callback) {
+        repository.checkActivePersonExistsExceptId(name, phone, excludeId, callback);
+    }
+
     public void removePerson(Person person) {
         repository.deletePerson(person);
     }
