@@ -108,7 +108,7 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.AddD
                 // Có người -> Hiện dialog chọn người
                 showSelectPersonDialog(people);
             }
-            // Sau khi check xong thì remove đúng observer one-shot
+
             if (addDebtFlowObserver != null) {
                 viewModel.getAllPeople().removeObserver(addDebtFlowObserver);
                 addDebtFlowObserver = null;
@@ -310,25 +310,34 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.AddD
                 }
 
                 button.setEnabled(false);
-                viewModel.checkActivePersonExists(name, phone, exists -> {
-                    if (exists) {
-                        editName.setError("Người này đã tồn tại");
-                        button.setEnabled(true);
-                        return;
+                viewModel.checkActivePersonExists(name, phone, new LendyRepository.PersonExistsCallback() {
+                    @Override
+                    public void onResult(boolean exists) {
+                        if (exists) {
+                            editName.setError("Người này đã tồn tại");
+                            button.setEnabled(true);
+                            return;
+                        }
+
+                        Person person = new Person();
+                        person.name = name;
+                        person.phoneNumber = phone;
+                        person.updatedAt = System.currentTimeMillis();
+
+                        long amount = com.lendy.app.utils.FormatUtils.parseFormattedNumber(amountStr);
+                        TransactionType type = (toggleGroup.getCheckedButtonId() == R.id.btnLending)
+                                ? TransactionType.LEND
+                                : TransactionType.BORROW;
+
+                        viewModel.addPersonWithInitialBalance(person, amount, type, note);
+                        dialog.dismiss();
                     }
 
-                    Person person = new Person();
-                    person.name = name;
-                    person.phoneNumber = phone;
-                    person.updatedAt = System.currentTimeMillis();
-
-                    long amount = com.lendy.app.utils.FormatUtils.parseFormattedNumber(amountStr);
-                    TransactionType type = (toggleGroup.getCheckedButtonId() == R.id.btnLending)
-                            ? TransactionType.LEND
-                            : TransactionType.BORROW;
-
-                    viewModel.addPersonWithInitialBalance(person, amount, type, note);
-                    dialog.dismiss();
+                    @Override
+                    public void onError(Exception exception) {
+                        button.setEnabled(true);
+                        Toast.makeText(MainActivity.this, "Không thể kiểm tra trùng người nợ", Toast.LENGTH_SHORT).show();
+                    }
                 });
             });
         });
@@ -363,7 +372,7 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.AddD
         TextInputEditText editNote = v.findViewById(R.id.editNote);
         MaterialButtonToggleGroup toggleGroup = v.findViewById(R.id.toggleGroup);
 
-        // 2. Format tiền & setup chips (mượn lại hàm setup đã có)
+        // 2. Format tiền, setup chips
         editAmount.addTextChangedListener(new CurrencyTextWatcher(editAmount));
         setupQuickAddChips(v, editAmount);
 

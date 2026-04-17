@@ -85,23 +85,32 @@ public class ContactsFragment extends Fragment {
                 }
 
                 button.setEnabled(false);
-                viewModel.checkActivePersonExists(name, phone, exists -> {
-                    if (exists) {
-                        editName.setError("Người này đã có trong danh bạ");
-                        button.setEnabled(true);
-                        return;
+                viewModel.checkActivePersonExists(name, phone, new LendyRepository.PersonExistsCallback() {
+                    @Override
+                    public void onResult(boolean exists) {
+                        if (exists) {
+                            editName.setError("Người này đã có trong danh bạ");
+                            button.setEnabled(true);
+                            return;
+                        }
+
+                        // 4. Lưu vào Database thông qua ViewModel
+                        Person person = new Person();
+                        person.name = name;
+                        person.phoneNumber = phone;
+                        person.updatedAt = System.currentTimeMillis();
+
+                        // Hàm addPerson sẽ tạo người với totalBalance = 0
+                        viewModel.addPerson(person);
+
+                        dialog.dismiss();
                     }
 
-                    // 4. Lưu vào Database thông qua ViewModel
-                    Person person = new Person();
-                    person.name = name;
-                    person.phoneNumber = phone;
-                    person.updatedAt = System.currentTimeMillis();
-
-                    // Hàm addPerson sẽ tạo người với totalBalance = 0
-                    viewModel.addPerson(person);
-
-                    dialog.dismiss();
+                    @Override
+                    public void onError(Exception exception) {
+                        button.setEnabled(true);
+                        android.widget.Toast.makeText(requireContext(), "Không thể kiểm tra trùng danh bạ", android.widget.Toast.LENGTH_SHORT).show();
+                    }
                 });
             });
         });
@@ -201,20 +210,30 @@ public class ContactsFragment extends Fragment {
                 }
 
                 button.setEnabled(false);
-                viewModel.checkActivePersonExistsExceptId(name, phone, person.id, exists -> {
-                    if (exists) {
-                        editName.setError("Tên đã tồn tại");
-                        button.setEnabled(true);
-                        return;
-                    }
+                viewModel.checkActivePersonExistsExceptId(name, phone, person.id,
+                        new LendyRepository.PersonExistsCallback() {
+                            @Override
+                            public void onResult(boolean exists) {
+                                if (exists) {
+                                    editName.setError("Tên đã tồn tại");
+                                    button.setEnabled(true);
+                                    return;
+                                }
 
-                    person.name = name;
-                    person.phoneNumber = phone;
-                    person.updatedAt = System.currentTimeMillis();
+                                person.name = name;
+                                person.phoneNumber = phone;
+                                person.updatedAt = System.currentTimeMillis();
 
-                    viewModel.updatePerson(person);
-                    dialog.dismiss();
-                });
+                                viewModel.updatePerson(person);
+                                dialog.dismiss();
+                            }
+
+                            @Override
+                            public void onError(Exception exception) {
+                                button.setEnabled(true);
+                                android.widget.Toast.makeText(requireContext(), "Không thể kiểm tra trùng danh bạ", android.widget.Toast.LENGTH_SHORT).show();
+                            }
+                        });
             });
         });
 

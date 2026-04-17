@@ -31,6 +31,8 @@ import java.util.concurrent.Executors;
 public class LendyRepository {
     public interface PersonExistsCallback {
         void onResult(boolean exists);
+
+        void onError(Exception exception);
     }
 
     private static final String TAG = "LendyRepository";
@@ -148,16 +150,13 @@ public class LendyRepository {
 
     private void executePersonExistenceCheck(Callable<Boolean> checker, PersonExistsCallback callback) {
         executor.execute(() -> {
-            boolean exists;
             try {
-                exists = checker.call();
+                boolean result = checker.call();
+                new Handler(Looper.getMainLooper()).post(() -> callback.onResult(result));
             } catch (Exception e) {
                 postError("Lỗi kiểm tra trùng người nợ.", e);
-                exists = false;
+                new Handler(Looper.getMainLooper()).post(() -> callback.onError(e));
             }
-
-            boolean result = exists;
-            new Handler(Looper.getMainLooper()).post(() -> callback.onResult(result));
         });
     }
 
