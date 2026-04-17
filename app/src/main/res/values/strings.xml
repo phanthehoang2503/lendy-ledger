@@ -18,9 +18,11 @@
 
     <!-- Xác nhận -->
     <string name="confirm_reset_title">Xóa toàn bộ dữ liệu?</string>
-    <string name="confirm_reset_message">Hành động này sẽ xóa sạch tất cả người nợ và lịch sử giao dịch. Bạn không thể hoàn tác!</string>
+    <string name="confirm_reset_message">Hành động này sẽ xóa sạch tất cả người nợ và lịch sử giao
+        dịch. Bạn không thể hoàn tác!</string>
     <string name="confirm_delete_person_title">Xóa người này?</string>
-    <string name="confirm_delete_person_message">Tất cả lịch sử giao dịch liên quan đến người này cũng sẽ bị xóa vĩnh viễn.</string>
+    <string name="confirm_delete_person_message">Tất cả lịch sử giao dịch liên quan đến người này
+        cũng sẽ bị xóa vĩnh viễn.</string>
 
     <!-- Trường nhập -->
     <string name="amount">Số tiền</string>
@@ -36,15 +38,15 @@
     <string name="home_quick_add_hint">Ghi khoản nợ mới…</string>
     <string name="home_empty_title">Sổ nợ đang trống</string>
     <string name="home_empty_subtitle">Hãy nhấn thanh nhập phía trên để
-bắt đầu ghi lại các khoản nợ nhé!</string>
+        bắt đầu ghi lại các khoản nợ nhé!</string>
 
     <string name="history_empty_title">Chưa có nợ hoàn thành</string>
     <string name="history_empty_subtitle">Khi bạn trả xong hoặc người khác trả nợ,
-thông tin nợ sẽ hiện ở đây.</string>
+        thông tin nợ sẽ hiện ở đây.</string>
 
     <string name="contacts_empty_title">Danh bạ trống</string>
     <string name="contacts_empty_subtitle">Những người bạn đã từng giao dịch
-sẽ xuất hiện tại đây.</string>
+        sẽ xuất hiện tại đây.</string>
 
     <string name="no_completed_debts">Chưa có khoản nợ nào hoàn thành</string>
     <string name="no_contacts">Chưa có liên lạc nào</string>
@@ -87,4 +89,12 @@ sẽ xuất hiện tại đây.</string>
     <string name="phone_hint">Số điện thoại (không bắt buộc)</string>
     <string name="no_transaction_data">Chưa có dữ liệu giao dịch</string>
     <string name="currency_symbol">đ</string>
+
+    <!-- Các chuỗi mới cho flow chọn người -->
+    <string name="dialog_select_person_title">Chọn người nợ</string>
+    <string name="search_person_hint">Tìm tên hoặc số điện thoại…</string>
+    <string name="add_new_person_button">Thêm người mới</string>
+    <string name="add_new_contact_title">Thêm liên lạc mới</string>
+    <string name="dialog_add_debt_title">Ghi khoản nợ</string>
+
 </resources>
