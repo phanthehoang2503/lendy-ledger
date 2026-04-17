@@ -52,15 +52,34 @@ public interface PersonDao {
     @Query("SELECT * FROM people WHERE name = :name AND phoneNumber = :phone AND isDeleted = 0 AND id != :excludeId LIMIT 1")
     Person findActivePersonExceptId(String name, String phone, long excludeId);
 
+    @Query("SELECT * FROM people WHERE name = :name AND phoneNumber = :phone LIMIT 1")
+    Person findPersonByNameAndPhone(String name, String phone);
+
+    @Query("SELECT * FROM people WHERE name = :name AND phoneNumber = :phone AND id != :excludeId LIMIT 1")
+    Person findPersonByNameAndPhoneExceptId(String name, String phone, long excludeId);
+
     @Transaction
     default int addOrUpdatePerson(Person person) {
         if (person.id > 0) {
-            Person duplicate = findActivePersonExceptId(person.name, person.phoneNumber, person.id);
+            Person duplicate = findPersonByNameAndPhoneExceptId(person.name, person.phoneNumber, person.id);
             if (duplicate != null) {
                 return RESULT_DUPLICATE;
             }
             update(person);
             return RESULT_SUCCESS;
+        }
+
+        Person existing = findPersonByNameAndPhone(person.name, person.phoneNumber);
+        if (existing != null) {
+            if (existing.isDeleted) {
+                existing.isDeleted = false;
+                existing.updatedAt = person.updatedAt;
+                existing.phoneNumber = person.phoneNumber;
+                existing.name = person.name;
+                update(existing);
+                return RESULT_SUCCESS;
+            }
+            return RESULT_DUPLICATE;
         }
 
         long rowId = insert(person);
