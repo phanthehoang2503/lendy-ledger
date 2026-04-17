@@ -12,7 +12,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -22,19 +25,27 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.lendy.app.R;
 import com.lendy.app.data.TransactionType;
 import com.lendy.app.data.entities.Person;
+import com.lendy.app.data.entities.TransactionRecord;
 import com.lendy.app.repository.LendyRepository;
 import com.lendy.app.ui.adapters.MainPagerAdapter;
+import com.lendy.app.ui.adapters.PersonPickerAdapter;
+import com.lendy.app.ui.fragments.HomeFragment;
 import com.lendy.app.utils.CurrencyTextWatcher;
 import com.lendy.app.viewmodel.LendyViewModel;
 import com.lendy.app.viewmodel.LendyViewModelFactory;
 
-public class MainActivity extends AppCompatActivity implements com.lendy.app.ui.fragments.HomeFragment.AddPersonDialogHost {
+import java.util.ArrayList;
+import java.util.List;
+
+public class MainActivity extends AppCompatActivity implements HomeFragment.AddDebtFlowHost {
 
     private LendyViewModel viewModel;
     private ViewPager2 viewPager;
     private BottomNavigationView bottomNav;
     private TextView textTotalLending, textTotalBorrowing, textAppTitle;
     private View welcomeContainer, summaryCard;
+    private Observer<List<Person>> addDebtFlowObserver;
+    private AlertDialog pendingAddTransactionDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +93,74 @@ public class MainActivity extends AppCompatActivity implements com.lendy.app.ui.
             }
             return insets;
         });
+    }
+
+    @Override
+    public void showAddDebtFlow() {
+        if (addDebtFlowObserver != null) {
+            viewModel.getAllPeople().removeObserver(addDebtFlowObserver);
+        }
+
+        addDebtFlowObserver = people -> {
+            if (people == null || people.isEmpty()) {
+                // Danh bạ trống -> Nhảy thẳng bước thêm người mới
+                showAddNewPersonDialog();
+            } else {
+                // Có người -> Hiện dialog chọn người
+                showSelectPersonDialog(people);
+            }
+
+            if (addDebtFlowObserver != null) {
+                viewModel.getAllPeople().removeObserver(addDebtFlowObserver);
+                addDebtFlowObserver = null;
+            }
+        };
+
+        viewModel.getAllPeople().observe(this, addDebtFlowObserver);
+    }
+
+    private void showSelectPersonDialog(List<Person> people) {
+        View v = getLayoutInflater().inflate(R.layout.dialog_select_person, null);
+        RecyclerView rv = v.findViewById(R.id.recyclerViewPicker);
+        TextInputEditText editSearch = v.findViewById(R.id.editSearch);
+        AlertDialog dialog = new MaterialAlertDialogBuilder(this)
+                .setView(v)
+                .create();
+
+        // Setup Adapter
+        PersonPickerAdapter adapter = new PersonPickerAdapter(person -> {
+            // KHI CHỌN 1 NGƯỜI:
+            // 1. Đóng dialog hiện tại
+            // 2. Mở dialog nhập tiền cho người đó
+            dialog.dismiss();
+            showAddTransactionForPerson(person);
+        });
+
+        rv.setLayoutManager(new LinearLayoutManager(this));
+        rv.setAdapter(adapter);
+        adapter.setFullList(people);
+
+        // Xử lý Search Bar
+        editSearch.addTextChangedListener(new android.text.TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(android.text.Editable s) {
+                adapter.filter(s.toString());
+            }
+        });
+
+        v.findViewById(R.id.btnAddNewPerson).setOnClickListener(view -> {
+            dialog.dismiss();
+            showAddNewPersonDialog();
+        });
+        dialog.show();
     }
 
     private void setupNavigation() {
@@ -154,8 +233,27 @@ public class MainActivity extends AppCompatActivity implements com.lendy.app.ui.
             String errorMsg = event.getContentIfNotHandled();
             if (errorMsg != null) {
                 Toast.makeText(this, errorMsg, Toast.LENGTH_SHORT).show();
+                if (pendingAddTransactionDialog != null && pendingAddTransactionDialog.isShowing()) {
+                    android.widget.Button saveButton = pendingAddTransactionDialog
+                            .getButton(AlertDialog.BUTTON_POSITIVE);
+                    if (saveButton != null) {
+                        saveButton.setEnabled(true);
+                    }
+                }
             }
         });
+
+        viewModel.getTransactionAddedObserver().observe(this, event -> {
+            Boolean added = event.getContentIfNotHandled();
+            if (Boolean.TRUE.equals(added)) {
+                Toast.makeText(this, "Đã thêm giao dịch", Toast.LENGTH_SHORT).show();
+                if (pendingAddTransactionDialog != null && pendingAddTransactionDialog.isShowing()) {
+                    pendingAddTransactionDialog.dismiss();
+                }
+                pendingAddTransactionDialog = null;
+            }
+        });
+
     }
 
     private void updateHeaderVisibility(int position) {
@@ -182,8 +280,7 @@ public class MainActivity extends AppCompatActivity implements com.lendy.app.ui.
         }
     }
 
-    @Override
-    public void showAddPersonDialog() {
+    private void showAddNewPersonDialog() {
         View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_add_person, null);
         TextInputEditText editName = dialogView.findViewById(R.id.editName);
         TextInputEditText editPhone = dialogView.findViewById(R.id.editPhone);
@@ -218,25 +315,35 @@ public class MainActivity extends AppCompatActivity implements com.lendy.app.ui.
                 }
 
                 button.setEnabled(false);
-                viewModel.checkActivePersonExists(name, phone, exists -> {
-                    if (exists) {
-                        editName.setError("Người này đã tồn tại");
-                        button.setEnabled(true);
-                        return;
+                Person person = new Person();
+                person.name = name;
+                person.phoneNumber = phone;
+                person.updatedAt = System.currentTimeMillis();
+
+                long amount = com.lendy.app.utils.FormatUtils.parseFormattedNumber(amountStr);
+                TransactionType type = (toggleGroup.getCheckedButtonId() == R.id.btnLending)
+                        ? TransactionType.LEND
+                        : TransactionType.BORROW;
+
+                viewModel.addPersonWithInitialBalance(person, amount, type, note,
+                        new LendyRepository.PersonWithBalanceCallback() {
+                    @Override
+                    public void onSuccess() {
+                        dialog.dismiss();
                     }
 
-                    Person person = new Person();
-                    person.name = name;
-                    person.phoneNumber = phone;
-                    person.updatedAt = System.currentTimeMillis();
+                    @Override
+                    public void onDuplicate() {
+                            editName.setError("Người này đã tồn tại");
+                            button.setEnabled(true);
+                    }
 
-                    long amount = com.lendy.app.utils.FormatUtils.parseFormattedNumber(amountStr);
-                    TransactionType type = (toggleGroup.getCheckedButtonId() == R.id.btnLending)
-                            ? TransactionType.LEND
-                            : TransactionType.BORROW;
-
-                    viewModel.addPersonWithInitialBalance(person, amount, type, note);
-                    dialog.dismiss();
+                    @Override
+                    public void onError(Exception exception) {
+                        button.setEnabled(true);
+                        Toast.makeText(MainActivity.this, "Không thể lưu người nợ", Toast.LENGTH_SHORT)
+                                .show();
+                    }
                 });
             });
         });
@@ -255,7 +362,8 @@ public class MainActivity extends AppCompatActivity implements com.lendy.app.ui.
                 chip.setOnClickListener(v -> {
                     String currentStr = editAmount.getText().toString().replaceAll("[^\\d]", "");
                     Long currentAmount = parseAmountSafely(currentStr);
-                    if (currentAmount == null) currentAmount = 0L;
+                    if (currentAmount == null)
+                        currentAmount = 0L;
                     long finalAmount = currentAmount + amount;
 
                     editAmount.setText(com.lendy.app.utils.FormatUtils.formatThousand(finalAmount));
@@ -265,8 +373,110 @@ public class MainActivity extends AppCompatActivity implements com.lendy.app.ui.
         }
     }
 
+    private void showAddTransactionForPerson(Person person) {
+        View v = getLayoutInflater().inflate(R.layout.dialog_transaction, null);
+        TextInputEditText editAmount = v.findViewById(R.id.editAmount);
+        TextInputEditText editNote = v.findViewById(R.id.editNote);
+        MaterialButtonToggleGroup toggleGroup = v.findViewById(R.id.toggleGroup);
+
+        // 2. Format tiền, setup chips
+        editAmount.addTextChangedListener(new CurrencyTextWatcher(editAmount));
+        setupQuickAddChips(v, editAmount);
+
+        // 3. Logic Toggle Button
+        if (person.totalBalance == 0) {
+            toggleGroup.check(R.id.btnLending); // Mặc định cho vay
+        } else if (person.totalBalance > 0) {
+            toggleGroup.check(R.id.btnLending); // Đang nợ mình -> mặc định cho vay thêm
+        } else {
+            toggleGroup.check(R.id.btnBorrowing); // Mình đang nợ họ -> mặc định vay thêm
+        }
+
+        AlertDialog dialog = new MaterialAlertDialogBuilder(this)
+                .setTitle("Ghi khoản nợ mới")
+                .setView(v)
+                .setPositiveButton("Lưu", null)
+                .setNegativeButton("Hủy", null)
+                .create();
+
+        dialog.setOnDismissListener(d -> {
+            if (pendingAddTransactionDialog == dialog) {
+                pendingAddTransactionDialog = null;
+            }
+        });
+
+        dialog.setOnShowListener(dialogInterface -> {
+            android.widget.Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+            positiveButton.setOnClickListener(buttonView -> {
+                long amount = com.lendy.app.utils.FormatUtils.parseFormattedNumber(editAmount.getText().toString());
+                if (amount <= 0) {
+                    editAmount.setError("Vui lòng nhập số tiền hợp lệ");
+                    return;
+                }
+
+                int checkedId = toggleGroup.getCheckedButtonId();
+                String note = editNote.getText().toString().trim();
+                List<TransactionRecord> records = new ArrayList<>();
+
+                if (checkedId == R.id.btnLending) {
+                    if (person.totalBalance < 0 && amount > Math.abs(person.totalBalance)) {
+                        long settleAmount = Math.abs(person.totalBalance);
+                        records.add(createTransactionRecord(person.id, settleAmount,
+                                com.lendy.app.data.TransactionType.PAY_BACK, note));
+
+                        long remainingAmount = amount - settleAmount;
+                        if (remainingAmount > 0) {
+                            records.add(createTransactionRecord(person.id, remainingAmount,
+                                    com.lendy.app.data.TransactionType.LEND, note));
+                        }
+                    } else {
+                        com.lendy.app.data.TransactionType type = (person.totalBalance >= 0)
+                                ? com.lendy.app.data.TransactionType.LEND
+                                : com.lendy.app.data.TransactionType.PAY_BACK;
+                        records.add(createTransactionRecord(person.id, amount, type, note));
+                    }
+                } else {
+                    if (person.totalBalance > 0 && amount > person.totalBalance) {
+                        long settleAmount = person.totalBalance;
+                        records.add(createTransactionRecord(person.id, settleAmount,
+                                com.lendy.app.data.TransactionType.REPAY, note));
+
+                        long remainingAmount = amount - settleAmount;
+                        if (remainingAmount > 0) {
+                            records.add(createTransactionRecord(person.id, remainingAmount,
+                                    com.lendy.app.data.TransactionType.BORROW, note));
+                        }
+                    } else {
+                        com.lendy.app.data.TransactionType type = (person.totalBalance <= 0)
+                                ? com.lendy.app.data.TransactionType.BORROW
+                                : com.lendy.app.data.TransactionType.REPAY;
+                        records.add(createTransactionRecord(person.id, amount, type, note));
+                    }
+                }
+
+                positiveButton.setEnabled(false);
+                pendingAddTransactionDialog = dialog;
+                viewModel.addTransactions(records);
+            });
+        });
+
+        dialog.show();
+    }
+
+    private TransactionRecord createTransactionRecord(long personId, long amount,
+            com.lendy.app.data.TransactionType type, String note) {
+        TransactionRecord record = new TransactionRecord();
+        record.personId = personId;
+        record.amount = amount;
+        record.type = type;
+        record.note = note;
+        record.timestamp = System.currentTimeMillis();
+        return record;
+    }
+
     private Long parseAmountSafely(String digits) {
-        if (digits == null || digits.isEmpty()) return null;
+        if (digits == null || digits.isEmpty())
+            return null;
         try {
             return Long.parseLong(digits);
         } catch (NumberFormatException e) {

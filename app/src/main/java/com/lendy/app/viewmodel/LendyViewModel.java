@@ -30,6 +30,8 @@ public class LendyViewModel extends ViewModel {
     private final LiveData<SummaryDTO> globalSummary;
     @Getter
     private final LiveData<Event<String>> errorObserver;
+    @Getter
+    private final LiveData<Event<Boolean>> transactionAddedObserver;
 
     public LendyViewModel(LendyRepository repository) {
         this.repository = Objects.requireNonNull(repository, "repository must not be null");
@@ -37,6 +39,7 @@ public class LendyViewModel extends ViewModel {
         this.completedDebts = repository.getCompletedDebts();
         this.globalSummary = repository.getGlobalSummary();
         this.errorObserver = repository.getErrorNotifier();
+        this.transactionAddedObserver = repository.getTransactionAddedNotifier();
     }
 
     public LiveData<List<Person>> getAllPeople() {
@@ -59,6 +62,10 @@ public class LendyViewModel extends ViewModel {
         repository.createTransaction(record);
     }
 
+    public void addTransactions(List<TransactionRecord> records) {
+        repository.createTransactions(records);
+    }
+
     public void updateTransaction(TransactionRecord oldRecord, TransactionRecord newRecord) {
         repository.updateTransaction(oldRecord, newRecord);
     }
@@ -71,6 +78,11 @@ public class LendyViewModel extends ViewModel {
         repository.addPersonWithBalance(person, amount, type, note);
     }
 
+    public void addPersonWithInitialBalance(Person person, long amount, TransactionType type, String note,
+            LendyRepository.PersonWithBalanceCallback callback) {
+        repository.addPersonWithBalance(person, amount, type, note, callback);
+    }
+
     public void addPerson(Person person) {
         repository.upsertPerson(person);
     }
@@ -79,8 +91,17 @@ public class LendyViewModel extends ViewModel {
         repository.upsertPerson(person);
     }
 
+    public void addOrUpdatePersonTransactional(Person person, LendyRepository.PersonUpsertCallback callback) {
+        repository.addOrUpdatePersonTransactional(person, callback);
+    }
+
     public void checkActivePersonExists(String name, String phone, LendyRepository.PersonExistsCallback callback) {
         repository.checkActivePersonExists(name, phone, callback);
+    }
+
+    public void checkActivePersonExistsExceptId(String name, String phone, long excludeId,
+            LendyRepository.PersonExistsCallback callback) {
+        repository.checkActivePersonExistsExceptId(name, phone, excludeId, callback);
     }
 
     public void removePerson(Person person) {
