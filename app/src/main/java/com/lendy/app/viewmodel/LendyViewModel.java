@@ -32,8 +32,6 @@ public class LendyViewModel extends ViewModel {
     private final LiveData<Event<String>> errorObserver;
     @Getter
     private final LiveData<Event<Boolean>> transactionAddedObserver;
-    @Getter
-    private final LiveData<Event<Boolean>> personAddedObserver;
 
     public LendyViewModel(LendyRepository repository) {
         this.repository = Objects.requireNonNull(repository, "repository must not be null");
@@ -42,7 +40,6 @@ public class LendyViewModel extends ViewModel {
         this.globalSummary = repository.getGlobalSummary();
         this.errorObserver = repository.getErrorNotifier();
         this.transactionAddedObserver = repository.getTransactionAddedNotifier();
-        this.personAddedObserver = repository.getPersonAddedNotifier();
     }
 
     public LiveData<List<Person>> getAllPeople() {
@@ -79,6 +76,11 @@ public class LendyViewModel extends ViewModel {
 
     public void addPersonWithInitialBalance(Person person, long amount, TransactionType type, String note) {
         repository.addPersonWithBalance(person, amount, type, note);
+    }
+
+    public void addPersonWithInitialBalance(Person person, long amount, TransactionType type, String note,
+            LendyRepository.PersonWithBalanceCallback callback) {
+        repository.addPersonWithBalance(person, amount, type, note, callback);
     }
 
     public void addPerson(Person person) {

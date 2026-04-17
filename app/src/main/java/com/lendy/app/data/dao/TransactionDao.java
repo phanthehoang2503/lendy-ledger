@@ -65,6 +65,15 @@ public abstract class TransactionDao {
      */
     @Transaction
     public void addTransaction(TransactionRecord record) {
+        applyTransactionRecord(record);
+    }
+
+    // Dùng khi caller đã mở transaction ở tầng cao hơn (Repository db.runInTransaction)
+    public void addTransactionInExistingTransaction(TransactionRecord record) {
+        applyTransactionRecord(record);
+    }
+
+    private void applyTransactionRecord(TransactionRecord record) {
         Person person = getPersonSync(record.personId);
         if (person == null) {
             throw new IllegalStateException("Không tìm thấy người có mã ID " + record.personId);

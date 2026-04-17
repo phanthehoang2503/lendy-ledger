@@ -46,7 +46,6 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.AddD
     private View welcomeContainer, summaryCard;
     private Observer<List<Person>> addDebtFlowObserver;
     private AlertDialog pendingAddTransactionDialog;
-    private AlertDialog pendingAddPersonDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -241,12 +240,6 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.AddD
                         saveButton.setEnabled(true);
                     }
                 }
-                if (pendingAddPersonDialog != null && pendingAddPersonDialog.isShowing()) {
-                    android.widget.Button saveButton = pendingAddPersonDialog.getButton(AlertDialog.BUTTON_POSITIVE);
-                    if (saveButton != null) {
-                        saveButton.setEnabled(true);
-                    }
-                }
             }
         });
 
@@ -261,15 +254,6 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.AddD
             }
         });
 
-        viewModel.getPersonAddedObserver().observe(this, event -> {
-            Boolean added = event.getContentIfNotHandled();
-            if (Boolean.TRUE.equals(added)) {
-                if (pendingAddPersonDialog != null && pendingAddPersonDialog.isShowing()) {
-                    pendingAddPersonDialog.dismiss();
-                }
-                pendingAddPersonDialog = null;
-            }
-        });
     }
 
     private void updateHeaderVisibility(int position) {
@@ -317,12 +301,6 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.AddD
                 .setNegativeButton("Hủy", null)
                 .create();
 
-        dialog.setOnDismissListener(d -> {
-            if (pendingAddPersonDialog == dialog) {
-                pendingAddPersonDialog = null;
-            }
-        });
-
         dialog.setOnShowListener(dialogInterface -> {
             android.widget.Button button = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
             button.setOnClickListener(view -> {
@@ -337,33 +315,33 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.AddD
                 }
 
                 button.setEnabled(false);
-                viewModel.checkActivePersonExists(name, phone, new LendyRepository.PersonExistsCallback() {
+                Person person = new Person();
+                person.name = name;
+                person.phoneNumber = phone;
+                person.updatedAt = System.currentTimeMillis();
+
+                long amount = com.lendy.app.utils.FormatUtils.parseFormattedNumber(amountStr);
+                TransactionType type = (toggleGroup.getCheckedButtonId() == R.id.btnLending)
+                        ? TransactionType.LEND
+                        : TransactionType.BORROW;
+
+                viewModel.addPersonWithInitialBalance(person, amount, type, note,
+                        new LendyRepository.PersonWithBalanceCallback() {
                     @Override
-                    public void onResult(boolean exists) {
-                        if (exists) {
+                    public void onSuccess() {
+                        dialog.dismiss();
+                    }
+
+                    @Override
+                    public void onDuplicate() {
                             editName.setError("Người này đã tồn tại");
                             button.setEnabled(true);
-                            return;
-                        }
-
-                        Person person = new Person();
-                        person.name = name;
-                        person.phoneNumber = phone;
-                        person.updatedAt = System.currentTimeMillis();
-
-                        long amount = com.lendy.app.utils.FormatUtils.parseFormattedNumber(amountStr);
-                        TransactionType type = (toggleGroup.getCheckedButtonId() == R.id.btnLending)
-                                ? TransactionType.LEND
-                                : TransactionType.BORROW;
-
-                        pendingAddPersonDialog = dialog;
-                        viewModel.addPersonWithInitialBalance(person, amount, type, note);
                     }
 
                     @Override
                     public void onError(Exception exception) {
                         button.setEnabled(true);
-                        Toast.makeText(MainActivity.this, "Không thể kiểm tra trùng người nợ", Toast.LENGTH_SHORT)
+                        Toast.makeText(MainActivity.this, "Không thể lưu người nợ", Toast.LENGTH_SHORT)
                                 .show();
                     }
                 });

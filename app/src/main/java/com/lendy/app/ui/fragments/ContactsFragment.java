@@ -211,7 +211,7 @@ public class ContactsFragment extends Fragment {
         dialog.setOnShowListener(dialogInterface -> {
             android.widget.Button button = dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE);
             button.setOnClickListener(view -> {
-                String name = editName.getText().toString().trim();
+                String name = Objects.requireNonNull(editName.getText()).toString().trim();
                 String phone = editPhone.getText().toString().trim();
 
                 if (name.isEmpty()) {

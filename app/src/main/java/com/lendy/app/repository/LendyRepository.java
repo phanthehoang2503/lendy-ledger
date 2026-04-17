@@ -43,13 +43,20 @@ public class LendyRepository {
         void onError(Exception exception);
     }
 
+    public interface PersonWithBalanceCallback {
+        void onSuccess();
+
+        void onDuplicate();
+
+        void onError(Exception exception);
+    }
+
     private static final String TAG = "LendyRepository";
     private final LendyDatabase db;
     private final TransactionDao transactionDao;
     private final PersonDao personDao;
     private final MutableLiveData<Event<String>> errorNotifier = new MutableLiveData<>();
     private final MutableLiveData<Event<Boolean>> transactionAddedNotifier = new MutableLiveData<>();
-    private final MutableLiveData<Event<Boolean>> personAddedNotifier = new MutableLiveData<>();
     private final ExecutorService executor;
     private static LendyRepository instance;
 
@@ -76,13 +83,18 @@ public class LendyRepository {
 
     // Add person with debt
     public void addPersonWithBalance(Person person, long amount, TransactionType type, String note) {
+        addPersonWithBalance(person, amount, type, note, null);
+    }
+
+    public void addPersonWithBalance(Person person, long amount, TransactionType type, String note,
+            PersonWithBalanceCallback callback) {
         executor.execute(() -> {
             try {
                 db.runInTransaction(() -> {
                     person.totalBalance = 0;
                     long personId = personDao.insert(person);
                     if (personId == -1L) {
-                        throw new IllegalStateException("Person already exists");
+                        throw new DuplicatePersonException();
                     }
 
                     if (amount != 0) {
@@ -92,12 +104,21 @@ public class LendyRepository {
                         firstRecord.type = type;
                         firstRecord.timestamp = System.currentTimeMillis();
                         firstRecord.note = (note != null && !note.trim().isEmpty()) ? note : "Khởi tạo số nợ";
-                        transactionDao.addTransaction(firstRecord);
+                        transactionDao.addTransactionInExistingTransaction(firstRecord);
                     }
                 });
-                personAddedNotifier.postValue(new Event<>(true));
+                if (callback != null) {
+                    new Handler(Looper.getMainLooper()).post(callback::onSuccess);
+                }
+            } catch (DuplicatePersonException duplicate) {
+                if (callback != null) {
+                    new Handler(Looper.getMainLooper()).post(callback::onDuplicate);
+                }
             } catch (Exception e) {
                 postError("Lỗi khởi tạo người nợ.", e);
+                if (callback != null) {
+                    new Handler(Looper.getMainLooper()).post(() -> callback.onError(e));
+                }
             }
         });
     }
@@ -119,9 +140,11 @@ public class LendyRepository {
     public void createTransactions(List<TransactionRecord> records) {
         executor.execute(() -> {
             try {
-                for (TransactionRecord record : records) {
-                    transactionDao.addTransaction(record);
-                }
+                db.runInTransaction(() -> {
+                    for (TransactionRecord record : records) {
+                        transactionDao.addTransactionInExistingTransaction(record);
+                    }
+                });
                 transactionAddedNotifier.postValue(new Event<>(true));
             } catch (Exception e) {
                 postError("Lỗi lưu giao dịch.", e);
@@ -249,7 +272,6 @@ public class LendyRepository {
         return transactionAddedNotifier;
     }
 
-    public LiveData<Event<Boolean>> getPersonAddedNotifier() {
-        return personAddedNotifier;
+    private static class DuplicatePersonException extends RuntimeException {
     }
 }
