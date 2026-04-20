@@ -24,6 +24,10 @@
             android:name=".ui.activities.PersonDetailActivity"
             android:exported="false"
             android:label="Chi tiết giao dịch" />
+        <activity
+            android:name=".ui.activities.SettingsActivity"
+            android:exported="false"
+            android:label="@string/settings_title" />
     </application>
 
 </manifest>
