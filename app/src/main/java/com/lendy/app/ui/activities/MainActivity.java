@@ -96,6 +96,22 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.AddD
     }
 
     @Override
+    public boolean onCreateOptionsMenu(android.view.Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(android.view.MenuItem item) {
+        if (item.getItemId() == R.id.action_settings) {
+            android.content.Intent intent = new android.content.Intent(this, SettingsActivity.class);
+            startActivity(intent);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public void showAddDebtFlow() {
         if (addDebtFlowObserver != null) {
             viewModel.getAllPeople().removeObserver(addDebtFlowObserver);

@@ -12,7 +12,9 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.lendy.app.R;
+import com.lendy.app.repository.LendyRepository;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -37,8 +39,15 @@ public class SettingsActivity extends AppCompatActivity {
 
         MaterialCardView cardClearData = findViewById(R.id.cardClearData);
         cardClearData.setOnClickListener(v -> {
-            // Logic for clear data will be implemented in phase 3
-            Toast.makeText(this, "Bấm để xóa - sẽ làm ở bước sau", Toast.LENGTH_SHORT).show();
+            new MaterialAlertDialogBuilder(this)
+                    .setTitle(R.string.confirm_reset_title)
+                    .setMessage(R.string.confirm_reset_message)
+                    .setPositiveButton(R.string.action_reset, (dialog, which) -> {
+                        LendyRepository.getInstance(getApplication()).clearAllData();
+                        Toast.makeText(this, "Đã xóa sạch dữ liệu", Toast.LENGTH_SHORT).show();
+                    })
+                    .setNegativeButton(R.string.cancel, null)
+                    .show();
         });
     }
 
