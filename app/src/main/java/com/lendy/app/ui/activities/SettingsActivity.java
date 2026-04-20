@@ -1,6 +1,7 @@
 package com.lendy.app.ui.activities;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -17,6 +18,7 @@ import com.lendy.app.R;
 import com.lendy.app.repository.LendyRepository;
 
 public class SettingsActivity extends AppCompatActivity {
+    private static final String TAG = "SettingsActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +53,8 @@ public class SettingsActivity extends AppCompatActivity {
 
                             @Override
                             public void onError(Exception exception) {
-                                Toast.makeText(SettingsActivity.this, exception.getMessage(), Toast.LENGTH_SHORT).show();
+                                Log.e(TAG, "Failed to clear all data", exception);
+                                Toast.makeText(SettingsActivity.this, getString(R.string.data_clear_failed_toast), Toast.LENGTH_SHORT).show();
                             }
                         });
                     })

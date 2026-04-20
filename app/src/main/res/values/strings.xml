@@ -105,5 +105,6 @@
     <string name="settings_clear_data_summary">Xóa toàn bộ người nợ và lịch sử giao dịch. Không thể hoàn tác.</string>
     <string name="settings_clear_data">Xóa sạch dữ liệu</string>
     <string name="data_cleared_toast">Đã xóa sạch dữ liệu</string>
+    <string name="data_clear_failed_toast">Không thể xóa dữ liệu. Vui lòng thử lại.</string>
 
 </resources>
