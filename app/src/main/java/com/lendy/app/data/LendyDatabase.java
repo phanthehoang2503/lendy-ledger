@@ -23,7 +23,7 @@ public abstract class LendyDatabase extends RoomDatabase {
     public abstract PersonDao personDao();
 
     /**
-     * HÀM LẤY KẾT NỐI:
+     * hàm lấy kết nối với csdl:
      * Đảm bảo app chỉ mở duy nhất 1 "cửa" vào Database để tránh xung đột dữ liệu.
      */
     public static synchronized LendyDatabase getInstance(Context context) {

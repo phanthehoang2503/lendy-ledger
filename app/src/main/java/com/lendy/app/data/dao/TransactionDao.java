@@ -56,6 +56,9 @@ public abstract class TransactionDao {
     @Query("SELECT * FROM transactions WHERE personId = :personId ORDER BY timestamp ASC, id ASC")
     public abstract List<TransactionRecord> getTimelineSync(long personId);
 
+    @Query("DELETE FROM transactions")
+    public abstract void deleteAllTransactions();
+
     /**
      * Khi gọi hàm này, máy sẽ vừa lưu lịch sử, vừa tự cộng/trừ tiền vào ví người
      * đó.
@@ -68,7 +71,6 @@ public abstract class TransactionDao {
         applyTransactionRecord(record);
     }
 
-    // Dùng khi caller đã mở transaction ở tầng cao hơn (Repository db.runInTransaction)
     public void addTransactionInExistingTransaction(TransactionRecord record) {
         applyTransactionRecord(record);
     }

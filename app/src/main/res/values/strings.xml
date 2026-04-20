@@ -98,4 +98,13 @@
     <string name="add_new_contact_title">Thêm liên lạc mới</string>
     <string name="dialog_add_debt_title">Ghi khoản nợ</string>
 
+    <!-- Cài đặt -->
+    <string name="settings">Cài đặt</string>
+    <string name="settings_title">Cài đặt</string>
+    <string name="settings_danger_zone">Vùng nguy hiểm</string>
+    <string name="settings_clear_data_summary">Xóa toàn bộ người nợ và lịch sử giao dịch. Không thể hoàn tác.</string>
+    <string name="settings_clear_data">Xóa sạch dữ liệu</string>
+    <string name="data_cleared_toast">Đã xóa sạch dữ liệu</string>
+    <string name="data_clear_failed_toast">Không thể xóa dữ liệu. Vui lòng thử lại.</string>
+
 </resources>
