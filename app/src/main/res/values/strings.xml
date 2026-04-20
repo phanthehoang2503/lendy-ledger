@@ -104,5 +104,6 @@
     <string name="settings_danger_zone">Vùng nguy hiểm</string>
     <string name="settings_clear_data_summary">Xóa toàn bộ người nợ và lịch sử giao dịch. Không thể hoàn tác.</string>
     <string name="settings_clear_data">Xóa sạch dữ liệu</string>
+    <string name="data_cleared_toast">Đã xóa sạch dữ liệu</string>
 
 </resources>

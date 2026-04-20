@@ -33,7 +33,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, 0, systemBars.right, systemBars.bottom);
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
 
@@ -43,8 +43,17 @@ public class SettingsActivity extends AppCompatActivity {
                     .setTitle(R.string.confirm_reset_title)
                     .setMessage(R.string.confirm_reset_message)
                     .setPositiveButton(R.string.action_reset, (dialog, which) -> {
-                        LendyRepository.getInstance(getApplication()).clearAllData();
-                        Toast.makeText(this, "Đã xóa sạch dữ liệu", Toast.LENGTH_SHORT).show();
+                        LendyRepository.getInstance(getApplication()).clearAllData(new LendyRepository.ClearDataCallback() {
+                            @Override
+                            public void onSuccess() {
+                                Toast.makeText(SettingsActivity.this, getString(R.string.data_cleared_toast), Toast.LENGTH_SHORT).show();
+                            }
+
+                            @Override
+                            public void onError(Exception exception) {
+                                Toast.makeText(SettingsActivity.this, exception.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        });
                     })
                     .setNegativeButton(R.string.cancel, null)
                     .show();

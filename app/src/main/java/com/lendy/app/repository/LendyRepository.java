@@ -51,6 +51,12 @@ public class LendyRepository {
         void onError(Exception exception);
     }
 
+    public interface ClearDataCallback {
+        void onSuccess();
+
+        void onError(Exception exception);
+    }
+
     private static final String TAG = "LendyRepository";
     private final LendyDatabase db;
     private final TransactionDao transactionDao;
@@ -124,11 +130,24 @@ public class LendyRepository {
     }
 
     public void clearAllData() {
+        clearAllData(null);
+    }
+
+    public void clearAllData(ClearDataCallback callback) {
         executor.execute(() -> {
             try {
-                personDao.deleteAll();
+                db.runInTransaction(() -> {
+                    transactionDao.deleteAllTransactions();
+                    personDao.deleteAll();
+                });
+                if (callback != null) {
+                    new Handler(Looper.getMainLooper()).post(callback::onSuccess);
+                }
             } catch (Exception e) {
                 postError("Lỗi khi xóa dữ liệu.", e);
+                if (callback != null) {
+                    new Handler(Looper.getMainLooper()).post(() -> callback.onError(e));
+                }
             }
         });
     }
