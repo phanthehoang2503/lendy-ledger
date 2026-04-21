@@ -12,7 +12,7 @@
         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Tên người nợ"
+        android:hint="@string/person_name_hint"
         android:layout_marginBottom="12dp"
         app:boxBackgroundColor="?attr/colorSurface">
 
@@ -44,7 +44,7 @@
         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Số tiền"
+        android:hint="@string/amount"
         android:layout_marginBottom="8dp"
         app:suffixText="@string/currency_symbol"
         app:boxBackgroundColor="?attr/colorSurface">
@@ -76,7 +76,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
                 android:checkable="false"
-                android:text="+20K" />
+                android:text="@string/chip_20k" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip50k"
@@ -85,7 +85,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
                 android:checkable="false"
-                android:text="+50K" />
+                android:text="@string/chip_50k" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip100k"
@@ -94,7 +94,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
                 android:checkable="false"
-                android:text="+100K" />
+                android:text="@string/chip_100k" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip200k"
@@ -103,7 +103,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
                 android:checkable="false"
-                android:text="+200K" />
+                android:text="@string/chip_200k" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip500k"
@@ -111,7 +111,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:checkable="false"
-                android:text="+500K" />
+                android:text="@string/chip_500k" />
         </LinearLayout>
     </HorizontalScrollView>
 
@@ -147,7 +147,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Họ nợ tôi" />
+            android:text="@string/they_owe_me_dialog" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnBorrowing"
@@ -155,7 +155,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Tôi nợ họ" />
+            android:text="@string/i_owe_them_dialog" />
     </com.google.android.material.button.MaterialButtonToggleGroup>
 
 </LinearLayout>

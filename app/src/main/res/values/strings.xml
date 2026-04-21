@@ -99,6 +99,7 @@
     <string name="dialog_add_debt_title">Ghi khoản nợ</string>
 
     <!-- Cài đặt -->
+    <string name="detail_title">Chi tiết</string>
     <string name="settings">Cài đặt</string>
     <string name="settings_title">Cài đặt</string>
     <string name="settings_danger_zone">Vùng nguy hiểm</string>
@@ -114,5 +115,23 @@
     <string name="btn_we_repay">Trả nợ họ</string>
     <string name="btn_lend">Cho vay</string>
     <string name="btn_borrow">Đi vay</string>
+
+    <string name="graph_distribution">Biểu đồ phân bổ</string>
+    <string name="who_owes_most">Ai nợ nhiều nhất?</string>
+    <string name="person_name_hint">Tên người nợ</string>
+    <string name="they_owe_me">Họ nợ mình</string>
+    <string name="i_owe_them">Mình nợ họ</string>
+    <string name="they_owe_me_dialog">Họ nợ tôi</string>
+    <string name="i_owe_them_dialog">Tôi nợ họ</string>
+    <string name="total_current_balance">Tổng dư nợ hiện tại</string>
+    <string name="default_positive_zero">+đ 0</string>
+    <string name="default_negative_zero">-đ 0</string>
+    
+    <!-- Tiền tệ suggestion -->
+    <string name="chip_20k">+20K</string>
+    <string name="chip_50k">+50K</string>
+    <string name="chip_100k">+100K</string>
+    <string name="chip_200k">+200K</string>
+    <string name="chip_500k">+500K</string>
 
 </resources>

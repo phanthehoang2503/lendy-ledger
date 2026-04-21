@@ -6,8 +6,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background"
-    tools:context=".MainActivity">
+    tools:context=".ui.activities.MainActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/app_bar_layout"
@@ -68,7 +67,6 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/white"
             android:orientation="horizontal"
             android:paddingVertical="20dp"
             android:paddingHorizontal="16dp">
@@ -83,7 +81,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Họ nợ mình"
+                    android:text="@string/they_owe_me"
                     android:textColor="@color/outline"
                     android:textSize="12sp"
                     android:textAllCaps="true"
@@ -95,7 +93,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"
-                    android:text="+đ 0"
+                    android:text="@string/default_positive_zero"
                     android:textColor="@color/receivable"
                     android:textSize="20sp"
                     android:textStyle="bold" />
@@ -117,7 +115,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Mình nợ họ"
+                    android:text="@string/i_owe_them"
                     android:textColor="@color/outline"
                     android:textSize="12sp"
                     android:textAllCaps="true"
@@ -129,7 +127,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"
-                    android:text="-đ 0"
+                    android:text="@string/default_negative_zero"
                     android:textColor="@color/payable"
                     android:textSize="20sp"
                     android:textStyle="bold" />

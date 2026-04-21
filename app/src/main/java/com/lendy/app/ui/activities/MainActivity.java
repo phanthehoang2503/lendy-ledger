@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
@@ -405,12 +406,21 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.AddD
         editAmount.addTextChangedListener(new CurrencyTextWatcher(editAmount));
         setupQuickAddChips(v, editAmount);
 
+        MaterialButton btnLeft = v.findViewById(R.id.btnLending);
+        MaterialButton btnRight = v.findViewById(R.id.btnBorrowing);
+
         // 3. Logic Toggle Button
         if (person.totalBalance == 0) {
+            btnLeft.setText(R.string.btn_lend);
+            btnRight.setText(R.string.btn_borrow);
             toggleGroup.check(R.id.btnLending); // Mặc định cho vay
         } else if (person.totalBalance > 0) {
+            btnLeft.setText(R.string.btn_lend_more);
+            btnRight.setText(R.string.btn_they_repay);
             toggleGroup.check(R.id.btnLending); // Đang nợ mình -> mặc định cho vay thêm
         } else {
+            btnLeft.setText(R.string.btn_borrow_more);
+            btnRight.setText(R.string.btn_we_repay);
             toggleGroup.check(R.id.btnBorrowing); // Mình đang nợ họ -> mặc định vay thêm
         }
 
