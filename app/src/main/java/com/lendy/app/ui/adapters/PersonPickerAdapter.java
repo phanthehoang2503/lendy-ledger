@@ -17,6 +17,7 @@ import com.lendy.app.data.entities.Person;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class PersonPickerAdapter extends ListAdapter<Person, PersonPickerAdapter.ViewHolder> {
 
@@ -52,9 +53,9 @@ public class PersonPickerAdapter extends ListAdapter<Person, PersonPickerAdapter
             submitList(fullList);
         } else {
             List<Person> filtered = new ArrayList<>();
-            String lower = query.toLowerCase().trim();
+            String lower = query.toLowerCase(Locale.ROOT).trim();
             for (Person p : fullList) {
-                if ((p.name != null && p.name.toLowerCase().contains(lower)) ||
+                if ((p.name != null && p.name.toLowerCase(Locale.ROOT).contains(lower)) ||
                         (p.phoneNumber != null && p.phoneNumber.contains(lower))) {
                     filtered.add(p);
                 }
@@ -77,7 +78,7 @@ public class PersonPickerAdapter extends ListAdapter<Person, PersonPickerAdapter
 
         // Setup Avatar
         if (p.name != null && !p.name.isEmpty()) {
-            holder.initial.setText(p.name.substring(0, 1).toUpperCase());
+            holder.initial.setText(p.name.substring(0, 1).toUpperCase(Locale.ROOT));
             int[] colors = {
                     R.color.avatar_color_1,
                     R.color.avatar_color_2,

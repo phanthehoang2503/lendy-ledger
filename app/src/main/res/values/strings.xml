@@ -82,8 +82,8 @@
     <string name="no_phone_number">Không có số điện thoại</string>
     <string name="no_phone_short">Không có SĐT</string>
     <string name="zero_balance">0 đ</string>
-    <string name="receivable_prefix">Nợ bạn: </string>
-    <string name="payable_prefix">Bạn nợ: </string>
+    <string name="receivable_format">Nợ bạn: %s</string>
+    <string name="payable_format">Bạn nợ: %s</string>
     <string name="settled_balance"> </string>
     <string name="no_phone_yet">Chưa có SĐT</string>
     <string name="note_hint">Lý do / Ghi chú (tùy chọn)</string>
@@ -106,5 +106,13 @@
     <string name="settings_clear_data">Xóa sạch dữ liệu</string>
     <string name="data_cleared_toast">Đã xóa sạch dữ liệu</string>
     <string name="data_clear_failed_toast">Không thể xóa dữ liệu. Vui lòng thử lại.</string>
+
+    <!-- Dialog Thêm Giao dịch -->
+    <string name="btn_lend_more">Cho vay thêm</string>
+    <string name="btn_they_repay">Họ trả nợ</string>
+    <string name="btn_borrow_more">Đi vay thêm</string>
+    <string name="btn_we_repay">Trả nợ họ</string>
+    <string name="btn_lend">Cho vay</string>
+    <string name="btn_borrow">Đi vay</string>
 
 </resources>
