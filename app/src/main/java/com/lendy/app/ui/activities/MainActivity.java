@@ -1,7 +1,10 @@
 package com.lendy.app.ui.activities;
 
 import android.os.Bundle;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -12,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -40,6 +44,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements HomeFragment.AddDebtFlowHost {
 
     private LendyViewModel viewModel;
+    private LiveData<List<Person>> allPeopleLiveData;
     private ViewPager2 viewPager;
     private BottomNavigationView bottomNav;
     private TextView textTotalLending, textTotalBorrowing, textAppTitle;
@@ -96,13 +101,13 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.AddD
     }
 
     @Override
-    public boolean onCreateOptionsMenu(android.view.Menu menu) {
+    public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
         return true;
     }
 
     @Override
-    public boolean onOptionsItemSelected(android.view.MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_settings) {
             android.content.Intent intent = new android.content.Intent(this, SettingsActivity.class);
             startActivity(intent);
@@ -113,8 +118,8 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.AddD
 
     @Override
     public void showAddDebtFlow() {
-        if (addDebtFlowObserver != null) {
-            viewModel.getAllPeople().removeObserver(addDebtFlowObserver);
+        if (addDebtFlowObserver != null && allPeopleLiveData != null) {
+            allPeopleLiveData.removeObserver(addDebtFlowObserver);
         }
 
         addDebtFlowObserver = people -> {
@@ -126,13 +131,14 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.AddD
                 showSelectPersonDialog(people);
             }
 
-            if (addDebtFlowObserver != null) {
-                viewModel.getAllPeople().removeObserver(addDebtFlowObserver);
+            if (addDebtFlowObserver != null && allPeopleLiveData != null) {
+                allPeopleLiveData.removeObserver(addDebtFlowObserver);
                 addDebtFlowObserver = null;
             }
         };
 
-        viewModel.getAllPeople().observe(this, addDebtFlowObserver);
+        allPeopleLiveData = viewModel.getAllPeople();
+        allPeopleLiveData.observe(this, addDebtFlowObserver);
     }
 
     private void showSelectPersonDialog(List<Person> people) {
@@ -157,7 +163,7 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.AddD
         adapter.setFullList(people);
 
         // Xử lý Search Bar
-        editSearch.addTextChangedListener(new android.text.TextWatcher() {
+        editSearch.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
