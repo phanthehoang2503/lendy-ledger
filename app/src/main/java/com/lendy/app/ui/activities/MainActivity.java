@@ -6,10 +6,12 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -36,6 +38,7 @@ import com.lendy.app.ui.adapters.MainPagerAdapter;
 import com.lendy.app.ui.adapters.PersonPickerAdapter;
 import com.lendy.app.ui.fragments.HomeFragment;
 import com.lendy.app.utils.CurrencyTextWatcher;
+import com.lendy.app.utils.FormatUtils;
 import com.lendy.app.viewmodel.LendyViewModel;
 import com.lendy.app.viewmodel.LendyViewModelFactory;
 
@@ -438,9 +441,9 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.AddD
         });
 
         dialog.setOnShowListener(dialogInterface -> {
-            android.widget.Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+            Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
             positiveButton.setOnClickListener(buttonView -> {
-                long amount = com.lendy.app.utils.FormatUtils.parseFormattedNumber(editAmount.getText().toString());
+                long amount = FormatUtils.parseFormattedNumber(editAmount.getText().toString());
                 if (amount <= 0) {
                     editAmount.setError("Vui lòng nhập số tiền hợp lệ");
                     return;
@@ -448,43 +451,15 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.AddD
 
                 int checkedId = toggleGroup.getCheckedButtonId();
                 String note = editNote.getText().toString().trim();
+                TransactionType type = getTransactionType(person, checkedId);
+
+                String finalNote = (note.isEmpty())
+                        ? (type == TransactionType.LEND || type == TransactionType.BORROW 
+                                ? "Giao dịch bổ sung" : "Trả nợ")
+                        : note;
+
                 List<TransactionRecord> records = new ArrayList<>();
-
-                if (checkedId == R.id.btnLending) {
-                    if (person.totalBalance < 0 && amount > Math.abs(person.totalBalance)) {
-                        long settleAmount = Math.abs(person.totalBalance);
-                        records.add(createTransactionRecord(person.id, settleAmount,
-                                com.lendy.app.data.TransactionType.PAY_BACK, note));
-
-                        long remainingAmount = amount - settleAmount;
-                        if (remainingAmount > 0) {
-                            records.add(createTransactionRecord(person.id, remainingAmount,
-                                    com.lendy.app.data.TransactionType.LEND, note));
-                        }
-                    } else {
-                        com.lendy.app.data.TransactionType type = (person.totalBalance >= 0)
-                                ? com.lendy.app.data.TransactionType.LEND
-                                : com.lendy.app.data.TransactionType.PAY_BACK;
-                        records.add(createTransactionRecord(person.id, amount, type, note));
-                    }
-                } else {
-                    if (person.totalBalance > 0 && amount > person.totalBalance) {
-                        long settleAmount = person.totalBalance;
-                        records.add(createTransactionRecord(person.id, settleAmount,
-                                com.lendy.app.data.TransactionType.REPAY, note));
-
-                        long remainingAmount = amount - settleAmount;
-                        if (remainingAmount > 0) {
-                            records.add(createTransactionRecord(person.id, remainingAmount,
-                                    com.lendy.app.data.TransactionType.BORROW, note));
-                        }
-                    } else {
-                        com.lendy.app.data.TransactionType type = (person.totalBalance <= 0)
-                                ? com.lendy.app.data.TransactionType.BORROW
-                                : com.lendy.app.data.TransactionType.REPAY;
-                        records.add(createTransactionRecord(person.id, amount, type, note));
-                    }
-                }
+                records.add(createTransactionRecord(person.id, amount, type, finalNote));
 
                 positiveButton.setEnabled(false);
                 pendingAddTransactionDialog = dialog;
@@ -493,6 +468,25 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.AddD
         });
 
         dialog.show();
+    }
+
+    @NonNull
+    private static TransactionType getTransactionType(Person person, int checkedId) {
+        TransactionType type;
+        if (person.totalBalance > 0) {
+            type = (checkedId == R.id.btnLending)
+                    ? TransactionType.LEND
+                    : TransactionType.REPAY;
+        } else if (person.totalBalance < 0) {
+            type = (checkedId == R.id.btnLending)
+                    ? TransactionType.BORROW
+                    : TransactionType.PAY_BACK;
+        } else {
+            type = (checkedId == R.id.btnLending)
+                    ? TransactionType.LEND
+                    : TransactionType.BORROW;
+        }
+        return type;
     }
 
     private TransactionRecord createTransactionRecord(long personId, long amount,
