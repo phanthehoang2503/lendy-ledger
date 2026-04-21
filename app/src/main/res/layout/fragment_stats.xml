@@ -3,8 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:clipToPadding="false"
-    android:paddingTop="0dp"
-    android:background="@color/background">
+    android:paddingTop="0dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -29,7 +28,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Biểu đồ phân bổ"
+                    android:text="@string/graph_distribution"
                     android:textColor="@color/black"
                     android:textSize="18sp"
                     android:textStyle="bold" />
@@ -58,7 +57,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:layout_marginStart="8dp"
-            android:text="Ai nợ nhiều nhất?"
+            android:text="@string/who_owes_most"
             android:textColor="@color/black"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -78,17 +77,15 @@
                 style="@style/Widget.Lendy.Button.WhiteOutlined"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Họ nợ mình"
-                android:textSize="13sp"
-
-                />
+                android:text="@string/they_owe_me"
+                android:textSize="13sp" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnPayables"
                 style="@style/Widget.Lendy.Button.WhiteOutlined"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Mình nợ họ"
+                android:text="@string/i_owe_them"
                 android:textSize="13sp" />
 
         </com.google.android.material.button.MaterialButtonToggleGroup>

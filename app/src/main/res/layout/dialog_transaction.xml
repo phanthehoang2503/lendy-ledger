@@ -23,7 +23,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Cho Vay Thêm" />
+            android:text="@string/btn_lend_more" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnBorrowing"
@@ -31,7 +31,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Trả Nợ/Thu" />
+            android:text="@string/btn_they_repay" />
     </com.google.android.material.button.MaterialButtonToggleGroup>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -67,7 +67,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
-                android:text="+20K" />
+                android:text="@string/chip_20k" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip50k"
@@ -75,7 +75,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
-                android:text="+50K" />
+                android:text="@string/chip_50k" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip100k"
@@ -83,7 +83,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
-                android:text="+100K" />
+                android:text="@string/chip_100k" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip200k"
@@ -91,14 +91,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
-                android:text="+200K" />
+                android:text="@string/chip_200k" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip500k"
                 style="@style/Widget.Material3.Chip.Suggestion"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="+500K" />
+                android:text="@string/chip_500k" />
         </LinearLayout>
     </HorizontalScrollView>
 

@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -80,7 +82,7 @@ public class ContactsFragment extends Fragment {
                 .create();
 
         dialog.setOnShowListener(dialogInterface -> {
-            android.widget.Button button = dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE);
+            Button button = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
             button.setOnClickListener(view -> {
                 String name = Objects.requireNonNull(editName.getText()).toString().trim();
                 String phone = Objects.requireNonNull(editPhone.getText()).toString().trim();
@@ -116,8 +118,8 @@ public class ContactsFragment extends Fragment {
                         button.setEnabled(true);
                         Context context = getContext();
                         if (context != null) {
-                            android.widget.Toast
-                                    .makeText(context, "Không thể lưu danh bạ", android.widget.Toast.LENGTH_SHORT)
+                            Toast
+                                    .makeText(context, "Không thể lưu danh bạ", Toast.LENGTH_SHORT)
                                     .show();
                         }
                     }
@@ -209,7 +211,7 @@ public class ContactsFragment extends Fragment {
                 .create();
 
         dialog.setOnShowListener(dialogInterface -> {
-            android.widget.Button button = dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE);
+            Button button = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
             button.setOnClickListener(view -> {
                 String name = Objects.requireNonNull(editName.getText()).toString().trim();
                 String phone = editPhone.getText().toString().trim();
@@ -245,8 +247,9 @@ public class ContactsFragment extends Fragment {
                                 button.setEnabled(true);
                                 Context context = getContext();
                                 if (context != null) {
-                                    android.widget.Toast.makeText(context, "Không thể lưu danh bạ",
-                                            android.widget.Toast.LENGTH_SHORT).show();
+                                    Toast
+                                            .makeText(context, "Không thể lưu danh bạ", Toast.LENGTH_SHORT)
+                                            .show();
                                 }
                             }
                         });

@@ -356,15 +356,15 @@ public class PersonDetailActivity extends AppCompatActivity {
         MaterialButton btnRight = dialogView.findViewById(R.id.btnBorrowing);
 
         if (currentBalance > 0) {
-            btnLeft.setText("Cho vay thêm");
-            btnRight.setText("Họ trả nợ");
+            btnLeft.setText(R.string.btn_lend_more);
+            btnRight.setText(R.string.btn_they_repay);
         } else if (currentBalance < 0) {
-            btnLeft.setText("Đi vay thêm");
-            btnRight.setText("Trả nợ họ");
+            btnLeft.setText(R.string.btn_borrow_more);
+            btnRight.setText(R.string.btn_we_repay);
         } else {
             // currentBalance == 0
-            btnLeft.setText("Cho vay");
-            btnRight.setText("Đi vay");
+            btnLeft.setText(R.string.btn_lend);
+            btnRight.setText(R.string.btn_borrow);
         }
 
         // Về cơ bản là cái hàm này nhìn cái input

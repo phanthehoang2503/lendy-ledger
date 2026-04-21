@@ -2,13 +2,11 @@
 <resources>
     <color name="black">#FF1A1C1E</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="transparent">#00000000</color>
 
     <!-- Màu trong suốt -->
     <color name="text_semi_white">#CCFFFFFF</color> <!-- Trắng mờ -->
     <color name="shadow_black">#40000000</color>     <!-- Đen mờ đổ bóng -->
     <color name="semi_black">#44000000</color>       <!-- Đen mờ -->
-    <color name="semi_white">#33FFFFFF</color>       <!-- Trắng mờ nhẹ -->
 
     <!-- Màu giao diện -->
     <!-- Gradient xanh đậm -->
@@ -18,7 +16,6 @@
     <color name="primary_dark">#001064</color>
     <color name="primary_light">#5472D3</color>
     <color name="primary_container">#E3F2FD</color>
-    <color name="text_white_secondary">#B3FFFFFF</color>
 
     <!-- Màu trạng thái -->
     <!-- Dùng chung -->
@@ -43,10 +40,8 @@
 
     <!-- Nền và bề mặt -->
     <color name="background">#F0F2F5</color>
-    <color name="surface">#FFFFFF</color>
     <color name="outline">#72777E</color>
     <color name="gray_unchecked">#757575</color>
-    <color name="unified_indicator">#1A237E</color>
 
     <!-- Màu phụ trợ -->
     <color name="divider">#EEEEEE</color>

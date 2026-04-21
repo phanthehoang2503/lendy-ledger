@@ -16,6 +16,8 @@ import com.lendy.app.R;
 import com.lendy.app.data.entities.Person;
 import com.lendy.app.utils.FormatUtils;
 
+import java.util.Locale;
+
 /******************************************************************************
  * PersonAdapter - Sử dụng ListAdapter
  * CHỨC NĂNG: Hiển thị danh sách khách hàng và số dư nợ.
@@ -91,7 +93,7 @@ public class PersonAdapter extends ListAdapter<Person, PersonAdapter.PersonViewH
             }
 
             if (person.name != null && !person.name.isEmpty()) {
-                textInitial.setText(person.name.substring(0, 1).toUpperCase());
+                textInitial.setText(person.name.substring(0, 1).toUpperCase(Locale.ROOT));
                 int colorIndex = (person.name.hashCode() & 0x7FFFFFFF) % avatarColorResIds.length;
                 avatarContainer.setCardBackgroundColor(
                         ContextCompat.getColor(itemView.getContext(), avatarColorResIds[colorIndex]));
@@ -100,10 +102,10 @@ public class PersonAdapter extends ListAdapter<Person, PersonAdapter.PersonViewH
             String formattedBalance = FormatUtils.formatCurrencyAbs(person.totalBalance);
 
             if (person.totalBalance > 0) {
-                textBalance.setText(itemView.getContext().getString(R.string.receivable_prefix) + formattedBalance);
+                textBalance.setText(itemView.getContext().getString(R.string.receivable_format, formattedBalance));
                 textBalance.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.receivable));
             } else if (person.totalBalance < 0) {
-                textBalance.setText(itemView.getContext().getString(R.string.payable_prefix) + formattedBalance);
+                textBalance.setText(itemView.getContext().getString(R.string.payable_format, formattedBalance));
                 textBalance.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.payable));
             } else {
                 textBalance.setText(itemView.getContext().getString(R.string.settled_balance));
