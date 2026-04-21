@@ -3,8 +3,6 @@
     <string name="app_name">L E N D Y</string>
 
     <!-- Thao tác -->
-    <string name="action_history">Lịch sử nợ</string>
-    <string name="action_contacts">Danh bạ</string>
     <string name="add_contact">Thêm liên lạc</string>
     <string name="action_reset">Xóa sạch dữ liệu</string>
     <string name="action_search">Tìm kiếm…</string>
@@ -13,21 +11,14 @@
     <string name="cancel">Hủy</string>
 
     <!-- Tiêu đề -->
-    <string name="title_completed_debts">Nợ đã hoàn thành</string>
-    <string name="title_contacts">Danh sách liên lạc</string>
-    <string name="statistics">Thống kê</string>
 
     <!-- Xác nhận -->
     <string name="confirm_reset_title">Xóa toàn bộ dữ liệu?</string>
     <string name="confirm_reset_message">Hành động này sẽ xóa sạch tất cả người nợ và lịch sử giao
         dịch. Bạn không thể hoàn tác!</string>
-    <string name="confirm_delete_person_title">Xóa người này?</string>
-    <string name="confirm_delete_person_message">Tất cả lịch sử giao dịch liên quan đến người này
-        cũng sẽ bị xóa vĩnh viễn.</string>
 
     <!-- Trường nhập -->
     <string name="amount">Số tiền</string>
-    <string name="transaction_note">Ghi chú (tùy chọn)</string>
 
     <!-- Điều hướng -->
     <string name="home">Trang chủ</string>
@@ -48,9 +39,6 @@
     <string name="contacts_empty_title">Danh bạ trống</string>
     <string name="contacts_empty_subtitle">Những người bạn đã từng giao dịch
         sẽ xuất hiện tại đây.</string>
-
-    <string name="no_completed_debts">Chưa có khoản nợ nào hoàn thành</string>
-    <string name="no_contacts">Chưa có liên lạc nào</string>
 
     <!-- Tên tab -->
     <string name="tab_home">L E N D Y</string>
@@ -92,11 +80,9 @@
     <string name="currency_symbol">đ</string>
 
     <!-- Các chuỗi mới cho flow chọn người -->
-    <string name="dialog_select_person_title">Chọn người nợ</string>
     <string name="search_person_hint">Tìm tên hoặc số điện thoại…</string>
     <string name="add_new_person_button">Thêm người mới</string>
     <string name="add_new_contact_title">Thêm liên lạc mới</string>
-    <string name="dialog_add_debt_title">Ghi khoản nợ</string>
 
     <!-- Cài đặt -->
     <string name="detail_title">Chi tiết</string>
