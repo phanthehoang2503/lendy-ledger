@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import com.lendy.app.R;
+import com.lendy.app.databinding.FragmentHomeBinding;
 import com.lendy.app.repository.LendyRepository;
 import com.lendy.app.ui.activities.PersonDetailActivity;
 import com.lendy.app.data.entities.Person;
@@ -24,47 +25,66 @@ import com.lendy.app.utils.PersonDialogHelper;
 import com.lendy.app.viewmodel.LendyViewModel;
 import com.lendy.app.viewmodel.LendyViewModelFactory;
 
+/**
+ * HomeFragment - Trang chủ hiển thị danh sách những người đang có nợ (Active Debts).
+ * Chức năng:
+ * - Hiển thị tóm tắt các khoản nợ đang hoạt động.
+ * - Cho phép bấm nhanh để thêm nợ mới (gọi qua MainActivity).
+ * - Xem chi tiết hoặc quản lý thông tin từng người nợ.
+ */
 public class HomeFragment extends Fragment {
 
+    /**
+     * Interface dùng để giao tiếp với Activity chủ (MainActivity)
+     * nhằm thực hiện luồng thêm nợ mới.
+     */
     public interface AddDebtFlowHost {
         void showAddDebtFlow();
     }
 
     private LendyViewModel viewModel;
     private PersonAdapter adapter;
-    private View emptyView;
+    private FragmentHomeBinding binding;
     private AddDebtFlowHost dialogHost;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
             @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_home, container, false);
+        // 1. Khởi tạo ViewBinding cho Fragment
+        binding = FragmentHomeBinding.inflate(inflater, container, false);
 
-        emptyView = view.findViewById(R.id.layoutEmptyHome);
-
-        // Connect Quick Add Bar
-        View btnQuickAdd = view.findViewById(R.id.cardQuickAdd);
-        if (btnQuickAdd != null) {
-            btnQuickAdd.setOnClickListener(v -> {
+        // 2. Kết nối nút "Thêm nợ nhanh" với Activity chủ
+        if (binding.cardQuickAdd != null) {
+            binding.cardQuickAdd.setOnClickListener(v -> {
                 if (dialogHost != null) {
                     dialogHost.showAddDebtFlow();
                 }
             });
         }
 
-        setupRecyclerView(view);
+        // 3. Cài đặt danh sách (RecyclerView) và Dữ liệu (ViewModel)
+        setupRecyclerView();
         setupViewModel();
 
-        return view;
+        return binding.getRoot();
     }
 
-    private void setupRecyclerView(View view) {
-        RecyclerView recyclerView = view.findViewById(R.id.recyclerViewHome);
-        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        // Giải phóng binding để tránh rò rỉ bộ nhớ (Memory Leak)
+        binding = null;
+    }
+
+    /**
+     * Thiết lập danh sách hiển thị người nợ.
+     */
+    private void setupRecyclerView() {
+        binding.recyclerViewHome.setLayoutManager(new LinearLayoutManager(requireContext()));
 
         adapter = new PersonAdapter(person -> {
-            // Click: Mở chi tiết
+            // Khi nhấn vào một người: Mở màn hình chi tiết nợ của người đó
             Intent intent = new Intent(getActivity(), PersonDetailActivity.class);
             intent.putExtra(PersonDetailActivity.EXTRA_PERSON_ID, person.id);
             intent.putExtra(PersonDetailActivity.EXTRA_PERSON_NAME, person.name);
@@ -72,9 +92,12 @@ public class HomeFragment extends Fragment {
             startActivity(intent);
         }, this::showPersonOptionsDialog);
 
-        recyclerView.setAdapter(adapter);
+        binding.recyclerViewHome.setAdapter(adapter);
     }
 
+    /**
+     * Kết nối và lắng nghe thay đổi dữ liệu từ Database.
+     */
     private void setupViewModel() {
         if (getActivity() == null)
             return;
@@ -85,15 +108,21 @@ public class HomeFragment extends Fragment {
                         LendyRepository.getInstance(requireActivity().getApplication())))
                 .get(LendyViewModel.class);
 
+        // Theo dõi danh sách những người đang có nợ
         viewModel.getActiveDebts().observe(getViewLifecycleOwner(), people -> {
             if (people == null || people.isEmpty()) {
-                emptyView.setVisibility(View.VISIBLE);
+                // Nếu không có ai nợ nần gì thì hiện thông báo trống
+                binding.layoutEmptyHome.setVisibility(View.VISIBLE);
             } else {
-                emptyView.setVisibility(View.GONE);
+                binding.layoutEmptyHome.setVisibility(View.GONE);
             }
             adapter.submitList(people);
         });
     }
+
+    /**
+     * Hiển thị menu tùy chọn khi nhấn giữ hoặc bấm vào icon menu của một người nợ.
+     */
     private void showPersonOptionsDialog(Person person) {
         String[] options = {"Chỉnh sửa thông tin", "Xóa người này"};
         new MaterialAlertDialogBuilder(requireContext())
@@ -108,6 +137,9 @@ public class HomeFragment extends Fragment {
                 .show();
     }
 
+    /**
+     * Hộp thoại xác nhận trước khi xóa một người nợ khỏi hệ thống.
+     */
     private void showDeleteConfirmation(Person person) {
         new MaterialAlertDialogBuilder(requireContext())
                 .setTitle("Xác nhận xóa")
