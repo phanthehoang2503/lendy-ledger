@@ -239,16 +239,20 @@ public class LendyRepository {
         executor.execute(() -> {
             try {
                 int result = personDao.addOrUpdatePerson(person);
-                new Handler(Looper.getMainLooper()).post(() -> {
-                    if (result == PersonDao.RESULT_DUPLICATE) {
-                        callback.onDuplicate();
-                    } else {
-                        callback.onSuccess();
-                    }
-                });
+                if (callback != null) {
+                    new Handler(Looper.getMainLooper()).post(() -> {
+                        if (result == PersonDao.RESULT_DUPLICATE) {
+                            callback.onDuplicate();
+                        } else {
+                            callback.onSuccess();
+                        }
+                    });
+                }
             } catch (Exception e) {
                 postError("Lỗi lưu người nợ.", e);
-                new Handler(Looper.getMainLooper()).post(() -> callback.onError(e));
+                if (callback != null) {
+                    new Handler(Looper.getMainLooper()).post(() -> callback.onError(e));
+                }
             }
         });
     }
@@ -273,10 +277,14 @@ public class LendyRepository {
         executor.execute(() -> {
             try {
                 boolean result = checker.call();
-                new Handler(Looper.getMainLooper()).post(() -> callback.onResult(result));
+                if (callback != null) {
+                    new Handler(Looper.getMainLooper()).post(() -> callback.onResult(result));
+                }
             } catch (Exception e) {
                 postError("Lỗi kiểm tra trùng người nợ.", e);
-                new Handler(Looper.getMainLooper()).post(() -> callback.onError(e));
+                if (callback != null) {
+                    new Handler(Looper.getMainLooper()).post(() -> callback.onError(e));
+                }
             }
         });
     }

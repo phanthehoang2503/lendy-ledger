@@ -156,6 +156,8 @@ public class StatsFragment extends Fragment {
                 // Chỉ lấy tối đa 3 người để hiển thị cho gọn
                 int limit = Math.min(filteredList.size(), 3);
                 topDebtorsAdapter.submitList(filteredList.subList(0, limit));
+            } else {
+                topDebtorsAdapter.submitList(Collections.emptyList());
             }
         } else {
             // Trường hợp không có dữ liệu

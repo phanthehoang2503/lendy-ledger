@@ -1,7 +1,6 @@
 package com.lendy.app.ui.fragments;
 
 import android.content.Intent;
-import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,11 +14,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.textfield.TextInputEditText;
 import com.lendy.app.R;
 import com.lendy.app.data.entities.Person;
 import com.lendy.app.databinding.DialogAddPersonBinding;
@@ -30,7 +26,6 @@ import com.lendy.app.ui.adapters.PersonAdapter;
 import com.lendy.app.viewmodel.LendyViewModel;
 import com.lendy.app.viewmodel.LendyViewModelFactory;
 
-import java.util.ArrayList;
 import java.util.Objects;
 
 /**
@@ -82,14 +77,10 @@ public class ContactsFragment extends Fragment {
      */
     private void showAddContactDialog() {
         // Sử dụng ViewBinding cho Dialog để code sạch hơn
-        com.lendy.app.databinding.DialogAddPersonBinding dialogBinding = 
-                com.lendy.app.databinding.DialogAddPersonBinding.inflate(getLayoutInflater());
+        DialogAddPersonBinding dialogBinding = DialogAddPersonBinding.inflate(getLayoutInflater());
 
         // Ẩn các trường không cần thiết (vì đây chỉ là thêm danh bạ, chưa phát sinh nợ)
-        dialogBinding.layoutAmount.setVisibility(View.GONE);
-        dialogBinding.toggleGroup.setVisibility(View.GONE);
-        dialogBinding.layoutNote.setVisibility(View.GONE);
-        dialogBinding.scrollChips.setVisibility(View.GONE);
+        hideContactDialogOptionalFields(dialogBinding);
 
         AlertDialog dialog = new MaterialAlertDialogBuilder(requireContext())
                 .setTitle(R.string.add_new_contact_title)
@@ -105,7 +96,7 @@ public class ContactsFragment extends Fragment {
                 String phone = Objects.requireNonNull(dialogBinding.editPhone.getText()).toString().trim();
 
                 if (name.isEmpty()) {
-                    dialogBinding.editName.setError("Vui lòng nhập tên");
+                    dialogBinding.editName.setError(getString(R.string.error_enter_name));
                     return;
                 }
 
@@ -124,7 +115,7 @@ public class ContactsFragment extends Fragment {
 
                     @Override
                     public void onDuplicate() {
-                        dialogBinding.editName.setError("Người này đã có trong danh bạ");
+                        dialogBinding.editName.setError(getString(R.string.error_contact_exists));
                         button.setEnabled(true);
                     }
 
@@ -132,7 +123,7 @@ public class ContactsFragment extends Fragment {
                     public void onError(Exception exception) {
                         if (!isAdded()) return;
                         button.setEnabled(true);
-                        Toast.makeText(requireContext(), "Không thể lưu danh bạ", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(requireContext(), getString(R.string.toast_contact_save_failed), Toast.LENGTH_SHORT).show();
                     }
                 });
             });
@@ -185,7 +176,10 @@ public class ContactsFragment extends Fragment {
      * Hiển thị menu tùy chọn (Sửa/Xóa) cho một liên hệ.
      */
     private void showPersonOptionsDialog(Person person) {
-        String[] options = { "Chỉnh sửa thông tin", "Xóa người này" };
+        String[] options = {
+            getString(R.string.option_edit_person_info),
+            getString(R.string.option_delete_person)
+        };
         new MaterialAlertDialogBuilder(requireContext())
                 .setTitle(person.name)
                 .setItems(options, (dialog, which) -> {
@@ -203,12 +197,12 @@ public class ContactsFragment extends Fragment {
      */
     private void showDeleteConfirmation(Person person) {
         new MaterialAlertDialogBuilder(requireContext())
-                .setTitle("Xác nhận xóa")
-                .setMessage("Bạn có chắc chắn muốn xóa '" + person.name + "'? Toàn bộ lịch sử giao dịch sẽ bị mất.")
-                .setPositiveButton("Xóa", (dialog, which) -> {
+                .setTitle(R.string.confirm_delete_contact_title)
+                .setMessage(getString(R.string.confirm_delete_contact_message, person.name))
+                .setPositiveButton(R.string.label_delete, (dialog, which) -> {
                     viewModel.removePerson(person);
                 })
-                .setNegativeButton("Hủy", null)
+                .setNegativeButton(R.string.cancel, null)
                 .show();
     }
 
@@ -217,11 +211,8 @@ public class ContactsFragment extends Fragment {
      */
     private void showEditPersonDialog(Person person) {
         DialogAddPersonBinding dialogBinding = DialogAddPersonBinding.inflate(getLayoutInflater());
-        
-        dialogBinding.layoutAmount.setVisibility(View.GONE);
-        dialogBinding.toggleGroup.setVisibility(View.GONE);
-        dialogBinding.layoutNote.setVisibility(View.GONE);
-        dialogBinding.scrollChips.setVisibility(View.GONE);
+
+        hideContactDialogOptionalFields(dialogBinding);
 
         dialogBinding.editName.setText(person.name);
         dialogBinding.editPhone.setText(person.phoneNumber);
@@ -229,8 +220,8 @@ public class ContactsFragment extends Fragment {
         AlertDialog dialog = new MaterialAlertDialogBuilder(requireContext())
                 .setTitle(R.string.edit_person)
                 .setView(dialogBinding.getRoot())
-                .setPositiveButton("Lưu", null)
-                .setNegativeButton("Hủy", null)
+            .setPositiveButton(R.string.save, null)
+            .setNegativeButton(R.string.cancel, null)
                 .create();
 
         dialog.setOnShowListener(dialogInterface -> {
@@ -240,7 +231,7 @@ public class ContactsFragment extends Fragment {
                 String phone = Objects.requireNonNull(dialogBinding.editPhone.getText()).toString().trim();
 
                 if (name.isEmpty()) {
-                    dialogBinding.editName.setError("Vui lòng nhập tên người nợ");
+                    dialogBinding.editName.setError(getString(R.string.error_enter_debtor_name));
                     return;
                 }
 
@@ -258,7 +249,7 @@ public class ContactsFragment extends Fragment {
 
                             @Override
                             public void onDuplicate() {
-                                dialogBinding.editName.setError("Tên đã tồn tại");
+                                dialogBinding.editName.setError(getString(R.string.error_name_exists));
                                 button.setEnabled(true);
                             }
 
@@ -266,12 +257,19 @@ public class ContactsFragment extends Fragment {
                             public void onError(Exception exception) {
                                 if (!isAdded()) return;
                                 button.setEnabled(true);
-                                Toast.makeText(requireContext(), "Không thể lưu danh bạ", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(requireContext(), getString(R.string.toast_contact_save_failed), Toast.LENGTH_SHORT).show();
                             }
                         });
             });
         });
 
         dialog.show();
+    }
+
+    private void hideContactDialogOptionalFields(DialogAddPersonBinding dialogBinding) {
+        dialogBinding.layoutAmount.setVisibility(View.GONE);
+        dialogBinding.toggleGroup.setVisibility(View.GONE);
+        dialogBinding.layoutNote.setVisibility(View.GONE);
+        dialogBinding.scrollChips.setVisibility(View.GONE);
     }
 }
