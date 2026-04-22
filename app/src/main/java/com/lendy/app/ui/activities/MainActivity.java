@@ -33,6 +33,7 @@ import com.lendy.app.R;
 import com.lendy.app.data.TransactionType;
 import com.lendy.app.data.entities.Person;
 import com.lendy.app.data.entities.TransactionRecord;
+import com.lendy.app.databinding.ActivityMainBinding;
 import com.lendy.app.repository.LendyRepository;
 import com.lendy.app.ui.adapters.MainPagerAdapter;
 import com.lendy.app.ui.adapters.PersonPickerAdapter;
@@ -49,10 +50,7 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.AddD
 
     private LendyViewModel viewModel;
     private LiveData<List<Person>> allPeopleLiveData;
-    private ViewPager2 viewPager;
-    private BottomNavigationView bottomNav;
-    private TextView textTotalLending, textTotalBorrowing, textAppTitle;
-    private View welcomeContainer, summaryCard;
+    private ActivityMainBinding binding;
     private Observer<List<Person>> addDebtFlowObserver;
     private AlertDialog pendingAddTransactionDialog;
 
@@ -60,43 +58,39 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.AddD
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_main);
-        // 1. Ánh xạ View
-        viewPager = findViewById(R.id.viewPager);
-        bottomNav = findViewById(R.id.bottomNav);
-        textTotalLending = findViewById(R.id.textTotalLending);
-        textTotalBorrowing = findViewById(R.id.textTotalBorrowing);
-        welcomeContainer = findViewById(R.id.header_welcome_container);
-        summaryCard = findViewById(R.id.summary_card);
-        textAppTitle = findViewById(R.id.textAppTitle);
+        
+        // 1. Khởi tạo ViewBinding - Giúp gọi View mà không cần findViewById
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
-        // 2. Toolbar
-        setSupportActionBar(findViewById(R.id.toolbar));
+        // 2. Thiết lập Toolbar (Thanh công cụ phía trên)
+        setSupportActionBar(binding.toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayShowTitleEnabled(false);
         }
 
-        // 3. Setup
-        setupNavigation();
-        setupViewModel();
+        // 3. Cài đặt các thành phần chính
+        setupNavigation(); // Cài đặt ViewPager và BottomNav
+        setupViewModel();  // Kết nối dữ liệu từ Database
 
-        ViewCompat.setOnApplyWindowInsetsListener(bottomNav, (v, insets) -> {
+        // 4. Xử lý khoảng cách cho Edge-to-Edge (Tránh bị thanh hệ thống che khuất UI)
+        ViewCompat.setOnApplyWindowInsetsListener(binding.bottomNav, (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(0, 0, 0, systemBars.bottom);
             return insets;
         });
 
-        ViewCompat.setOnApplyWindowInsetsListener(viewPager, (v, insets) -> {
-            int navHeight = bottomNav.getHeight();
+        ViewCompat.setOnApplyWindowInsetsListener(binding.viewPager, (v, insets) -> {
+            int navHeight = binding.bottomNav.getHeight();
             if (navHeight > 0) {
                 v.setPadding(0, 0, 0, navHeight);
             } else {
-                bottomNav.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+                binding.bottomNav.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
                     @Override
                     public void onLayoutChange(View view, int left, int top, int right, int bottom, int oldLeft,
                             int oldTop, int oldRight, int oldBottom) {
-                        bottomNav.removeOnLayoutChangeListener(this);
-                        v.setPadding(0, 0, 0, bottomNav.getHeight());
+                        binding.bottomNav.removeOnLayoutChangeListener(this);
+                        v.setPadding(0, 0, 0, binding.bottomNav.getHeight());
                     }
                 });
             }
@@ -110,6 +104,9 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.AddD
         return true;
     }
 
+    /**
+     * Mở màn hình cài đặt của ứng dụng.
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_settings) {
@@ -120,6 +117,11 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.AddD
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Luồng xử lý khi bấm nút "Thêm nợ".
+     * Nếu chưa có ai trong danh bạ -> Hiện dialog thêm người mới.
+     * Nếu đã có người -> Hiện danh sách để chọn người cần ghi nợ.
+     */
     @Override
     public void showAddDebtFlow() {
         if (addDebtFlowObserver != null && allPeopleLiveData != null) {
@@ -189,12 +191,15 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.AddD
         dialog.show();
     }
 
+    /**
+     * Thiết lập điều hướng Tab phía dưới (Bottom Navigation) và ViewPager.
+     */
     private void setupNavigation() {
         MainPagerAdapter adapter = new MainPagerAdapter(this);
-        viewPager.setAdapter(adapter);
+        binding.viewPager.setAdapter(adapter);
 
-        // Vuốt -> Chọn Menu
-        viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+        // Khi người dùng vuốt trang -> Cập nhật Menu tương ứng ở phía dưới
+        binding.viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageSelected(int position) {
                 int menuId;
@@ -214,26 +219,27 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.AddD
                     default:
                         menuId = R.id.nav_home;
                 }
-                bottomNav.setSelectedItemId(menuId);
+                binding.bottomNav.setSelectedItemId(menuId);
                 updateHeaderVisibility(position);
             }
         });
 
-        // Bấm Menu -> Chuyển Trang
-        bottomNav.setOnItemSelectedListener(item -> {
+        // Khi bấm vào Menu ở dưới -> Chuyển trang hiển thị tương ứng
+        binding.bottomNav.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
             if (id == R.id.nav_home)
-                viewPager.setCurrentItem(0);
+                binding.viewPager.setCurrentItem(0);
             else if (id == R.id.nav_stats)
-                viewPager.setCurrentItem(1);
+                binding.viewPager.setCurrentItem(1);
             else if (id == R.id.nav_history)
-                viewPager.setCurrentItem(2);
+                binding.viewPager.setCurrentItem(2);
             else if (id == R.id.nav_contacts)
-                viewPager.setCurrentItem(3);
+                binding.viewPager.setCurrentItem(3);
             return true;
         });
 
-        viewPager.setUserInputEnabled(false);
+        // Tắt tính năng vuốt tay để tránh xung đột với các thành phần UI khác
+        binding.viewPager.setUserInputEnabled(false);
     }
 
     private void setupViewModel() {
@@ -247,12 +253,12 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.AddD
             long lendingVal = summary.totalLending != null ? summary.totalLending : 0;
             long borrowingVal = Math.abs(summary.totalBorrowing != null ? summary.totalBorrowing : 0);
 
-            // Format số
-            textTotalLending.setText(com.lendy.app.utils.FormatUtils.formatCurrency(lendingVal));
-            textTotalBorrowing.setText(com.lendy.app.utils.FormatUtils.formatCurrency(borrowingVal));
+            // Hiển thị tổng tiền cho vay và đi vay lên màn hình
+            binding.textTotalLending.setText(com.lendy.app.utils.FormatUtils.formatCurrency(lendingVal));
+            binding.textTotalBorrowing.setText(com.lendy.app.utils.FormatUtils.formatCurrency(borrowingVal));
 
-            textTotalLending.setTextColor(androidx.core.content.ContextCompat.getColor(this, R.color.receivable));
-            textTotalBorrowing.setTextColor(androidx.core.content.ContextCompat.getColor(this, R.color.payable));
+            binding.textTotalLending.setTextColor(androidx.core.content.ContextCompat.getColor(this, R.color.receivable));
+            binding.textTotalBorrowing.setTextColor(androidx.core.content.ContextCompat.getColor(this, R.color.payable));
         });
 
         viewModel.getErrorObserver().observe(this, event -> {
@@ -282,25 +288,28 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.AddD
 
     }
 
+    /**
+     * Ẩn/Hiện header và cập nhật tiêu đề app tùy theo trang người dùng đang đứng.
+     */
     private void updateHeaderVisibility(int position) {
         if (position == 0) {
-            textAppTitle.setText(getString(R.string.tab_home));
-            welcomeContainer.setVisibility(View.VISIBLE);
-            summaryCard.setVisibility(View.VISIBLE);
+            binding.textAppTitle.setText(getString(R.string.tab_home));
+            binding.headerWelcomeContainer.setVisibility(View.VISIBLE);
+            binding.summaryCard.setVisibility(View.VISIBLE);
         } else {
-            welcomeContainer.setVisibility(View.GONE);
-            summaryCard.setVisibility(View.GONE);
+            binding.headerWelcomeContainer.setVisibility(View.GONE);
+            binding.summaryCard.setVisibility(View.GONE);
 
             // Cập nhật tiêu đề động theo từng Tab
             switch (position) {
                 case 1:
-                    textAppTitle.setText(getString(R.string.tab_stats));
+                    binding.textAppTitle.setText(getString(R.string.tab_stats));
                     break;
                 case 2:
-                    textAppTitle.setText(getString(R.string.tab_history));
+                    binding.textAppTitle.setText(getString(R.string.tab_history));
                     break;
                 case 3:
-                    textAppTitle.setText(getString(R.string.tab_contacts));
+                    binding.textAppTitle.setText(getString(R.string.tab_contacts));
                     break;
             }
         }

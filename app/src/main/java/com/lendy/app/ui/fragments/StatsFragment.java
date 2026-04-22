@@ -1,6 +1,8 @@
 package com.lendy.app.ui.fragments;
 
 import android.content.Intent;
+
+import com.lendy.app.databinding.FragmentStatsBinding;
 import com.lendy.app.ui.activities.PersonDetailActivity;
 
 import android.graphics.Color;
@@ -34,54 +36,68 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * StatsFragment - Màn hình thống kê dữ liệu.
+ * Chức năng:
+ * - Hiển thị biểu đồ tròn (PieChart) so sánh tỷ lệ Cho vay vs Đi vay.
+ * - Hiển thị danh sách "Top 3" những người nợ nhiều nhất hoặc mình nợ nhiều nhất.
+ */
 public class StatsFragment extends Fragment {
 
     private LendyViewModel viewModel;
-    private PieChart pieChart;
     private PersonAdapter topDebtorsAdapter;
-    private RecyclerView recyclerViewTopDebtors;
-    private View textTopDebtorsTitle;
-    private MaterialButtonToggleGroup toggleGroup;
-    private boolean showReceivables = true;
+    private FragmentStatsBinding binding;
+    private boolean showReceivables = true; // Mặc định hiển thị danh sách "Họ nợ mình"
     private List<Person> currentPeople = new ArrayList<>();
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
             @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_stats, container, false);
+        // 1. Khởi tạo ViewBinding
+        binding = FragmentStatsBinding.inflate(inflater, container, false);
 
-        pieChart = view.findViewById(R.id.pieChart);
-        textTopDebtorsTitle = view.findViewById(R.id.textTopDebtorsTitle);
-
-        setupRecyclerView(view);
+        // 2. Cài đặt các thành phần UI
+        setupRecyclerView();
         setupViewModel();
 
-        return view;
+        return binding.getRoot();
     }
 
-    private void setupRecyclerView(View view) {
-        recyclerViewTopDebtors = view.findViewById(R.id.recyclerViewTopDebtors);
-        toggleGroup = view.findViewById(R.id.toggleGroupStats);
-        recyclerViewTopDebtors.setLayoutManager(new LinearLayoutManager(requireContext()));
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
+    }
+
+    /**
+     * Thiết lập danh sách Top những người nợ.
+     */
+    private void setupRecyclerView() {
+        binding.recyclerViewTopDebtors.setLayoutManager(new LinearLayoutManager(requireContext()));
         
         topDebtorsAdapter = new PersonAdapter(person -> {
+            // Khi nhấn vào một người trong danh sách Top: Mở chi tiết nợ
             Intent intent = new Intent(getActivity(), PersonDetailActivity.class);
             intent.putExtra(PersonDetailActivity.EXTRA_PERSON_ID, person.id);
             intent.putExtra(PersonDetailActivity.EXTRA_PERSON_NAME, person.name);
             intent.putExtra(PersonDetailActivity.EXTRA_PERSON_PHONE, person.phoneNumber);
             startActivity(intent);
         }, null);
-        recyclerViewTopDebtors.setAdapter(topDebtorsAdapter);
+        binding.recyclerViewTopDebtors.setAdapter(topDebtorsAdapter);
 
-        toggleGroup.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
+        // Xử lý khi người dùng bấm chuyển giữa tab "Họ nợ mình" và "Mình nợ họ"
+        binding.toggleGroupStats.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
             if (isChecked) {
                 showReceivables = (checkedId == R.id.btnReceivables);
-                refreshTopList();
+                refreshTopList(); // Làm mới danh sách hiển thị
             }
         });
     }
 
+    /**
+     * Kết nối dữ liệu từ ViewModel.
+     */
     private void setupViewModel() {
         if (getActivity() == null)
             return;
@@ -92,24 +108,28 @@ public class StatsFragment extends Fragment {
                         LendyRepository.getInstance(requireActivity().getApplication())))
                 .get(LendyViewModel.class);
 
-        // 1. Cập nhật biểu đồ tròn
+        // 1. Cập nhật biểu đồ tròn khi số liệu tổng thay đổi
         viewModel.getGlobalSummary().observe(getViewLifecycleOwner(), summary -> {
             if (summary != null) {
                 updateChart(summary);
             }
         });
 
-        // 2. Cập nhật danh sách Top 3
+        // 2. Cập nhật danh sách Top 3 khi danh bạ có thay đổi
         viewModel.getActiveDebts().observe(getViewLifecycleOwner(), people -> {
             this.currentPeople = people != null ? people : new ArrayList<>();
             refreshTopList();
         });
     }
 
+    /**
+     * Logic lọc và sắp xếp để lấy ra Top 3 người nợ nhiều nhất.
+     */
     private void refreshTopList() {
         boolean hasData = currentPeople != null && !currentPeople.isEmpty();
         if (hasData) {
             List<Person> filteredList = new ArrayList<>();
+            // Lọc danh sách dựa trên Tab đang chọn
             for (Person p : currentPeople) {
                 if (showReceivables && p.totalBalance > 0) {
                     filteredList.add(p);
@@ -119,45 +139,50 @@ public class StatsFragment extends Fragment {
             }
 
             boolean hasFilteredData = !filteredList.isEmpty();
-            textTopDebtorsTitle.setVisibility(hasFilteredData ? View.VISIBLE : View.GONE);
-            recyclerViewTopDebtors.setVisibility(hasFilteredData ? View.VISIBLE : View.GONE);
-            toggleGroup.setVisibility(View.VISIBLE);
+            binding.textTopDebtorsTitle.setVisibility(hasFilteredData ? View.VISIBLE : View.GONE);
+            binding.recyclerViewTopDebtors.setVisibility(hasFilteredData ? View.VISIBLE : View.GONE);
+            binding.toggleGroupStats.setVisibility(View.VISIBLE);
 
             if (hasFilteredData) {
-                // Sắp xếp
+                // Thực hiện sắp xếp (Sorting)
                 if (showReceivables) {
-                    // Họ nợ mình:  số lớn nhất lên đầu
+                    // Họ nợ mình: Những người nợ số tiền lớn nhất lên đầu
                     Collections.sort(filteredList, (p1, p2) -> Double.compare(p2.totalBalance, p1.totalBalance));
                 } else {
-                    // Mình nợ họ: số âm bé nhất (nợ nhiều nhất) lên đầu
+                    // Mình nợ họ: Những khoản nợ mình âm nhiều nhất (phải trả nhiều nhất) lên đầu
                     Collections.sort(filteredList, (p1, p2) -> Double.compare(p1.totalBalance, p2.totalBalance));
                 }
 
-                // Lấy tối đa 3 người
+                // Chỉ lấy tối đa 3 người để hiển thị cho gọn
                 int limit = Math.min(filteredList.size(), 3);
                 topDebtorsAdapter.submitList(filteredList.subList(0, limit));
+            } else {
+                topDebtorsAdapter.submitList(Collections.emptyList());
             }
         } else {
-            textTopDebtorsTitle.setVisibility(View.GONE);
-            recyclerViewTopDebtors.setVisibility(View.GONE);
-            toggleGroup.setVisibility(View.GONE);
+            // Trường hợp không có dữ liệu
+            binding.textTopDebtorsTitle.setVisibility(View.GONE);
+            binding.recyclerViewTopDebtors.setVisibility(View.GONE);
+            binding.toggleGroupStats.setVisibility(View.GONE);
             topDebtorsAdapter.submitList(new ArrayList<>());
         }
     }
 
+    /**
+     * Vẽ biểu đồ tròn so sánh tỷ lệ nợ.
+     */
     private void updateChart(SummaryDTO summary) {
         float lending = summary.totalLending != null ? summary.totalLending.floatValue() : 0f;
         float borrowing = summary.totalBorrowing != null ? summary.totalBorrowing.floatValue() : 0f;
 
-        View emptyText = getView() != null ? getView().findViewById(R.id.textChartEmpty) : null;
-
         if (lending == 0 && borrowing == 0) {
-            pieChart.setVisibility(View.GONE);
-            if (emptyText != null) emptyText.setVisibility(View.VISIBLE);
+            // Không có nợ nần gì thì ẩn biểu đồ
+            binding.pieChart.setVisibility(View.GONE);
+            binding.textChartEmpty.setVisibility(View.VISIBLE);
             return;
         } else {
-            pieChart.setVisibility(View.VISIBLE);
-            if (emptyText != null) emptyText.setVisibility(View.GONE);
+            binding.pieChart.setVisibility(View.VISIBLE);
+            binding.textChartEmpty.setVisibility(View.GONE);
         }
 
         List<PieEntry> entries = new ArrayList<>();
@@ -173,11 +198,11 @@ public class StatsFragment extends Fragment {
         dataSet.setValueTextSize(14f);
 
         PieData data = new PieData(dataSet);
-        pieChart.setData(data);
-        pieChart.getDescription().setEnabled(false);
-        pieChart.setCenterText(getString(R.string.total_debt_center));
-        pieChart.setDrawEntryLabels(false);
-        pieChart.animateY(1000);
-        pieChart.invalidate();
+        binding.pieChart.setData(data);
+        binding.pieChart.getDescription().setEnabled(false);
+        binding.pieChart.setCenterText(getString(R.string.total_debt_center));
+        binding.pieChart.setDrawEntryLabels(false);
+        binding.pieChart.animateY(1000); // Hiệu ứng vẽ biểu đồ xoay tròn
+        binding.pieChart.invalidate();
     }
 }

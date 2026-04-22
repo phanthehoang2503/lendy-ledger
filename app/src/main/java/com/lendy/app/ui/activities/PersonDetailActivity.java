@@ -27,6 +27,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.lendy.app.R;
 import com.lendy.app.data.TransactionType;
 import com.lendy.app.data.entities.TransactionRecord;
+import com.lendy.app.databinding.ActivityPersonDetailBinding;
 import com.lendy.app.repository.LendyRepository;
 import com.lendy.app.ui.adapters.TransactionAdapter;
 import com.lendy.app.utils.FormatUtils;
@@ -35,6 +36,13 @@ import com.lendy.app.viewmodel.LendyViewModelFactory;
 
 import java.util.List;
 
+/**
+ * PersonDetailActivity - Màn hình hiển thị chi tiết các giao dịch của một người nợ.
+ * Chức năng:
+ * - Hiển thị tên, số điện thoại và tổng dư nợ hiện tại.
+ * - Danh sách lịch sử giao dịch (Timeline) theo thời gian.
+ * - Cho phép thêm, sửa, xóa giao dịch trực tiếp.
+ */
 public class PersonDetailActivity extends AppCompatActivity {
 
     public static final String EXTRA_PERSON_ID = "extra_person_id";
@@ -45,14 +53,18 @@ public class PersonDetailActivity extends AppCompatActivity {
     private TransactionAdapter adapter;
     private long personId;
     private long currentBalance = 0;
-    private TextView textName, textPhone, textBalance;
+    private ActivityPersonDetailBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_person_detail);
+        
+        // 1. Khởi tạo ViewBinding
+        binding = ActivityPersonDetailBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
+        // 2. Lấy dữ liệu ID người nợ được truyền từ màn hình trước sang
         personId = getIntent().getLongExtra(EXTRA_PERSON_ID, -1);
         if (personId == -1) {
             android.widget.Toast.makeText(this, "Không tìm thấy thông tin người nợ", android.widget.Toast.LENGTH_SHORT)
@@ -64,45 +76,44 @@ public class PersonDetailActivity extends AppCompatActivity {
         String name = getIntent().getStringExtra(EXTRA_PERSON_NAME);
         String phone = getIntent().getStringExtra(EXTRA_PERSON_PHONE);
 
-        textName = findViewById(R.id.textDetailName);
-        textPhone = findViewById(R.id.textDetailPhone);
-        textBalance = findViewById(R.id.textDetailBalance);
+        // 3. Hiển thị thông tin cơ bản lên Header
+        binding.textDetailName.setText(name);
+        binding.textDetailPhone.setText(phone != null && !phone.isEmpty() ? phone : getString(R.string.no_phone_number));
 
-        textName.setText(name);
-        textPhone.setText(phone != null && !phone.isEmpty() ? phone : getString(R.string.no_phone_number));
+        // 4. Nút quay lại
+        binding.toolbar.setOnClickListener(v -> finish());
 
-        findViewById(R.id.toolbar).setOnClickListener(v -> finish());
-
-        setupRecyclerView();
-        setupViewModel();
-        setupFab();
-        setupEdgeToEdgeInsets();
+        // 5. Cài đặt các thành phần bổ trợ
+        setupRecyclerView(); // Danh sách giao dịch
+        setupViewModel();    // Kết nối Database
+        setupFab();          // Nút thêm giao dịch nhanh
+        setupEdgeToEdgeInsets(); // Xử lý khoảng cách thanh hệ thống
     }
 
+    /**
+     * Cấu hình xử lý insets cho chế độ Edge-to-Edge, 
+     * đảm bảo giao diện không bị đè bởi thanh trạng thái và thanh điều hướng.
+     */
     private void setupEdgeToEdgeInsets() {
-        View appBar = findViewById(R.id.detail_app_bar);
-        RecyclerView recyclerView = findViewById(R.id.recyclerViewTimeline);
-        FloatingActionButton fab = findViewById(R.id.fabAddTransaction);
+        final int initialAppBarTopPadding = binding.detailAppBar.getPaddingTop();
+        final int initialRecyclerBottomPadding = binding.recyclerViewTimeline.getPaddingBottom();
+        final int initialFabBottomMargin = ((ViewGroup.MarginLayoutParams) binding.fabAddTransaction.getLayoutParams()).bottomMargin;
 
-        final int initialAppBarTopPadding = appBar.getPaddingTop();
-        final int initialRecyclerBottomPadding = recyclerView.getPaddingBottom();
-        final int initialFabBottomMargin = ((ViewGroup.MarginLayoutParams) fab.getLayoutParams()).bottomMargin;
-
-        ViewCompat.setOnApplyWindowInsetsListener(appBar, (v, insets) -> {
+        ViewCompat.setOnApplyWindowInsetsListener(binding.detailAppBar, (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(v.getPaddingLeft(), initialAppBarTopPadding + systemBars.top, v.getPaddingRight(),
                     v.getPaddingBottom());
             return insets;
         });
 
-        ViewCompat.setOnApplyWindowInsetsListener(recyclerView, (v, insets) -> {
+        ViewCompat.setOnApplyWindowInsetsListener(binding.recyclerViewTimeline, (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(v.getPaddingLeft(), v.getPaddingTop(), v.getPaddingRight(),
                     initialRecyclerBottomPadding + systemBars.bottom);
             return insets;
         });
 
-        ViewCompat.setOnApplyWindowInsetsListener(fab, (v, insets) -> {
+        ViewCompat.setOnApplyWindowInsetsListener(binding.fabAddTransaction, (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams) v.getLayoutParams();
             layoutParams.bottomMargin = initialFabBottomMargin + systemBars.bottom;
@@ -110,18 +121,17 @@ public class PersonDetailActivity extends AppCompatActivity {
             return insets;
         });
 
-        ViewCompat.requestApplyInsets(findViewById(android.R.id.content));
+        ViewCompat.requestApplyInsets(binding.getRoot());
     }
 
     private void setupRecyclerView() {
-        RecyclerView recyclerView = findViewById(R.id.recyclerViewTimeline);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        binding.recyclerViewTimeline.setLayoutManager(new LinearLayoutManager(this));
         adapter = new TransactionAdapter();
 
         // Vuốt hoặc ấn giữ đều được nhưng vuốt tiện hơn mà =))
         adapter.setOnTransactionLongClickListener(this::showTransactionOptionsDialog);
 
-        recyclerView.setAdapter(adapter);
+        binding.recyclerViewTimeline.setAdapter(adapter);
 
         new ItemTouchHelper(
                 new ItemTouchHelper.SimpleCallback(0,
@@ -161,7 +171,7 @@ public class PersonDetailActivity extends AppCompatActivity {
                             adapter.notifyItemChanged(position); // Reset ui card back
                         }
                     }
-                }).attachToRecyclerView(recyclerView);
+                }).attachToRecyclerView(binding.recyclerViewTimeline);
     }
 
     private void setupViewModel() {
@@ -176,8 +186,8 @@ public class PersonDetailActivity extends AppCompatActivity {
 
                 // Cập nhật lại tên và SĐT nếu có thay đổi
                 String displayName = person.isDeleted ? person.name + " (Đã xóa)" : person.name;
-                textName.setText(displayName);
-                textPhone.setText(person.phoneNumber != null && !person.phoneNumber.isEmpty()
+                binding.textDetailName.setText(displayName);
+                binding.textDetailPhone.setText(person.phoneNumber != null && !person.phoneNumber.isEmpty()
                         ? person.phoneNumber
                         : getString(R.string.no_phone_short));
             }
@@ -190,23 +200,28 @@ public class PersonDetailActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Cập nhật màu sắc và nội dung hiển thị của số dư tổng.
+     * @param balance Số dư (Dương: Họ nợ mình, Âm: Mình nợ họ)
+     */
     private void updateBalanceUI(long balance) {
         String formatted = FormatUtils.formatCurrencyAbs(balance);
 
         if (balance > 0) {
-            // Nợ thu (Họ nợ mình)
-            textBalance.setText(formatted);
-            textBalance.setContentDescription(getString(R.string.balance_receivable_talkback, formatted));
-            textBalance.setTextColor(ContextCompat.getColor(this, R.color.black));
+            // Nợ thu (Họ nợ mình) - Hiển thị màu đen mặc định hoặc xanh tùy thiết kế
+            binding.textDetailBalance.setText(formatted);
+            binding.textDetailBalance.setContentDescription(getString(R.string.balance_receivable_talkback, formatted));
+            binding.textDetailBalance.setTextColor(ContextCompat.getColor(this, R.color.black));
         } else if (balance < 0) {
             // Nợ trả (Mình nợ họ)
-            textBalance.setText(formatted);
-            textBalance.setContentDescription(getString(R.string.balance_payable_talkback, formatted));
-            textBalance.setTextColor(ContextCompat.getColor(this, R.color.black));
+            binding.textDetailBalance.setText(formatted);
+            binding.textDetailBalance.setContentDescription(getString(R.string.balance_payable_talkback, formatted));
+            binding.textDetailBalance.setTextColor(ContextCompat.getColor(this, R.color.black));
         } else {
-            textBalance.setText(getString(R.string.zero_balance));
-            textBalance.setContentDescription(getString(R.string.zero_balance));
-            textBalance.setTextColor(ContextCompat.getColor(this, R.color.black));
+            // Hết nợ
+            binding.textDetailBalance.setText(getString(R.string.zero_balance));
+            binding.textDetailBalance.setContentDescription(getString(R.string.zero_balance));
+            binding.textDetailBalance.setTextColor(ContextCompat.getColor(this, R.color.black));
         }
     }
 
@@ -343,10 +358,12 @@ public class PersonDetailActivity extends AppCompatActivity {
     }
 
     private void setupFab() {
-        FloatingActionButton fab = findViewById(R.id.fabAddTransaction);
-        fab.setOnClickListener(v -> showAddTransactionDialog());
+        binding.fabAddTransaction.setOnClickListener(v -> showAddTransactionDialog());
     }
 
+    /**
+     * Hiển thị hộp thoại thêm giao dịch mới (Cho vay thêm / Trả bớt).
+     */
     private void showAddTransactionDialog() {
         View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_transaction, null);
         TextInputEditText editAmount = dialogView.findViewById(R.id.editAmount);

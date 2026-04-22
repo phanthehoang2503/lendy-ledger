@@ -1,7 +1,6 @@
 package com.lendy.app.ui.fragments;
 
 import android.content.Intent;
-import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,43 +14,49 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.textfield.TextInputEditText;
 import com.lendy.app.R;
 import com.lendy.app.data.entities.Person;
+import com.lendy.app.databinding.DialogAddPersonBinding;
+import com.lendy.app.databinding.FragmentContactsBinding;
 import com.lendy.app.repository.LendyRepository;
 import com.lendy.app.ui.activities.PersonDetailActivity;
 import com.lendy.app.ui.adapters.PersonAdapter;
 import com.lendy.app.viewmodel.LendyViewModel;
 import com.lendy.app.viewmodel.LendyViewModelFactory;
 
-import java.util.ArrayList;
 import java.util.Objects;
 
+/**
+ * ContactsFragment - Màn hình quản lý danh bạ người nợ.
+ * Chức năng:
+ * - Hiển thị danh sách tất cả mọi người (cả người đang nợ và người đã trả hết).
+ * - Thêm mới liên hệ (người nợ) mà không cần nhập số tiền ngay.
+ * - Chỉnh sửa thông tin cá nhân (Tên, SĐT).
+ * - Xóa liên hệ khỏi hệ thống.
+ */
 public class ContactsFragment extends Fragment {
 
     private LendyViewModel viewModel;
     private PersonAdapter adapter;
-    private View emptyView;
+    private FragmentContactsBinding binding;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
             @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_contacts, container, false);
-        emptyView = view.findViewById(R.id.layoutEmptyContacts);
+        // 1. Khởi tạo ViewBinding cho Fragment
+        binding = FragmentContactsBinding.inflate(inflater, container, false);
 
-        // nút bên màn hình danh bạ
-        FloatingActionButton fab = view.findViewById(R.id.fabAddContact);
-        if (fab != null) {
-            fab.setOnClickListener(v -> showAddContactDialog());
+        // 2. Nút thêm liên hệ mới
+        if (binding.fabAddContact != null) {
+            binding.fabAddContact.setOnClickListener(v -> showAddContactDialog());
         }
 
-        setupRecyclerView(view);
-        return view;
+        // 3. Cài đặt danh sách
+        setupRecyclerView();
+        return binding.getRoot();
     }
 
     @Override
@@ -60,23 +65,26 @@ public class ContactsFragment extends Fragment {
         setupViewModel();
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
+    }
+
+    /**
+     * Hiển thị hộp thoại để thêm một liên hệ mới vào danh bạ.
+     * Ở đây mình dùng chung layout 'dialog_add_person' nhưng ẩn đi các phần nhập tiền.
+     */
     private void showAddContactDialog() {
-        // 1. Inflate layout
-        View v = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_add_person, null);
+        // Sử dụng ViewBinding cho Dialog để code sạch hơn
+        DialogAddPersonBinding dialogBinding = DialogAddPersonBinding.inflate(getLayoutInflater());
 
-        // 2. Ẩn các trường không cần thiết
-        v.findViewById(R.id.layoutAmount).setVisibility(View.GONE);
-        v.findViewById(R.id.toggleGroup).setVisibility(View.GONE);
-        v.findViewById(R.id.layoutNote).setVisibility(View.GONE);
-        v.findViewById(R.id.scrollChips).setVisibility(View.GONE);
+        // Ẩn các trường không cần thiết (vì đây chỉ là thêm danh bạ, chưa phát sinh nợ)
+        hideContactDialogOptionalFields(dialogBinding);
 
-        TextInputEditText editName = v.findViewById(R.id.editName);
-        TextInputEditText editPhone = v.findViewById(R.id.editPhone);
-
-        // 3. Tạo Dialog
         AlertDialog dialog = new MaterialAlertDialogBuilder(requireContext())
-                .setTitle(R.string.add_new_contact_title) // Dùng string mới tạo ở Phase 1
-                .setView(v)
+                .setTitle(R.string.add_new_contact_title)
+                .setView(dialogBinding.getRoot())
                 .setPositiveButton(R.string.save, null)
                 .setNegativeButton(R.string.cancel, null)
                 .create();
@@ -84,11 +92,11 @@ public class ContactsFragment extends Fragment {
         dialog.setOnShowListener(dialogInterface -> {
             Button button = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
             button.setOnClickListener(view -> {
-                String name = Objects.requireNonNull(editName.getText()).toString().trim();
-                String phone = Objects.requireNonNull(editPhone.getText()).toString().trim();
+                String name = Objects.requireNonNull(dialogBinding.editName.getText()).toString().trim();
+                String phone = Objects.requireNonNull(dialogBinding.editPhone.getText()).toString().trim();
 
                 if (name.isEmpty()) {
-                    editName.setError("Vui lòng nhập tên");
+                    dialogBinding.editName.setError(getString(R.string.error_enter_name));
                     return;
                 }
 
@@ -98,6 +106,7 @@ public class ContactsFragment extends Fragment {
                 person.phoneNumber = phone;
                 person.updatedAt = System.currentTimeMillis();
 
+                // Lưu vào Database thông qua ViewModel
                 viewModel.addOrUpdatePersonTransactional(person, new LendyRepository.PersonUpsertCallback() {
                     @Override
                     public void onSuccess() {
@@ -106,22 +115,15 @@ public class ContactsFragment extends Fragment {
 
                     @Override
                     public void onDuplicate() {
-                        editName.setError("Người này đã có trong danh bạ");
+                        dialogBinding.editName.setError(getString(R.string.error_contact_exists));
                         button.setEnabled(true);
                     }
 
                     @Override
                     public void onError(Exception exception) {
-                        if (!isAdded()) {
-                            return;
-                        }
+                        if (!isAdded()) return;
                         button.setEnabled(true);
-                        Context context = getContext();
-                        if (context != null) {
-                            Toast
-                                    .makeText(context, "Không thể lưu danh bạ", Toast.LENGTH_SHORT)
-                                    .show();
-                        }
+                        Toast.makeText(requireContext(), getString(R.string.toast_contact_save_failed), Toast.LENGTH_SHORT).show();
                     }
                 });
             });
@@ -129,12 +131,14 @@ public class ContactsFragment extends Fragment {
         dialog.show();
     }
 
-    private void setupRecyclerView(View view) {
-        RecyclerView recyclerView = view.findViewById(R.id.recyclerViewContacts);
-        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+    /**
+     * Cài đặt danh sách hiển thị danh bạ.
+     */
+    private void setupRecyclerView() {
+        binding.recyclerViewContacts.setLayoutManager(new LinearLayoutManager(requireContext()));
 
         adapter = new PersonAdapter(person -> {
-            // Click: Mở chi tiết
+            // Nhấn vào người: Xem chi tiết giao dịch
             Intent intent = new Intent(getActivity(), PersonDetailActivity.class);
             intent.putExtra(PersonDetailActivity.EXTRA_PERSON_ID, person.id);
             intent.putExtra(PersonDetailActivity.EXTRA_PERSON_NAME, person.name);
@@ -142,12 +146,14 @@ public class ContactsFragment extends Fragment {
             startActivity(intent);
         }, this::showPersonOptionsDialog);
 
-        recyclerView.setAdapter(adapter);
+        binding.recyclerViewContacts.setAdapter(adapter);
     }
 
+    /**
+     * Lấy dữ liệu danh bạ từ ViewModel.
+     */
     private void setupViewModel() {
-        if (getActivity() == null)
-            return;
+        if (getActivity() == null) return;
 
         viewModel = new ViewModelProvider(
                 requireActivity(),
@@ -155,18 +161,25 @@ public class ContactsFragment extends Fragment {
                         LendyRepository.getInstance(requireActivity().getApplication())))
                 .get(LendyViewModel.class);
 
+        // Theo dõi toàn bộ danh sách người nợ (bao gồm cả người nợ = 0)
         viewModel.getAllPeople().observe(getViewLifecycleOwner(), people -> {
             if (people == null || people.isEmpty()) {
-                emptyView.setVisibility(View.VISIBLE);
+                binding.layoutEmptyContacts.setVisibility(View.VISIBLE);
             } else {
-                emptyView.setVisibility(View.GONE);
+                binding.layoutEmptyContacts.setVisibility(View.GONE);
             }
             adapter.submitList(people);
         });
     }
 
+    /**
+     * Hiển thị menu tùy chọn (Sửa/Xóa) cho một liên hệ.
+     */
     private void showPersonOptionsDialog(Person person) {
-        String[] options = { "Chỉnh sửa thông tin", "Xóa người này" };
+        String[] options = {
+            getString(R.string.option_edit_person_info),
+            getString(R.string.option_delete_person)
+        };
         new MaterialAlertDialogBuilder(requireContext())
                 .setTitle(person.name)
                 .setItems(options, (dialog, which) -> {
@@ -179,45 +192,46 @@ public class ContactsFragment extends Fragment {
                 .show();
     }
 
+    /**
+     * Xác nhận xóa vĩnh viễn một người và lịch sử của họ.
+     */
     private void showDeleteConfirmation(Person person) {
         new MaterialAlertDialogBuilder(requireContext())
-                .setTitle("Xác nhận xóa")
-                .setMessage("Bạn có chắc chắn muốn xóa '" + person.name + "'? Toàn bộ lịch sử giao dịch sẽ bị mất.")
-                .setPositiveButton("Xóa", (dialog, which) -> {
+                .setTitle(R.string.confirm_delete_contact_title)
+                .setMessage(getString(R.string.confirm_delete_contact_message, person.name))
+                .setPositiveButton(R.string.label_delete, (dialog, which) -> {
                     viewModel.removePerson(person);
                 })
-                .setNegativeButton("Hủy", null)
+                .setNegativeButton(R.string.cancel, null)
                 .show();
     }
 
+    /**
+     * Hộp thoại chỉnh sửa thông tin cá nhân.
+     */
     private void showEditPersonDialog(Person person) {
-        View v = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_add_person, null);
-        v.findViewById(R.id.layoutAmount).setVisibility(View.GONE);
-        v.findViewById(R.id.toggleGroup).setVisibility(View.GONE);
-        v.findViewById(R.id.layoutNote).setVisibility(View.GONE);
-        v.findViewById(R.id.scrollChips).setVisibility(View.GONE);
+        DialogAddPersonBinding dialogBinding = DialogAddPersonBinding.inflate(getLayoutInflater());
 
-        TextInputEditText editName = v.findViewById(R.id.editName);
-        TextInputEditText editPhone = v.findViewById(R.id.editPhone);
+        hideContactDialogOptionalFields(dialogBinding);
 
-        editName.setText(person.name);
-        editPhone.setText(person.phoneNumber);
+        dialogBinding.editName.setText(person.name);
+        dialogBinding.editPhone.setText(person.phoneNumber);
 
         AlertDialog dialog = new MaterialAlertDialogBuilder(requireContext())
                 .setTitle(R.string.edit_person)
-                .setView(v)
-                .setPositiveButton("Lưu", null)
-                .setNegativeButton("Hủy", null)
+                .setView(dialogBinding.getRoot())
+            .setPositiveButton(R.string.save, null)
+            .setNegativeButton(R.string.cancel, null)
                 .create();
 
         dialog.setOnShowListener(dialogInterface -> {
             Button button = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
             button.setOnClickListener(view -> {
-                String name = Objects.requireNonNull(editName.getText()).toString().trim();
-                String phone = editPhone.getText().toString().trim();
+                String name = Objects.requireNonNull(dialogBinding.editName.getText()).toString().trim();
+                String phone = Objects.requireNonNull(dialogBinding.editPhone.getText()).toString().trim();
 
                 if (name.isEmpty()) {
-                    editName.setError("Vui lòng nhập tên người nợ");
+                    dialogBinding.editName.setError(getString(R.string.error_enter_debtor_name));
                     return;
                 }
 
@@ -235,27 +249,27 @@ public class ContactsFragment extends Fragment {
 
                             @Override
                             public void onDuplicate() {
-                                editName.setError("Tên đã tồn tại");
+                                dialogBinding.editName.setError(getString(R.string.error_name_exists));
                                 button.setEnabled(true);
                             }
 
                             @Override
                             public void onError(Exception exception) {
-                                if (!isAdded()) {
-                                    return;
-                                }
+                                if (!isAdded()) return;
                                 button.setEnabled(true);
-                                Context context = getContext();
-                                if (context != null) {
-                                    Toast
-                                            .makeText(context, "Không thể lưu danh bạ", Toast.LENGTH_SHORT)
-                                            .show();
-                                }
+                                Toast.makeText(requireContext(), getString(R.string.toast_contact_save_failed), Toast.LENGTH_SHORT).show();
                             }
                         });
             });
         });
 
         dialog.show();
+    }
+
+    private void hideContactDialogOptionalFields(DialogAddPersonBinding dialogBinding) {
+        dialogBinding.layoutAmount.setVisibility(View.GONE);
+        dialogBinding.toggleGroup.setVisibility(View.GONE);
+        dialogBinding.layoutNote.setVisibility(View.GONE);
+        dialogBinding.scrollChips.setVisibility(View.GONE);
     }
 }

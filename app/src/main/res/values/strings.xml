@@ -83,6 +83,16 @@
     <string name="search_person_hint">Tìm tên hoặc số điện thoại…</string>
     <string name="add_new_person_button">Thêm người mới</string>
     <string name="add_new_contact_title">Thêm liên lạc mới</string>
+    <string name="error_enter_name">Vui lòng nhập tên</string>
+    <string name="error_contact_exists">Người này đã có trong danh bạ</string>
+    <string name="toast_contact_save_failed">Không thể lưu danh bạ</string>
+    <string name="option_edit_person_info">Chỉnh sửa thông tin</string>
+    <string name="option_delete_person">Xóa người này</string>
+    <string name="confirm_delete_contact_title">Xác nhận xóa</string>
+    <string name="confirm_delete_contact_message">Bạn có chắc chắn muốn xóa '%1$s'? Toàn bộ lịch sử giao dịch sẽ bị mất.</string>
+    <string name="label_delete">Xóa</string>
+    <string name="error_enter_debtor_name">Vui lòng nhập tên người nợ</string>
+    <string name="error_name_exists">Tên đã tồn tại</string>
 
     <!-- Cài đặt -->
     <string name="detail_title">Chi tiết</string>
