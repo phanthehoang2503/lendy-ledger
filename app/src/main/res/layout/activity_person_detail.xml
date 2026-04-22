@@ -11,13 +11,14 @@
         android:id="@+id/detail_app_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@drawable/bg_header_gradient"
         app:elevation="0dp">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:navigationIcon="@android:drawable/ic_menu_revert"
+            app:navigationIcon="@drawable/ic_back_arrow"
             app:navigationIconTint="@color/white"
             app:title="@string/detail_title"
             app:titleTextColor="@color/white" />
@@ -25,9 +26,9 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:minHeight="100dp"
-            android:paddingTop="16dp"
-            android:paddingBottom="75dp">
+            android:minHeight="80dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="65dp">
 
             <TextView
                 android:id="@+id/textDetailName"
