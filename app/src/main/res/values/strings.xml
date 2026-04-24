@@ -89,7 +89,7 @@
     <string name="option_edit_person_info">Chỉnh sửa thông tin</string>
     <string name="option_delete_person">Xóa người này</string>
     <string name="confirm_delete_contact_title">Xác nhận xóa</string>
-    <string name="confirm_delete_contact_message">Bạn có chắc chắn muốn xóa '%1$s'? Toàn bộ lịch sử giao dịch sẽ bị mất.</string>
+    <string name="confirm_delete_contact_message">Bạn có chắc chắn muốn xóa \'%1$s\'? Toàn bộ lịch sử giao dịch sẽ bị mất.</string>
     <string name="label_delete">Xóa</string>
     <string name="error_enter_debtor_name">Vui lòng nhập tên người nợ</string>
     <string name="error_name_exists">Tên đã tồn tại</string>
@@ -129,5 +129,29 @@
     <string name="chip_100k">+100K</string>
     <string name="chip_200k">+200K</string>
     <string name="chip_500k">+500K</string>
+
+    <!-- PersonDetailActivity -->
+    <string name="error_person_not_found">Không tìm thấy thông tin người nợ</string>
+    <string name="suffix_deleted"> (Đã xóa)</string>
+    <string name="confirm_delete_transaction_title">Xóa giao dịch này?</string>
+    <string name="confirm_delete_transaction_message">Số dư của người này sẽ được tự động tính toán lại.</string>
+    <string name="transaction_options_title">Tùy chọn giao dịch</string>
+    <string name="option_edit_amount">Sửa số tiền</string>
+    <string name="option_delete_transaction">Xóa giao dịch</string>
+    <string name="edit_transaction_title">Sửa số tiền giao dịch</string>
+    <string name="label_update">Cập nhật</string>
+    <string name="error_amount_must_be_positive">Số tiền phải lớn hơn 0</string>
+    <string name="add_transaction_title">Thêm giao dịch mới</string>
+    <string name="default_note_additional">Giao dịch bổ sung</string>
+    <string name="default_note_repayment">Trả nợ</string>
+
+    <!-- MainActivity -->
+    <string name="toast_transaction_added">Đã thêm giao dịch</string>
+    <string name="add_new_debtor_title">Thêm người nợ mới</string>
+    <string name="label_add">Thêm</string>
+    <string name="error_person_exists">Người này đã tồn tại</string>
+    <string name="error_save_person_failed">Không thể lưu người nợ</string>
+    <string name="add_debt_title">Ghi khoản nợ mới</string>
+    <string name="error_invalid_amount">Vui lòng nhập số tiền hợp lệ</string>
 
 </resources>

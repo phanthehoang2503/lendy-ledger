@@ -15,6 +15,8 @@ import com.google.android.material.card.MaterialCardView;
 import com.lendy.app.R;
 import com.lendy.app.data.entities.Person;
 
+import com.lendy.app.databinding.ItemPersonPickerBinding;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -67,18 +69,20 @@ public class PersonPickerAdapter extends ListAdapter<Person, PersonPickerAdapter
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_person_picker, parent, false);
-        return new ViewHolder(v);
+        ItemPersonPickerBinding binding = ItemPersonPickerBinding.inflate(
+                LayoutInflater.from(parent.getContext()), parent, false);
+        return new ViewHolder(binding);
     }
+
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Person p = getItem(position);
-        holder.name.setText(p.name);
-        holder.phone.setText(p.phoneNumber != null ? p.phoneNumber : "");
+        holder.binding.textName.setText(p.name);
+        holder.binding.textPhone.setText(p.phoneNumber != null ? p.phoneNumber : "");
 
         // Setup Avatar
         if (p.name != null && !p.name.isEmpty()) {
-            holder.initial.setText(p.name.substring(0, 1).toUpperCase(Locale.ROOT));
+            holder.binding.textInitial.setText(p.name.substring(0, 1).toUpperCase(Locale.ROOT));
             int[] colors = {
                     R.color.avatar_color_1,
                     R.color.avatar_color_2,
@@ -88,20 +92,17 @@ public class PersonPickerAdapter extends ListAdapter<Person, PersonPickerAdapter
                     R.color.avatar_color_6
             };
             int colorIdx = (p.name.hashCode() & 0x7FFFFFFF) % colors.length;
-            holder.card.setCardBackgroundColor(ContextCompat.getColor(holder.itemView.getContext(), colors[colorIdx]));
+            holder.binding.avatarContainer.setCardBackgroundColor(
+                    ContextCompat.getColor(holder.itemView.getContext(), colors[colorIdx]));
         }
         holder.itemView.setOnClickListener(v -> listener.onSelected(p));
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView initial, name, phone;
-        MaterialCardView card;
-        ViewHolder(View v) {
-            super(v);
-            initial = v.findViewById(R.id.textInitial);
-            name = v.findViewById(R.id.textName);
-            phone = v.findViewById(R.id.textPhone);
-            card = v.findViewById(R.id.avatarContainer);
+        final ItemPersonPickerBinding binding;
+        ViewHolder(ItemPersonPickerBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
         }
     }
 }

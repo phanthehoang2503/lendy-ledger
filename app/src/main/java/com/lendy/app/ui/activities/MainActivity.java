@@ -278,7 +278,7 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.AddD
         viewModel.getTransactionAddedObserver().observe(this, event -> {
             Boolean added = event.getContentIfNotHandled();
             if (Boolean.TRUE.equals(added)) {
-                Toast.makeText(this, "Đã thêm giao dịch", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.toast_transaction_added), Toast.LENGTH_SHORT).show();
                 if (pendingAddTransactionDialog != null && pendingAddTransactionDialog.isShowing()) {
                     pendingAddTransactionDialog.dismiss();
                 }
@@ -330,10 +330,10 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.AddD
         editAmount.addTextChangedListener(new CurrencyTextWatcher(editAmount));
 
         AlertDialog dialog = new MaterialAlertDialogBuilder(this)
-                .setTitle("Thêm người nợ mới")
+                .setTitle(R.string.add_new_debtor_title)
                 .setView(dialogView)
-                .setPositiveButton("Thêm", null)
-                .setNegativeButton("Hủy", null)
+                .setPositiveButton(R.string.label_add, null)
+                .setNegativeButton(R.string.cancel, null)
                 .create();
 
         dialog.setOnShowListener(dialogInterface -> {
@@ -345,7 +345,7 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.AddD
                 String note = editNote.getText().toString().trim();
 
                 if (name.isEmpty()) {
-                    editName.setError("Vui lòng nhập tên người nợ");
+                    editName.setError(getString(R.string.error_enter_debtor_name));
                     return;
                 }
 
@@ -369,14 +369,14 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.AddD
 
                     @Override
                     public void onDuplicate() {
-                            editName.setError("Người này đã tồn tại");
+                            editName.setError(getString(R.string.error_person_exists));
                             button.setEnabled(true);
                     }
 
                     @Override
                     public void onError(Exception exception) {
                         button.setEnabled(true);
-                        Toast.makeText(MainActivity.this, "Không thể lưu người nợ", Toast.LENGTH_SHORT)
+                        Toast.makeText(MainActivity.this, getString(R.string.error_save_person_failed), Toast.LENGTH_SHORT)
                                 .show();
                     }
                 });
@@ -437,10 +437,10 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.AddD
         }
 
         AlertDialog dialog = new MaterialAlertDialogBuilder(this)
-                .setTitle("Ghi khoản nợ mới")
+                .setTitle(R.string.add_debt_title)
                 .setView(v)
-                .setPositiveButton("Lưu", null)
-                .setNegativeButton("Hủy", null)
+                .setPositiveButton(R.string.save, null)
+                .setNegativeButton(R.string.cancel, null)
                 .create();
 
         dialog.setOnDismissListener(d -> {
@@ -454,7 +454,7 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.AddD
             positiveButton.setOnClickListener(buttonView -> {
                 long amount = FormatUtils.parseFormattedNumber(editAmount.getText().toString());
                 if (amount <= 0) {
-                    editAmount.setError("Vui lòng nhập số tiền hợp lệ");
+                    editAmount.setError(getString(R.string.error_invalid_amount));
                     return;
                 }
 
@@ -464,7 +464,7 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.AddD
 
                 String finalNote = (note.isEmpty())
                         ? (type == TransactionType.LEND || type == TransactionType.BORROW 
-                                ? "Giao dịch bổ sung" : "Trả nợ")
+                                ? getString(R.string.default_note_additional) : getString(R.string.default_note_repayment))
                         : note;
 
                 List<TransactionRecord> records = new ArrayList<>();

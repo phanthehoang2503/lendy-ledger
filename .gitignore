@@ -112,3 +112,8 @@ build/
 
 .idea/
 .vscode/
+
+AGENTS.md
+GEMINI.md
+GLOBAL_AGENTS.md
+.agents/
