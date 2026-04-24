@@ -67,7 +67,7 @@ public class PersonDetailActivity extends AppCompatActivity {
         // 2. Lấy dữ liệu ID người nợ được truyền từ màn hình trước sang
         personId = getIntent().getLongExtra(EXTRA_PERSON_ID, -1);
         if (personId == -1) {
-            android.widget.Toast.makeText(this, "Không tìm thấy thông tin người nợ", android.widget.Toast.LENGTH_SHORT)
+            android.widget.Toast.makeText(this, getString(R.string.error_person_not_found), android.widget.Toast.LENGTH_SHORT)
                     .show();
             setResult(RESULT_CANCELED);
             finish();
@@ -157,10 +157,10 @@ public class PersonDetailActivity extends AppCompatActivity {
                         if (direction == ItemTouchHelper.LEFT) {
                             // Vuốt trái -> Xóa
                             new MaterialAlertDialogBuilder(PersonDetailActivity.this)
-                                    .setTitle("Xóa giao dịch này?")
-                                    .setMessage("Số dư của người này sẽ được tự động tính toán lại.")
-                                    .setPositiveButton("Xóa", (d, w) -> viewModel.deleteTransaction(record))
-                                    .setNegativeButton("Hủy", (d, w) -> {
+                                    .setTitle(R.string.confirm_delete_transaction_title)
+                                    .setMessage(R.string.confirm_delete_transaction_message)
+                                    .setPositiveButton(R.string.label_delete, (d, w) -> viewModel.deleteTransaction(record))
+                                    .setNegativeButton(R.string.cancel, (d, w) -> {
                                         adapter.notifyItemChanged(position); // Hoàn tác ui
                                     })
                                     .setOnCancelListener(dialog -> adapter.notifyItemChanged(position))
@@ -185,7 +185,7 @@ public class PersonDetailActivity extends AppCompatActivity {
                 updateBalanceUI(person.totalBalance);
 
                 // Cập nhật lại tên và SĐT nếu có thay đổi
-                String displayName = person.isDeleted ? person.name + " (Đã xóa)" : person.name;
+                String displayName = person.isDeleted ? person.name + " " + getString(R.string.suffix_deleted) : person.name;
                 binding.textDetailName.setText(displayName);
                 binding.textDetailPhone.setText(person.phoneNumber != null && !person.phoneNumber.isEmpty()
                         ? person.phoneNumber
@@ -226,9 +226,9 @@ public class PersonDetailActivity extends AppCompatActivity {
     }
 
     private void showTransactionOptionsDialog(TransactionRecord record) {
-        String[] options = { "Sửa số tiền", "Xóa giao dịch" };
+        String[] options = { getString(R.string.option_edit_amount), getString(R.string.option_delete_transaction) };
         new MaterialAlertDialogBuilder(this)
-                .setTitle("Tùy chọn giao dịch")
+                .setTitle(R.string.transaction_options_title)
                 .setItems(options, (dialog, which) -> {
                     if (which == 0) {
                         showEditTransactionDialog(record);
@@ -241,10 +241,10 @@ public class PersonDetailActivity extends AppCompatActivity {
 
     private void showDeleteConfirmDialog(TransactionRecord record) {
         new MaterialAlertDialogBuilder(this)
-                .setTitle("Xóa giao dịch này?")
-                .setMessage("Số dư của người này sẽ được tự động tính toán lại.")
-                .setPositiveButton("Xóa", (d, w) -> viewModel.deleteTransaction(record))
-                .setNegativeButton("Hủy", null)
+                .setTitle(R.string.confirm_delete_transaction_title)
+                .setMessage(R.string.confirm_delete_transaction_message)
+                .setPositiveButton(R.string.label_delete, (d, w) -> viewModel.deleteTransaction(record))
+                .setNegativeButton(R.string.cancel, null)
                 .show();
     }
 
@@ -322,10 +322,10 @@ public class PersonDetailActivity extends AppCompatActivity {
         dialogView.findViewById(R.id.chip500k).setOnClickListener(chipListener);
 
         AlertDialog dialog = new MaterialAlertDialogBuilder(this)
-                .setTitle("Sửa số tiền giao dịch")
+                .setTitle(R.string.edit_transaction_title)
                 .setView(dialogView)
-                .setPositiveButton("Cập nhật", null)
-                .setNegativeButton("Hủy", null)
+                .setPositiveButton(R.string.label_update, null)
+                .setNegativeButton(R.string.cancel, null)
                 .create();
 
         dialog.setOnShowListener(dialogInterface -> {
@@ -336,7 +336,7 @@ public class PersonDetailActivity extends AppCompatActivity {
                 String newNote = editNote.getText().toString().trim();
 
                 if (newAmount <= 0) {
-                    editAmount.setError("Số tiền phải lớn hơn 0");
+                    editAmount.setError(getString(R.string.error_amount_must_be_positive));
                     return;
                 }
 
@@ -449,10 +449,10 @@ public class PersonDetailActivity extends AppCompatActivity {
         dialogView.findViewById(R.id.chip500k).setOnClickListener(chipListener);
 
         AlertDialog dialog = new MaterialAlertDialogBuilder(this)
-                .setTitle("Thêm giao dịch mới")
+                .setTitle(R.string.add_transaction_title)
                 .setView(dialogView)
-                .setPositiveButton("Lưu", null)
-                .setNegativeButton("Hủy", null)
+                .setPositiveButton(R.string.save, null)
+                .setNegativeButton(R.string.cancel, null)
                 .create();
 
         dialog.setOnShowListener(dialogInterface -> {
@@ -462,7 +462,7 @@ public class PersonDetailActivity extends AppCompatActivity {
                 String note = editNote.getText().toString().trim();
 
                 if (amount <= 0) {
-                    editAmount.setError("Số tiền phải lớn hơn 0");
+                    editAmount.setError(getString(R.string.error_amount_must_be_positive));
                     return;
                 }
 
@@ -487,8 +487,8 @@ public class PersonDetailActivity extends AppCompatActivity {
                 record.amount = amount;
                 record.type = type;
                 record.note = (note.isEmpty())
-                        ? (type == TransactionType.LEND || type == TransactionType.BORROW ? "Giao dịch bổ sung"
-                                : "Trả nợ")
+                        ? (type == TransactionType.LEND || type == TransactionType.BORROW ? getString(R.string.default_note_additional)
+                                : getString(R.string.default_note_repayment))
                         : note;
                 record.timestamp = System.currentTimeMillis();
 

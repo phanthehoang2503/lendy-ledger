@@ -16,13 +16,14 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
 import com.lendy.app.R;
 import com.lendy.app.data.entities.Person;
-import com.lendy.app.databinding.DialogAddPersonBinding;
 import com.lendy.app.databinding.FragmentContactsBinding;
 import com.lendy.app.repository.LendyRepository;
 import com.lendy.app.ui.activities.PersonDetailActivity;
 import com.lendy.app.ui.adapters.PersonAdapter;
+import com.lendy.app.utils.PersonDialogHelper;
 import com.lendy.app.viewmodel.LendyViewModel;
 import com.lendy.app.viewmodel.LendyViewModelFactory;
 
@@ -76,59 +77,7 @@ public class ContactsFragment extends Fragment {
      * Ở đây mình dùng chung layout 'dialog_add_person' nhưng ẩn đi các phần nhập tiền.
      */
     private void showAddContactDialog() {
-        // Sử dụng ViewBinding cho Dialog để code sạch hơn
-        DialogAddPersonBinding dialogBinding = DialogAddPersonBinding.inflate(getLayoutInflater());
-
-        // Ẩn các trường không cần thiết (vì đây chỉ là thêm danh bạ, chưa phát sinh nợ)
-        hideContactDialogOptionalFields(dialogBinding);
-
-        AlertDialog dialog = new MaterialAlertDialogBuilder(requireContext())
-                .setTitle(R.string.add_new_contact_title)
-                .setView(dialogBinding.getRoot())
-                .setPositiveButton(R.string.save, null)
-                .setNegativeButton(R.string.cancel, null)
-                .create();
-
-        dialog.setOnShowListener(dialogInterface -> {
-            Button button = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-            button.setOnClickListener(view -> {
-                String name = Objects.requireNonNull(dialogBinding.editName.getText()).toString().trim();
-                String phone = Objects.requireNonNull(dialogBinding.editPhone.getText()).toString().trim();
-
-                if (name.isEmpty()) {
-                    dialogBinding.editName.setError(getString(R.string.error_enter_name));
-                    return;
-                }
-
-                button.setEnabled(false);
-                Person person = new Person();
-                person.name = name;
-                person.phoneNumber = phone;
-                person.updatedAt = System.currentTimeMillis();
-
-                // Lưu vào Database thông qua ViewModel
-                viewModel.addOrUpdatePersonTransactional(person, new LendyRepository.PersonUpsertCallback() {
-                    @Override
-                    public void onSuccess() {
-                        dialog.dismiss();
-                    }
-
-                    @Override
-                    public void onDuplicate() {
-                        dialogBinding.editName.setError(getString(R.string.error_contact_exists));
-                        button.setEnabled(true);
-                    }
-
-                    @Override
-                    public void onError(Exception exception) {
-                        if (!isAdded()) return;
-                        button.setEnabled(true);
-                        Toast.makeText(requireContext(), getString(R.string.toast_contact_save_failed), Toast.LENGTH_SHORT).show();
-                    }
-                });
-            });
-        });
-        dialog.show();
+        PersonDialogHelper.showAddOrEditContactDialog(requireContext(), viewModel, null);
     }
 
     /**
@@ -210,66 +159,6 @@ public class ContactsFragment extends Fragment {
      * Hộp thoại chỉnh sửa thông tin cá nhân.
      */
     private void showEditPersonDialog(Person person) {
-        DialogAddPersonBinding dialogBinding = DialogAddPersonBinding.inflate(getLayoutInflater());
-
-        hideContactDialogOptionalFields(dialogBinding);
-
-        dialogBinding.editName.setText(person.name);
-        dialogBinding.editPhone.setText(person.phoneNumber);
-
-        AlertDialog dialog = new MaterialAlertDialogBuilder(requireContext())
-                .setTitle(R.string.edit_person)
-                .setView(dialogBinding.getRoot())
-            .setPositiveButton(R.string.save, null)
-            .setNegativeButton(R.string.cancel, null)
-                .create();
-
-        dialog.setOnShowListener(dialogInterface -> {
-            Button button = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-            button.setOnClickListener(view -> {
-                String name = Objects.requireNonNull(dialogBinding.editName.getText()).toString().trim();
-                String phone = Objects.requireNonNull(dialogBinding.editPhone.getText()).toString().trim();
-
-                if (name.isEmpty()) {
-                    dialogBinding.editName.setError(getString(R.string.error_enter_debtor_name));
-                    return;
-                }
-
-                button.setEnabled(false);
-                person.name = name;
-                person.phoneNumber = phone;
-                person.updatedAt = System.currentTimeMillis();
-
-                viewModel.addOrUpdatePersonTransactional(person,
-                        new LendyRepository.PersonUpsertCallback() {
-                            @Override
-                            public void onSuccess() {
-                                dialog.dismiss();
-                            }
-
-                            @Override
-                            public void onDuplicate() {
-                                dialogBinding.editName.setError(getString(R.string.error_name_exists));
-                                button.setEnabled(true);
-                            }
-
-                            @Override
-                            public void onError(Exception exception) {
-                                if (!isAdded()) return;
-                                button.setEnabled(true);
-                                Toast.makeText(requireContext(), getString(R.string.toast_contact_save_failed), Toast.LENGTH_SHORT).show();
-                            }
-                        });
-            });
-        });
-
-        dialog.show();
-    }
-
-    private void hideContactDialogOptionalFields(DialogAddPersonBinding dialogBinding) {
-        dialogBinding.layoutAmount.setVisibility(View.GONE);
-        dialogBinding.toggleGroup.setVisibility(View.GONE);
-        dialogBinding.layoutNote.setVisibility(View.GONE);
-        dialogBinding.scrollChips.setVisibility(View.GONE);
+        PersonDialogHelper.showAddOrEditContactDialog(requireContext(), viewModel, person);
     }
 }

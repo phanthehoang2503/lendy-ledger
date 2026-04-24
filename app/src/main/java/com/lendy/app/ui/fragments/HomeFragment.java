@@ -124,12 +124,12 @@ public class HomeFragment extends Fragment {
      * Hiển thị menu tùy chọn khi nhấn giữ hoặc bấm vào icon menu của một người nợ.
      */
     private void showPersonOptionsDialog(Person person) {
-        String[] options = {"Chỉnh sửa thông tin", "Xóa người này"};
+        String[] options = {getString(R.string.option_edit_person_info), getString(R.string.option_delete_person)};
         new MaterialAlertDialogBuilder(requireContext())
                 .setTitle(person.name)
                 .setItems(options, (dialog, which) -> {
                     if (which == 0) {
-                        PersonDialogHelper.showEditPersonDialog(requireContext(), viewModel, person);
+                        PersonDialogHelper.showAddOrEditContactDialog(requireContext(), viewModel, person);
                     } else {
                         showDeleteConfirmation(person);
                     }
@@ -142,12 +142,12 @@ public class HomeFragment extends Fragment {
      */
     private void showDeleteConfirmation(Person person) {
         new MaterialAlertDialogBuilder(requireContext())
-                .setTitle("Xác nhận xóa")
-                .setMessage("Bạn có chắc chắn muốn xóa '" + person.name + "'? Toàn bộ lịch sử giao dịch sẽ bị mất.")
-                .setPositiveButton("Xóa", (dialog, which) -> {
+                .setTitle(R.string.confirm_delete_contact_title)
+                .setMessage(getString(R.string.confirm_delete_contact_message, person.name))
+                .setPositiveButton(R.string.label_delete, (dialog, which) -> {
                     viewModel.removePerson(person);
                 })
-                .setNegativeButton("Hủy", null)
+                .setNegativeButton(R.string.cancel, null)
                 .show();
     }
 
