@@ -4,7 +4,6 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 
@@ -88,20 +87,11 @@ public class PersonDialogHelper {
                     @Override
                     public void onError(Exception exception) {
                         button.setEnabled(true);
-                        Toast.makeText(context, context.getString(R.string.toast_contact_save_failed), Toast.LENGTH_SHORT).show();
                     }
                 });
             });
         });
 
         dialog.show();
-    }
-
-    /**
-     * @deprecated Sử dụng {@link #showAddOrEditContactDialog(Context, LendyViewModel, Person)} để hỗ trợ tốt hơn.
-     */
-    @Deprecated
-    public static void showEditPersonDialog(Context context, LendyViewModel viewModel, Person person) {
-        showAddOrEditContactDialog(context, viewModel, person);
     }
 }

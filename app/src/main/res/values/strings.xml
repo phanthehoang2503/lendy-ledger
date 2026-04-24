@@ -132,7 +132,7 @@
 
     <!-- PersonDetailActivity -->
     <string name="error_person_not_found">Không tìm thấy thông tin người nợ</string>
-    <string name="suffix_deleted"> (Đã xóa)</string>
+    <string name="suffix_deleted">(Đã xóa)</string>
     <string name="confirm_delete_transaction_title">Xóa giao dịch này?</string>
     <string name="confirm_delete_transaction_message">Số dư của người này sẽ được tự động tính toán lại.</string>
     <string name="transaction_options_title">Tùy chọn giao dịch</string>

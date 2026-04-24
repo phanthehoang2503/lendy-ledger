@@ -94,6 +94,10 @@ public class PersonPickerAdapter extends ListAdapter<Person, PersonPickerAdapter
             int colorIdx = (p.name.hashCode() & 0x7FFFFFFF) % colors.length;
             holder.binding.avatarContainer.setCardBackgroundColor(
                     ContextCompat.getColor(holder.itemView.getContext(), colors[colorIdx]));
+            } else {
+                holder.binding.textInitial.setText("");
+                holder.binding.avatarContainer.setCardBackgroundColor(
+                    ContextCompat.getColor(holder.itemView.getContext(), R.color.outline));
         }
         holder.itemView.setOnClickListener(v -> listener.onSelected(p));
     }

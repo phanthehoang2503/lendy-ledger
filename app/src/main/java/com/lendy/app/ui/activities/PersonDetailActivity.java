@@ -185,7 +185,7 @@ public class PersonDetailActivity extends AppCompatActivity {
                 updateBalanceUI(person.totalBalance);
 
                 // Cập nhật lại tên và SĐT nếu có thay đổi
-                String displayName = person.isDeleted ? person.name + getString(R.string.suffix_deleted) : person.name;
+                String displayName = person.isDeleted ? person.name + " " + getString(R.string.suffix_deleted) : person.name;
                 binding.textDetailName.setText(displayName);
                 binding.textDetailPhone.setText(person.phoneNumber != null && !person.phoneNumber.isEmpty()
                         ? person.phoneNumber
