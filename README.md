@@ -25,9 +25,9 @@ The project follows the MVVM (Model-View-ViewModel) architectural pattern:
 *   **Database**: Room Persistence Library (SQLite).
 *   **UI Components**: Material Components (M3), ViewPager2, RecyclerView.
 *   **Libraries**:
-    *   **Lombok**: Used for reducing boilerplate code.
-    *   **MPAndroidChart**: Used for financial data visualization.
-    *   **Timber**: Used for logging.
+    *   **Lombok**: For reducing boilerplate code.
+    *   **MPAndroidChart**: For financial data visualization.
+    *   **Timber**: For logging.
 *   **Concurrency**: ExecutorService for background database operations.
 
 ## Database Design and Integrity
@@ -52,11 +52,3 @@ The application utilizes a relational schema to ensure data consistency:
 2.  Open the project in Android Studio.
 3.  Sync project with Gradle files.
 4.  Build and run on an emulator or physical device.
-
-## Contribution and Standards
-*   **Coding Style**: Adheres to standard Android Java conventions.
-*   **Documentation**: Business logic is documented using Vietnamese Javadoc.
-*   **UI Binding**: Strict use of ViewBinding (no findViewById).
-
----
-*Developed for personal financial management.*
